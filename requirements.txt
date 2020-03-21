@@ -1,0 +1,15 @@
+voila
+voila-material
+matplotlib
+pandas
+ipywidgets
+numpy
+tabulate
+IPython
+requests
+scipy
+datetime
+requests
+plotly
+tabulate
+qgrid
