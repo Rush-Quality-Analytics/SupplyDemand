@@ -44,6 +44,19 @@ def dataframe():
     df.insert(0, 'type', col1)
     df.insert(1, 'population size', col2)
     
+    df = df[df['Country/Region'] == 'US']
+
+    patternDel = ","
+    filter = df['Province/State'].str.contains(patternDel)
+    df = df[~filter]
+
+    #df = df.drop(df.columns[0], axis=1)
+
+    df['sum'] = df.iloc[:, 6:].sum(axis=1)
+    df = df[df['sum'] > 1]
+    df = df.drop(['sum'], axis=1)
+
+
     
     df.to_csv('COVID-CASES-DF.txt', sep='\t')
 
