@@ -62,6 +62,9 @@ def seir_sd(obs_x, obs_y, ForecastDays, init_vals, params, N, t, sd):
         R.append(next_R)
         
         test_lag = 1/(1+np.exp(-0.1*j+5))
+        
+        #test_lag = 1/(1 + 0.97**(j))
+        
         Ir.append(next_I * test_lag)
         
                 
