@@ -34,7 +34,7 @@ Bala N. Hota, MD, MPH, Vice President, Chief Analytics Officer
 
 ## Websites
 
-### The source code in this repository is deployed to two different webistes:
+### The source code in this repository is deployed to two different websites:
 
 1. Primary: Rush University Medical Center website <http://covid19forecast.rush.edu/> maintained by Jawad Khan
 2. Testing: A heroku deployed app used for development and testing <https://rush-covid19.herokuapp.com/> maintained by Ken Locey and Tom Webb
