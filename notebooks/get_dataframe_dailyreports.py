@@ -6,6 +6,7 @@ import sys
 import datetime
 from tabulate import tabulate
 import IPython.display as display
+import numpy as np
 
 dates = []
 def dataframe():
@@ -120,4 +121,15 @@ for ps in provstates:
 
     
 df = pd.DataFrame.from_records(lofl, columns=col_names)
+
+c = df.shape[1] - 1
+df['sum'] = df.iloc[:, c:]
+df = df[df['sum'] > 0]
+df = df.drop(['sum'], axis=1)
+
+c = df.shape[1] - 2
+df['sum'] = df.iloc[:, c:-1]
+df = df[df['sum'] > 0]
+df = df.drop(['sum'], axis=1)
+
 df.to_csv('COVID-CASES-DF.txt', sep='\t')
