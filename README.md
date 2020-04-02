@@ -1,23 +1,26 @@
-<img src="notebooks/RUSH_full_color.jpg" align="center" width="300" height="70"/>
+<img src="notebooks/RUSH_full_color.jpg" align="center" width="400" height="90"/>
 
 <font size="5" color='green'>Center for Quality, Safety & Value Analytics</font>
 
 # SupplyDemand
 
 
-## A python-based application for predicting changes in COVID-19 cases, hospital visits, admits, ICU needs, and protective equipment
+### A python-based application for predicting changes in COVID-19 cases, hospital visits, admits, ICU needs, and protective equipment
 
+## Contributors
+### Developer 
+Ken Locey, PhD Biology, Data Science Analyst
 
-<p style="text-align: justify;"><span style="color: rgb(0, 128, 0);">Developer</span></p>
-<p style="text-align: justify;">Ken Locey, PhD Biology, Data Science Analyst</p>
-<p style="text-align: justify;"><span style="color: rgb(0, 128, 0);">Site Architect and Administrator</span></p>
-<p style="text-align: justify;">Jawad Khan, AVP, Advanced Analytics &amp; Knowledge Management</p>
-<p style="text-align: justify;"><span style="color: rgb(0, 128, 0);">Center for Quality, Safety &amp; Value Analytics Leadership</span></p>
-<p style="text-align: justify;">Thomas A. Webb, MBA, Associate Vice President</p>
-<p style="text-align: justify;">Bala N. Hota, MD, MPH, Vice President, Chief Analytics Officer</p>
+### Rush Site Architect and Administrator
+Jawad Khan, AVP, Advanced Analytics & Knowledge Management
+
+### Center for Quality, Safety & Value Analytics Leadership
+Thomas A. Webb, MBA, Associate Vice President
+Bala N. Hota, MD, MPH, Vice President, Chief Analytics Officer
+
 
 ## Software used
-### We tried to keep the required software to a minimum. Most are rather standard python libraries.
+### We tried to keep the required software to a minimum. Most are standard python libraries.
 
 * python 3.7.4
 * numpy 1.18.1
@@ -31,12 +34,14 @@
 
 ## Websites
 
-The source code in this repository is deployed to two different webistes:
+### The source code in this repository is deployed to two different webistes:
 
 1. Primary: Rush University Medical Center website <http://covid19forecast.rush.edu/> maintained by Jawad Khan
 2. Testing: A heroku deployed app used for development and testing <https://rush-covid19.herokuapp.com/> maintained by Ken Locey and Tom Webb
 
 ## Contents
+
+### We have endeavored to keep the contents uncomplicated
 
 * **Procfile --** A file used by voila and heroku to set the environment. This file contains the following information and nothing else:
 	```web: voila --port=$PORT --no-browser --enable_nbextensions=True --theme=light notebooks/dashboard.ipynb```
