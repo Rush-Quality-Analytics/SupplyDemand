@@ -9,7 +9,7 @@
 
 ## Contributors
 ### Developer 
-Ken Locey, PhD Biology, Data Science Analyst
+Kenneth J. Locey, PhD Biology, Data Science Analyst
 
 ### Rush Site Architect and Administrator
 Jawad Khan, AVP, Advanced Analytics & Knowledge Management
