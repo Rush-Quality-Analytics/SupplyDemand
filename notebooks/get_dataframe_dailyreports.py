@@ -123,13 +123,10 @@ for ps in provstates:
 df = pd.DataFrame.from_records(lofl, columns=col_names)
 
 c = df.shape[1] - 1
-df['sum'] = df.iloc[:, c:]
-df = df[df['sum'] > 0]
-df = df.drop(['sum'], axis=1)
+sum_col = np.array(df.iloc[:, c:].T)[0]
 
-c = df.shape[1] - 2
-df['sum'] = df.iloc[:, c:-1]
-df = df[df['sum'] > 0]
-df = df.drop(['sum'], axis=1)
+if sum(sum_col) == 0:
+    df = df.drop(df.columns[c], axis=1)
+
 
 df.to_csv('COVID-CASES-DF.txt', sep='\t')
