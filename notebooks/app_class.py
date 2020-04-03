@@ -108,7 +108,7 @@ class App_GetFits:
         self._24_floattext = self._create_floattext(label = 'Reproduction no.', 
                                                     val=4, minv=1, maxv=21, boxw='50%', desw='50%')
         self._25_floattext = self._create_floattext(label = 'Social Distancing: 1 - 100', 
-                                                    val=10, minv=0, maxv=100, boxw='50%', desw='50%')
+                                                    val=90, minv=0, maxv=100, boxw='50%', desw='50%')
         self._26_floattext = self._create_floattext(label = 'Avg. visit time lag (days)', 
                                                     val=0, minv=0, maxv=14, boxw='33%', desw='70%')
         
