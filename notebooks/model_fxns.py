@@ -265,14 +265,7 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, T0, incubation_period, infec
 def correct_beta(sd, beta, fraction_infected):
     # A function to adjust the contact rate (beta) by the percent infected
     
-    # Convert the user-entered social distancing value
-    # to a small decimal number (sd).
-    
     pi = 100*fraction_infected
-    
-    # rescale sd values as fractions instead of percents
-    sd = 0.01*sd
-    
     beta = beta * 1/(sd*pi + 1)
     
     return beta
