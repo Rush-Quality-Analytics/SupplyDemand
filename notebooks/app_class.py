@@ -63,7 +63,7 @@ class App_GetFits:
         self._1_dropdown = self._create_dropdown(['logistic', 'SEIR-SD', 'exponential', 'polynomial'],
                                                  0, label = 'Choose a model to fit:')
         self._2_dropdown = self._create_dropdown(available_indicators2, ill, label = 'Choose a location:')
-        self._3_floattext = self._create_floattext(label = 'p% Visiting your hospital:', 
+        self._3_floattext = self._create_floattext(label = '% Visiting your hospital:', 
                                                    val=10, minv=0, maxv=100, boxw='33%', desw='70%')
         self._4_floattext = self._create_floattext(label = '% Admitted to your hospital:', 
                                                    val=30, minv=0, maxv=100, boxw='33%', desw='70%')
@@ -107,8 +107,8 @@ class App_GetFits:
                                                     val=7, minv=1, maxv=21, boxw='50%', desw='50%')
         self._24_floattext = self._create_floattext(label = 'Reproduction no.', 
                                                     val=4, minv=1, maxv=21, boxw='50%', desw='50%')
-        self._25_floattext = self._create_floattext(label = 'Social Distancing: 1 - 100', 
-                                                    val=90, minv=0, maxv=100, boxw='50%', desw='50%')
+        self._25_floattext = self._create_floattext(label = 'Social Distancing (0 = no effect)', 
+                                                    val=0.6, minv=0, maxv=100, boxw='50%', desw='50%')
         self._26_floattext = self._create_floattext(label = 'Avg. visit time lag (days)', 
                                                     val=0, minv=0, maxv=14, boxw='33%', desw='70%')
         
