@@ -246,8 +246,8 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, T0, incubation_period, infec
         t = list(range(t_max))
         
         # Run SEIR-SD model and get forecasted and predicted values
-        forecasted_y, forecasted_x, pred_y = seir_sd(obs_x, obs_y, ForecastDays,
-                                        init_vals, params, N, t, socdist)
+        forecasted_y, forecasted_x, pred_y = seir_sd(obs_x, obs_y, ForecastDays, 
+                                                     init_vals, params, N, t, socdist)
         
         # Get r-square for observed vs. predicted values
         obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
@@ -257,23 +257,20 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, T0, incubation_period, infec
 
 
 
-#################### Epidemiological models
-def correct_beta(socdist, beta, percent_infected):
+
+
+
+
+
+def correct_beta(sd, beta, fraction_infected):
     # A function to adjust the contact rate (beta) by the percent infected
     
-    # Convert the user-entered social distancing value
-    # to a small decimal number (sd).
-    sd = 0.0000000001 * (105 - socdist)
-    # The small magnitude of sd allows the function below to:
-    #    1. Adjust beta between 0 and 100% of its given value
-    #    2. Make significant changes to beta before the percent 
-    #       infected increases to a substantial fraction of the 
-    #       population size. In short, social distancing policies
-    #       have been implemented before 1% (or even 0.001%) of 
-    #       the population has been infected
+    pi = 100*fraction_infected
+    beta = beta * 1/(sd*pi + 1)
     
-    beta = beta * (sd/(sd + percent_infected))
     return beta
+
+
 
 def test_effect(i):
     # A logistic function with an output ranging between 0 and 1 
@@ -282,9 +279,9 @@ def test_effect(i):
     # according to an assumption that testing for COVID-19 was
     # minimal in the first few weeks of infection
     return 1/(1+np.exp(-0.1*i+5))
-    
 
-def seir_sd(obs_x, obs_y, ForecastDays, init_vals, params, N, t, socdist):
+
+def seir_sd(obs_x, obs_y, ForecastDays, init_vals, params, N, t, sd):
     # A function to fit various models to observed COVID-19 cases data according to:
         # obs_x: observed x values
         # obs_y: observed y values
@@ -303,9 +300,8 @@ def seir_sd(obs_x, obs_y, ForecastDays, init_vals, params, N, t, socdist):
             # of an infection in a population where everyone is susceptible
         # socdist: population-specific social-distancing parameter
         
-    # This model was inspired by: 
-    # https://towardsdatascience.com/social-distancing-to-slow-the-coronavirus-768292f04296
-    # But it follows the traditional SEIR formulation while allowing for effects of social distancing,
+    # This model follows the traditional SEIR formulation while allowing 
+    # for effects of social distancing,
     # testing delays, and likely date of first infection
     
     # Assume that trailing zeros in obs_y data are not real but instead 
@@ -333,9 +329,9 @@ def seir_sd(obs_x, obs_y, ForecastDays, init_vals, params, N, t, socdist):
     for i in t[1:]:
         
         # fraction infected is the last element in the I list
-        I_N = I[-1]/N
+
         # adjust the contact rate (beta) by the % infected
-        beta = correct_beta(socdist, beta, I_N)
+        beta = correct_beta(sd, beta, I[-1])
         
         # No. susceptible at time t = S - beta*S*I
         next_S = S[-1] - beta*S[-1]*I[-1]
