@@ -39,7 +39,7 @@ class App_GetFits:
     # and classes
     
     
-    def __init__(self, df):
+    def __init__(self, df, statepops):
         
         self.itsProblem = "problem"
         
@@ -51,18 +51,23 @@ class App_GetFits:
         # df is a copy of the primary dataframe ap_df
         self._df = df
         
+        self._statepops = statepops
+        
         # locations the user can choose
         available_indicators2 = list(set(self._df['Province/State']))
         # order the locations alphabetically
         available_indicators2.sort()
         
         # Find the index of your default location
-        ill = available_indicators2.index('Illinois')
+        lab = 'Illinois'
+        ill = available_indicators2.index(lab)
         
         # declare widgets: dropdowns, floattexts, toggle buttons, datepicker, etc.
         self._1_dropdown = self._create_dropdown(['logistic', 'SEIR-SD', 'exponential', 'polynomial'],
                                                  0, label = 'Choose a model to fit:')
+        
         self._2_dropdown = self._create_dropdown(available_indicators2, ill, label = 'Choose a location:')
+        
         self._3_floattext = self._create_floattext(label = '% Visiting your hospital:', 
                                                    val=10, minv=0, maxv=100, boxw='33%', desw='70%')
         self._4_floattext = self._create_floattext(label = '% Admitted to your hospital:', 
@@ -99,20 +104,25 @@ class App_GetFits:
         self._19_floattext = self._create_floattext(label = 'Forecast length (days)', 
                                                     val=10, minv=1, maxv=30, boxw='33%', desw='70%')
         
-        self._20_floattext = self._create_floattext(label = 'Focal population size', 
-                                                    val=12740000, minv=1, maxv=10**8, boxw='50%', desw='50%')
+        
         self._22_floattext = self._create_floattext(label = 'Incubation period', 
-                                                    val=5, minv=1, maxv=21, boxw='50%', desw='50%')
+                                                    val=5, minv=1, maxv=21, boxw='33%', desw='70%')
         self._23_floattext = self._create_floattext(label = 'Infectious period', 
-                                                    val=7, minv=1, maxv=21, boxw='50%', desw='50%')
+                                                    val=7, minv=1, maxv=21, boxw='33%', desw='70%')
         self._24_floattext = self._create_floattext(label = 'Reproduction no.', 
-                                                    val=4, minv=1, maxv=21, boxw='50%', desw='50%')
-        self._25_floattext = self._create_floattext(label = 'Social Distancing (0 = no effect)', 
-                                                    val=0.6, minv=0, maxv=100, boxw='50%', desw='50%')
+                                                    val=4, minv=1, maxv=21, boxw='33%', desw='70%')
+        
         self._26_floattext = self._create_floattext(label = 'Avg. visit time lag (days)', 
                                                     val=0, minv=0, maxv=14, boxw='33%', desw='70%')
         
-        self._21_datepickr = self._create_datepickr(label='Likely date of 1st exposure', boxw='49%', desw='51%')
+        
+        
+        self._25_floattext = self._create_floattext(
+            label = 'Social distancing: The % daily change in contact rate for each % of the infected population', 
+                                                    val=75, minv=0, maxv=100, boxw='60%', desw='initial',
+                                                    )
+                                                    
+        
         
         # define containers to hold the widgets, plots, and additional outputs
         self._plot_container = widgets.Output()
@@ -142,12 +152,12 @@ class App_GetFits:
                            layout=widgets.Layout(display='flex', flex_flow='column', border='solid 1px', 
                                         align_items='stretch', width='100%')),
              
-             widgets.VBox([widgets.HBox([self._20_floattext, self._22_floattext],
+             widgets.VBox([widgets.HBox([self._22_floattext, self._23_floattext, self._24_floattext],
                              layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
-                           widgets.HBox([self._23_floattext, self._24_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
-                           widgets.HBox([self._25_floattext, self._21_datepickr],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%'))],
+                          
+                           widgets.HBox([self._25_floattext],
+                             layout=widgets.Layout(align_items='center', flex='auto auto auto', width='100%'))],
+                           
                            
                            layout=widgets.Layout(display='flex', flex_flow='column', border='solid 1px', 
                                         align_items='stretch', width='100%')),
@@ -169,8 +179,11 @@ class App_GetFits:
         ap_df = ap_df[ap_df['Country/Region'] == 'US']
         ap_df = ap_df[ap_df['Province/State'] != 'US']
         ap_df.drop(columns=['Unnamed: 0'], inplace=True)
+        
+        statepops = pd.read_csv('StatePops.csv')
+        
         # reuse primary dataframe when updating the app
-        return cls(ap_df)
+        return cls(ap_df, statepops)
         
         
     def _create_dropdown(self, indicators, initial_index, label):
@@ -214,18 +227,6 @@ class App_GetFits:
         return obj
     
     
-    def _create_datepickr(self, label, boxw, desw):
-        # create a widget for picking dates
-        obj = widgets.DatePicker(
-                    description=label,
-                    disabled=False,
-                    layout={'width': boxw},
-                    style={'description_width': desw},
-                )
-        obj.observe(self._on_change, names=['value'])
-        return obj
-                
-    
     
     def _on_change(self, _):
         # do the following when app inputs change
@@ -255,13 +256,13 @@ class App_GetFits:
         ppe_SHIELD_FACE_FULL_ANTI_FOG = self._17_floattext.value
         ppe_RESPIRATOR_PARTICULATE_FILTER_REG = self._18_floattext.value
         ForecastDays = self._19_floattext.value
-        State_Pop_Size = self._20_floattext.value
-        T0 = self._21_datepickr.value
+        
         Incubation = self._22_floattext.value
         Infectious = self._23_floattext.value
         Rho = self._24_floattext.value
         SocialDist = self._25_floattext.value
         TimeLag = self._26_floattext.value
+        StatePops = self._statepops
         
         # wait to clear the plots/tables until new ones are generated
         self._plot_container.clear_output(wait=True)
@@ -273,8 +274,8 @@ class App_GetFits:
                          ppe_MASK_FACE_PROCEDURE_ANTI_FOG, ppe_MASK_PROCEDURE_FLUID_RESISTANT, 
                          ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                          ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
-                         ForecastDays, State_Pop_Size, T0, Incubation, Infectious, Rho, SocialDist,
-                         TimeLag)
+                         ForecastDays, Incubation, Infectious, Rho, SocialDist,
+                         TimeLag, StatePops)
             
             plt.show()
             
@@ -284,8 +285,16 @@ class App_GetFits:
                         ppe_MASK_FACE_PROCEDURE_ANTI_FOG, ppe_MASK_PROCEDURE_FLUID_RESISTANT, 
                         ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                         ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
-                        ForecastDays, State_Pop_Size, T0, Incubation, Infectious, Rho, SocialDist,
-                        TimeLag):
+                        ForecastDays, Incubation, Infectious, Rho, SocialDist,
+                        TimeLag, StatePops):
+        
+        
+        PopSize = StatePops[StatePops['Province/State'] == focal_loc]['PopSize'].tolist()
+        PopSize = PopSize[0]
+        
+        ArrivalDate = StatePops[StatePops['Province/State'] == focal_loc]['Date_of_first_reported_infection'].tolist()
+        ArrivalDate = ArrivalDate[0]
+        
         
         
         # A function to generate all figures and tables
@@ -296,7 +305,7 @@ class App_GetFits:
             # model: the model to fit
             # ForecastDays: number of days ahead to extend predictions
             # N: population size of interest
-            # T0: likely data of first infection (used by SEIR-SD model)
+            # ArrivalDate: likely data of first infection (used by SEIR-SD model)
             # incubation_period: disease-specific epidemilogical parameter
                 # average number of days until an exposed person becomes
                 # begins to exhibit symptoms of infection
@@ -365,7 +374,8 @@ class App_GetFits:
             #    predicted y-values
             #    forecasted x and y values
             obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y = fxns.fit_curve(x, y, 
-                                self.model, ForecastDays, State_Pop_Size, T0, Incubation, Infectious, Rho, SocialDist)
+                                self.model, ForecastDays, PopSize, ArrivalDate, Incubation, 
+                                Infectious, Rho, SocialDist)
             
             # convert y values to numpy array
             y = np.array(y)
@@ -388,7 +398,7 @@ class App_GetFits:
             forecasted_y[forecasted_y < 0] = 0
             forecast_vals = np.copy(forecasted_y)
 
-            # number of from T0 to end of forecast window
+            # number of from ArrivalDate to end of forecast window
             numdays = len(forecasted_x)
             latest_date = pd.to_datetime(dates[-1])
             first_date = pd.to_datetime(dates[0])
@@ -396,7 +406,7 @@ class App_GetFits:
             # get the date of the last day in the forecast window
             future_date = latest_date + datetime.timedelta(days = ForecastDays-1)
             
-            # get all dates from T0 to the last day in the forecast window
+            # get all dates from ArrivalDate to the last day in the forecast window
             fdates = pd.date_range(start=first_date, end=future_date)
             fdates = fdates.strftime('%m/%d')
             
@@ -413,7 +423,7 @@ class App_GetFits:
             # plot forecasted y values vs. dates
             plt.plot(fdates, forecasted_y, c=clrs[i], linewidth=3, label=label)
             
-            # get dates from T0 to the current day
+            # get dates from ArrivalDate to the current day
             dates = pd.date_range(start=first_date, end=latest_date)
             dates = dates.strftime('%m/%d')
             
@@ -601,7 +611,7 @@ class App_GetFits:
         
         # Customize table title
         if ForecastDays <= 18:
-            plt.title('Forecasted cases for '+ loc, fontsize = 16, fontweight = 'bold')
+            plt.title('Forecasted cases for '+ loc + '\nPopulation size: '+str(PopSize), fontsize = 16, fontweight = 'bold')
         elif ForecastDays > 18:
             titletext = 'Forecasted cases for '+ loc + '\ndata beyond 18 days is available in the csv (below)'
             plt.title(titletext, fontsize = 14, fontweight = 'bold')

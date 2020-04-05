@@ -163,7 +163,8 @@ def get_polynomial(obs_x, obs_y, ForecastDays):
 
 
 
-def fit_curve(obs_x, obs_y, model, ForecastDays, N, T0, incubation_period, infectious_period, rho, socdist):
+def fit_curve(obs_x, obs_y, model, ForecastDays, N, T0, incubation_period, 
+              infectious_period, rho, socdist):
     # A function to fit various models to observed COVID-19 cases data according to:
     # obs_x: observed x values
     # obs_y: observed y values
@@ -209,12 +210,7 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, T0, incubation_period, infec
         
         # Get formatted date parameters
         today = pd.to_datetime('today', format='%Y/%m/%d')
-        if T0 is None:
-            # If a date wasn't chosen, then use the date of Chicago's first infection as a default
-            d1 = pd.to_datetime('2020/01/26', format='%Y/%m/%d')
-        else:
-            # Otherwise, use TO
-            d1 = pd.to_datetime(T0, format='%Y-%m-%d')
+        d1 = pd.to_datetime(T0, format='%m/%d/%Y')
         
         # number of days between TO and the end of the forecast window
         t_max = (today-d1).days + ForecastDays
@@ -265,8 +261,8 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, T0, incubation_period, infec
 def correct_beta(sd, beta, fraction_infected):
     # A function to adjust the contact rate (beta) by the percent infected
     
-    pi = 100*fraction_infected
-    beta = beta * 1/(sd*pi + 1)
+    pi = fraction_infected
+    beta = beta/(sd*pi + 1)
     
     return beta
 
@@ -278,7 +274,7 @@ def test_effect(i):
     # This function corrects the apparent number of infected 
     # according to an assumption that testing for COVID-19 was
     # minimal in the first few weeks of infection
-    return 1/(1+np.exp(-0.1*i+5))
+    return 1/(1+np.exp(-0.1*i+5.8))
 
 
 def seir_sd(obs_x, obs_y, ForecastDays, init_vals, params, N, t, sd):
