@@ -68,15 +68,15 @@ class App_GetFits:
         
         self._2_dropdown = self._create_dropdown(available_indicators2, ill, label = 'Choose a location:')
         
-        self._3_floattext = self._create_floattext(label = '% Visiting your hospital:', 
+        self._3_floattext = self._create_floattext(label = '% Visiting your hospital', 
                                                    val=10, minv=0, maxv=100, boxw='33%', desw='70%')
-        self._4_floattext = self._create_floattext(label = '% Admitted to your hospital:', 
+        self._4_floattext = self._create_floattext(label = '% Admitted to your hospital', 
                                                    val=30, minv=0, maxv=100, boxw='33%', desw='70%')
         self._5_floattext = self._create_floattext(label = '% Admitted to critical care:', 
                                                    val=25, minv=0, maxv=100, boxw='33%', desw='70%')
-        self._6_floattext = self._create_floattext(label = 'LOS (non-critical care):', 
+        self._6_floattext = self._create_floattext(label = 'LOS (non-critical care)', 
                                                    val=3, minv=1, maxv=180, boxw='33%', desw='70%')
-        self._7_floattext = self._create_floattext(label = 'LOS (critical care):', 
+        self._7_floattext = self._create_floattext(label = 'LOS (critical care)', 
                                                    val=12, minv=1, maxv=180, boxw='33%', desw='70%')
         self._8_floattext = self._create_floattext(label = '% of ICU on vent:',
                                                    val=60, minv=0, maxv=100, boxw='33%', desw='70%')
@@ -118,9 +118,17 @@ class App_GetFits:
         
         
         self._25_floattext = self._create_floattext(
-            label = 'Social distancing: The % daily change in contact rate for each % of the infected population', 
-                                                    val=75, minv=0, maxv=100, boxw='60%', desw='initial',
+            label = 'Social distancing: % daily change in contact rate, per % of the infected population', 
+                                                    val=75, minv=0, maxv=100, boxw='50%', desw='90%',
                                                     )
+        
+        self._21_floattext = self._create_floattext(
+            label='Days between first infection and first reported case', 
+                                                    val=0, minv=0, maxv=100, boxw='50%', desw='85%')
+        
+        self._27_floattext = self._create_floattext(
+            label='Use a different population size than that of the state or territory', 
+                                                    val=0, minv=0, maxv=10**8, boxw='50%', desw='80%')
                                                     
         
         
@@ -155,8 +163,11 @@ class App_GetFits:
              widgets.VBox([widgets.HBox([self._22_floattext, self._23_floattext, self._24_floattext],
                              layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
                           
-                           widgets.HBox([self._25_floattext],
-                             layout=widgets.Layout(align_items='center', flex='auto auto auto', width='100%'))],
+                           widgets.HBox([self._25_floattext, self._21_floattext],
+                             layout=widgets.Layout(align_items='inherit', flex='auto auto', width='100%')),
+                          
+                          widgets.HBox([self._27_floattext],
+                             layout=widgets.Layout(align_items='inherit', flex='auto', width='100%'))],
                            
                            
                            layout=widgets.Layout(display='flex', flex_flow='column', border='solid 1px', 
@@ -228,6 +239,7 @@ class App_GetFits:
     
     
     
+    
     def _on_change(self, _):
         # do the following when app inputs change
         self._update_app()
@@ -263,6 +275,8 @@ class App_GetFits:
         SocialDist = self._25_floattext.value
         TimeLag = self._26_floattext.value
         StatePops = self._statepops
+        T0 = self._21_floattext.value
+        N_mod = self._27_floattext.value
         
         # wait to clear the plots/tables until new ones are generated
         self._plot_container.clear_output(wait=True)
@@ -275,7 +289,7 @@ class App_GetFits:
                          ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                          ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
                          ForecastDays, Incubation, Infectious, Rho, SocialDist,
-                         TimeLag, StatePops)
+                         TimeLag, StatePops, T0, N_mod)
             
             plt.show()
             
@@ -286,11 +300,14 @@ class App_GetFits:
                         ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                         ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
                         ForecastDays, Incubation, Infectious, Rho, SocialDist,
-                        TimeLag, StatePops):
+                        TimeLag, StatePops, T0, N_mod):
         
         
         PopSize = StatePops[StatePops['Province/State'] == focal_loc]['PopSize'].tolist()
         PopSize = PopSize[0]
+        
+        if N_mod > 0:
+            PopSize =int(N_mod)
         
         ArrivalDate = StatePops[StatePops['Province/State'] == focal_loc]['Date_of_first_reported_infection'].tolist()
         ArrivalDate = ArrivalDate[0]
@@ -303,6 +320,7 @@ class App_GetFits:
             # obs_x: observed x values
             # obs_y: observed y values
             # model: the model to fit
+            # T0: likely date of first infection
             # ForecastDays: number of days ahead to extend predictions
             # N: population size of interest
             # ArrivalDate: likely data of first infection (used by SEIR-SD model)
@@ -375,7 +393,7 @@ class App_GetFits:
             #    forecasted x and y values
             obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y = fxns.fit_curve(x, y, 
                                 self.model, ForecastDays, PopSize, ArrivalDate, Incubation, 
-                                Infectious, Rho, SocialDist)
+                                Infectious, Rho, SocialDist, T0, N_mod)
             
             # convert y values to numpy array
             y = np.array(y)
@@ -611,7 +629,7 @@ class App_GetFits:
         
         # Customize table title
         if ForecastDays <= 18:
-            plt.title('Forecasted cases for '+ loc + '\nPopulation size: '+str(PopSize), fontsize = 16, fontweight = 'bold')
+            plt.title('Forecasted cases for '+ loc + '\nPopulation size: '+f"{PopSize:,}", fontsize = 16, fontweight = 'bold')
         elif ForecastDays > 18:
             titletext = 'Forecasted cases for '+ loc + '\ndata beyond 18 days is available in the csv (below)'
             plt.title(titletext, fontsize = 14, fontweight = 'bold')
