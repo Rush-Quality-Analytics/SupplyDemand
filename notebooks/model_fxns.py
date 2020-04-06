@@ -163,8 +163,8 @@ def get_polynomial(obs_x, obs_y, ForecastDays):
 
 
 
-def fit_curve(obs_x, obs_y, model, ForecastDays, N, T0, incubation_period, 
-              infectious_period, rho, socdist):
+def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, incubation_period, 
+              infectious_period, rho, socdist, T0, N_mod):
     # A function to fit various models to observed COVID-19 cases data according to:
     # obs_x: observed x values
     # obs_y: observed y values
@@ -210,11 +210,16 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, T0, incubation_period,
         
         # Get formatted date parameters
         today = pd.to_datetime('today', format='%Y/%m/%d')
-        d1 = pd.to_datetime(T0, format='%m/%d/%Y')
+        
+        d1 = pd.to_datetime(ArrivalDate, format='%m/%d/%Y')
+        
         
         # number of days between TO and the end of the forecast window
-        t_max = (today-d1).days + ForecastDays
+        t_max = int((today-d1).days + ForecastDays + T0)
         
+        if N_mod > 0:
+            N = N_mod
+            
         # Initial SEIR parameters
         S = [1 - 1/N] # fraction susceptible
         E = [1/N] # fraction exposed
@@ -337,6 +342,7 @@ def seir_sd(obs_x, obs_y, ForecastDays, init_vals, params, N, t, sd):
         
         # No. infected at time t = I + alpha*E - gamma*I
         next_I = I[-1] + alpha*E[-1] - gamma*I[-1]
+    
         
         # No. recovered at time t = R - gamma*I
         next_R = R[-1] + (gamma*I[-1])
