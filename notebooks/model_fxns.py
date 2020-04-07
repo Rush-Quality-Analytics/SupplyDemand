@@ -241,7 +241,7 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, incubation_peri
             #     = beta/gamma
             # And, beta = rho*gamma
         beta = rho*gamma
-        params = alpha, beta, gamma
+        params = alpha, beta, gamma, rho
         
         # a list of time steps to iterate: integers ranging from 0 to t_max-1
         t = list(range(t_max))
@@ -323,11 +323,12 @@ def seir_sd(obs_x, obs_y, ForecastDays, init_vals, params, N, t, sd):
     Ir = list(I)
     
     # unpack parameters
-    alpha, beta, gamma = params
+    alpha, beta, gamma, rho = params
     
     # loop through time steps from date of first likely infection
     # to end of forecast window
     for i in t[1:]:
+        
         
         # fraction infected is the last element in the I list
 
@@ -341,8 +342,7 @@ def seir_sd(obs_x, obs_y, ForecastDays, init_vals, params, N, t, sd):
         next_E = E[-1] + beta*S[-1]*I[-1] - alpha*E[-1]
         
         # No. infected at time t = I + alpha*E - gamma*I
-        next_I = I[-1] + alpha*E[-1] - gamma*I[-1]
-    
+        next_I = I[-1] + alpha*E[-1] - gamma*I[-1] #* 0.1
         
         # No. recovered at time t = R - gamma*I
         next_R = R[-1] + (gamma*I[-1])
