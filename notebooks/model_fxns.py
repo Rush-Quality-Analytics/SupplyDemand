@@ -27,7 +27,7 @@ def obs_pred_rsquare(obs, pred):
 def logistic(x, a, b, c):
     # A general logistic function
     # x is observed data
-    # a, b, c are optimized by scipy optimize curve fit 
+    # a, b, c are optimized by scipy optimize curve fit
     return a / (np.exp(-c * x) + b)
 
 
@@ -163,8 +163,7 @@ def get_polynomial(obs_x, obs_y, ForecastDays):
 
 
 
-def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, incubation_period, 
-              infectious_period, rho, socdist, T0, N_mod):
+def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate):
     # A function to fit various models to observed COVID-19 cases data according to:
     # obs_x: observed x values
     # obs_y: observed y values
@@ -202,55 +201,8 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, incubation_peri
         forecasted_y, forecasted_x, pred_y = get_polynomial(obs_x, obs_y, ForecastDays)
         obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
         
-    elif model == 'SEIR-SD':
-        # This model was inspired by: 
-        # https://towardsdatascience.com/social-distancing-to-slow-the-coronavirus-768292f04296
-        # But it follows the traditional SEIR formulation while allowing for effects of social distancing,
-        # testing delays, and likely date of first infection
-        
-        # Get formatted date parameters
-        today = pd.to_datetime('today', format='%Y/%m/%d')
-        
-        d1 = pd.to_datetime(ArrivalDate, format='%m/%d/%Y')
-        
-        
-        # number of days between TO and the end of the forecast window
-        t_max = int((today-d1).days + ForecastDays + T0)
-        
-        if N_mod > 0:
-            N = N_mod
-            
-        # Initial SEIR parameters
-        S = [1 - 1/N] # fraction susceptible
-        E = [1/N] # fraction exposed
-        I = [0] # fraction infected
-        R = [0] # fraction recovered
-        init_vals = S, E, I, R
-
-        #### 3 parameters of the classic SEIR model: alpha, beta, gamma
-        # inverse of the incubation period
-        alpha = 1/incubation_period 
-        # inverse of the infectious period
-        gamma = 1/infectious_period
-        # contact rate, derived from alpha & gamma
-            # Suppose infectious individuals make an average of x1 = beta infection-producing 
-            # contacts per unit time, with a mean infectious period of x2 = 1/gamma. 
-            # Then the basic reproduction number (rho) is: 
-            # rho = x1 * x2
-            #     = beta * 1/gamma
-            #     = beta/gamma
-            # And, beta = rho*gamma
-        beta = rho*gamma
-        params = alpha, beta, gamma, rho
-        
-        # a list of time steps to iterate: integers ranging from 0 to t_max-1
-        t = list(range(t_max))
-        
-        # Run SEIR-SD model and get forecasted and predicted values
-        forecasted_y, forecasted_x, pred_y = seir_sd(obs_x, obs_y, ForecastDays, 
-                                                     init_vals, params, N, t, socdist)
-        
-        # Get r-square for observed vs. predicted values
+    elif model == 'SEIR-SD (Requires 1 minute to optimize)':        
+        forecasted_y, forecasted_x, pred_y = get_seir(obs_x, obs_y, ForecastDays, N)
         obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
         
     # return the r-square and observed, predicted, and forecasted values
@@ -263,115 +215,139 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, incubation_peri
 
 
 
-def correct_beta(sd, beta, fraction_infected):
-    # A function to adjust the contact rate (beta) by the percent infected
+
+def get_seir(obs_x, obs_y, ForecastDays, N):
     
-    pi = fraction_infected
-    beta = beta/(sd*pi + 1)
     
-    return beta
+    def correct_beta(sd, beta, fraction_infected):
+        # A function to adjust the contact rate (beta) by the percent infected
+        
+        pi = fraction_infected
+        beta = beta/(sd*pi + 1)
+        
+        return beta
 
 
 
-def test_effect(i):
-    # A logistic function with an output ranging between 0 and 1 
-    # 'i' is the time step
-    # This function corrects the apparent number of infected 
-    # according to an assumption that testing for COVID-19 was
-    # minimal in the first few weeks of infection
-    return 1/(1+np.exp(-0.1*i+5.8))
+    def test_effect(i):
+        # A logistic function with an output ranging between 0 and 1 
+        # 'i' is the time step
+        # This function corrects the apparent number of infected 
+        # according to an assumption that testing for COVID-19 was
+        # minimal in the first few weeks of infection
+        
+        return 1/(1+np.exp(-0.1*i+5.8))
+    
+    
+    def seir(obs_pred_r2x, alpha, beta, gamma, t_max, sd, fdays=0):
+        
+        t_max += fdays
+        t = list(range(int(t_max))) 
+        
+        # unpack initial values
+        S = [1 - 1/N] # fraction susceptible
+        E = [1/N] # fraction exposed
+        I = [0] # fraction infected
+        R = [0] # fraction recovered
+        
+        # declare a list that will hold testing-corrected
+        # number of infections
+        Ir = list(I)
+        
+        # loop through time steps from date of first likely infection
+        
+        # to end of forecast window
+        
+        for i in t[1:]:
+            
+            #print('hi', t_max, alpha, beta, gamma)
+            
+            # fraction infected is the last element in the I list
+    
+            # adjust the contact rate (beta) by the % infected
+            beta = correct_beta(sd, beta, I[-1])
+            
+            # No. susceptible at time t = S - beta*S*I
+            next_S = S[-1] - beta *S[-1]*I[-1]
+            
+            # No. exposed at time t = S - beta*S*I - alpha*E
+            next_E = E[-1] + beta *S[-1]*I[-1] - alpha*E[-1]
+            
+            # No. infected at time t = I + alpha*E - gamma*I
+            next_I = I[-1] + alpha*E[-1] - gamma*I[-1] #* 0.1
+            
+            # No. recovered at time t = R - gamma*I
+            next_R = R[-1] + (gamma*I[-1])
+            
+            S.append(next_S)
+            E.append(next_E)
+            I.append(next_I)
+            R.append(next_R)
+            
+            # get the testing lag
+            test_lag = test_effect(i)
+            # get apparent infected by multiplying I by the testing lag
+            Ir.append(next_I * test_lag)
+        
+        # multiply array of apparent percent infected by N
+        I = np.array(Ir)*N
+        # convert I to a list
+        I = I.tolist()
+        
+        # number of observed days + size of forecast window
+        num = len(obs_x)+fdays
+        
+        # trim extra days, i.e., between T0 and day of first observation
+        I = I[-num:]
+        I = np.array(I)
+        
+        return I
 
 
-def seir_sd(obs_x, obs_y, ForecastDays, init_vals, params, N, t, sd):
-    # A function to fit various models to observed COVID-19 cases data according to:
-        # obs_x: observed x values
-        # obs_y: observed y values
-        # model: the model to fit
-        # ForecastDays: number of days ahead to extend predictions
-        # N: population size of interest
-        # T0: likely data of first infection (used by SEIR-SD model)
-        # incubation_period: disease-specific epidemilogical parameter
-            # average number of days until an exposed person becomes
-            # begins to exhibit symptoms of infection
-        # infectious_period: disease-specific epidemilogical parameter
-            # average number of days an infected person is infected
-        # rho: disease-specific epidemilogical parameter
-            # aka basic reproductive number
-            # average number of secondary infections produced by a typical case 
-            # of an infection in a population where everyone is susceptible
-        # socdist: population-specific social-distancing parameter
-        
-    # This model follows the traditional SEIR formulation while allowing 
-    # for effects of social distancing,
-    # testing delays, and likely date of first infection
-    
-    # Assume that trailing zeros in obs_y data are not real but instead 
-    # represent a lack of information.
-    obs_x = np.array(obs_x)
-    for i, val in enumerate(obs_y):
-        if val == 0:
-            try:
-                obs_y[i] = obs_y[i-1]
-            except:
-                pass
-    
-    # unpack initial values
-    S, E, I, R = init_vals
-    
-    # declare a list that will hold testing-corrected
-    # number of infections
-    Ir = list(I)
-    
-    # unpack parameters
-    alpha, beta, gamma, rho = params
-    
-    # loop through time steps from date of first likely infection
-    # to end of forecast window
-    for i in t[1:]:
-        
-        
-        # fraction infected is the last element in the I list
 
-        # adjust the contact rate (beta) by the % infected
-        beta = correct_beta(sd, beta, I[-1])
-        
-        # No. susceptible at time t = S - beta*S*I
-        next_S = S[-1] - beta*S[-1]*I[-1]
-        
-        # No. exposed at time t = S - beta*S*I - alpha*E
-        next_E = E[-1] + beta*S[-1]*I[-1] - alpha*E[-1]
-        
-        # No. infected at time t = I + alpha*E - gamma*I
-        next_I = I[-1] + alpha*E[-1] - gamma*I[-1] #* 0.1
-        
-        # No. recovered at time t = R - gamma*I
-        next_R = R[-1] + (gamma*I[-1])
-        
-        S.append(next_S)
-        E.append(next_E)
-        I.append(next_I)
-        R.append(next_R)
-        
-        # get the testing lag
-        test_lag = test_effect(i)
-        # get apparent infected by multiplying I by the testing lag
-        Ir.append(next_I * test_lag)
+    forecasted_y, forecasted_x, pred_y = [], [], []
     
-    # multiply array of apparent percent infected by N
-    I = np.array(Ir)*N
-    # convert I to a list
-    I = I.tolist()
+    today = pd.to_datetime('today', format='%Y/%m/%d')
     
-    # number of observed days + size of forecast window
-    num = len(obs_x)+ForecastDays
+    sd_o = 0
+    pred_y_o = []
+    forecasted_y_o = []
     
-    # trim extra days, i.e., between T0 and day of first observation
-    forecasted_y = I[-num+1:]
+    ct = 0
+    while ct < 100:
+        
+        incubation_period = np.random.uniform(4, 6)
+        infectious_period = np.random.uniform(1, 14)
+        rho = np.random.uniform(1, 6)
+        sd = np.random.uniform(0, 100)
+        d1 = np.random.randint(1, 50)
+        
+        ArrivalDate = today - datetime.timedelta(days = d1 + len(obs_x))
+        t_max = (today - ArrivalDate).days
+        
+        alpha = 1/incubation_period 
+        gamma = 1/infectious_period
+        beta = rho*gamma
+
+        pred_y = seir(obs_x, alpha, beta, gamma, t_max, sd)
+        
+        
+        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+        
+        
+        if obs_pred_r2 > 0.99:
+            ct += 1
+            
+            pred_y_o.append(pred_y)
+            
+            forecasted_y = seir(obs_x, alpha, beta, gamma, t_max, sd, ForecastDays-1)
+            forecasted_y_o.append(forecasted_y)
+            
+            
+    pred_y = [float(sum(col))/len(col) for col in zip(*pred_y_o)]
+    forecasted_y = [float(sum(col))/len(col) for col in zip(*forecasted_y_o)]
     
-    # forecasted_x is simply a list of values starting from 0
-    forecasted_x = range(len(forecasted_y))
-    # pred_y is a smaller list than forecasted_y
-    pred_y = forecasted_y[:-ForecastDays+1]
+    forecasted_x = list(range(len(forecasted_y)))
     
-    # predicted, and forecasted values
+    # return the forecasted x-y values and predicted y values
     return forecasted_y, forecasted_x, pred_y

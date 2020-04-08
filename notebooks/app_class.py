@@ -16,7 +16,7 @@ from scipy.optimize import curve_fit # optimization for fitting curves
 import re # library for using regular expressions (text parsing)
 import warnings # needed for suppression of unnecessary warnings
 import base64 # functionality for encoding binary data to ASCII characters and decoding back to binary data
-import sys # used to exit the program; for testing 
+#import sys # used to exit the program; for testing 
 
 import model_fxns as fxns
 
@@ -63,7 +63,7 @@ class App_GetFits:
         ill = available_indicators2.index(lab)
         
         # declare widgets: dropdowns, floattexts, toggle buttons, datepicker, etc.
-        self._1_dropdown = self._create_dropdown(['logistic', 'SEIR-SD', 'exponential', 'polynomial'],
+        self._1_dropdown = self._create_dropdown(['logistic', 'SEIR-SD (Requires 1 minute to optimize)', 'exponential', 'polynomial'],
                                                  0, label = 'Choose a model to fit:')
         
         self._2_dropdown = self._create_dropdown(available_indicators2, ill, label = 'Choose a location:')
@@ -103,33 +103,9 @@ class App_GetFits:
         
         self._19_floattext = self._create_floattext(label = 'Forecast length (days)', 
                                                     val=10, minv=1, maxv=30, boxw='33%', desw='70%')
-        
-        
-        self._22_floattext = self._create_floattext(label = 'Incubation period', 
-                                                    val=5, minv=1, maxv=21, boxw='33%', desw='70%')
-        self._23_floattext = self._create_floattext(label = 'Infectious period', 
-                                                    val=7, minv=1, maxv=21, boxw='33%', desw='70%')
-        self._24_floattext = self._create_floattext(label = 'Reproduction no.', 
-                                                    val=4, minv=1, maxv=21, boxw='33%', desw='70%')
-        
-        self._26_floattext = self._create_floattext(label = 'Avg. visit time lag (days)', 
+        self._20_floattext = self._create_floattext(label = 'Avg. visit time lag (days)', 
                                                     val=0, minv=0, maxv=14, boxw='33%', desw='70%')
         
-        
-        
-        self._25_floattext = self._create_floattext(
-            label = 'Social distancing: % daily change in contact rate, per % of the infected population', 
-                                                    val=75, minv=0, maxv=100, boxw='50%', desw='90%',
-                                                    )
-        
-        self._21_floattext = self._create_floattext(
-            label='Days between first infection and first reported case', 
-                                                    val=0, minv=0, maxv=100, boxw='50%', desw='85%')
-        
-        self._27_floattext = self._create_floattext(
-            label='Use a different population size than that of the state or territory', 
-                                                    val=0, minv=0, maxv=10**8, boxw='50%', desw='80%')
-                                                    
         
         
         # define containers to hold the widgets, plots, and additional outputs
@@ -154,24 +130,14 @@ class App_GetFits:
                            widgets.HBox([self._16_floattext, self._17_floattext, self._18_floattext],
                              layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
                           
-                           widgets.HBox([self._19_floattext, self._26_floattext],
+                           widgets.HBox([self._19_floattext, self._20_floattext],
                              layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%'))],
                            
                            layout=widgets.Layout(display='flex', flex_flow='column', border='solid 1px', 
                                         align_items='stretch', width='100%')),
              
-             widgets.VBox([widgets.HBox([self._22_floattext, self._23_floattext, self._24_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
                           
-                           widgets.HBox([self._25_floattext, self._21_floattext],
-                             layout=widgets.Layout(align_items='inherit', flex='auto auto', width='100%')),
-                          
-                          widgets.HBox([self._27_floattext],
-                             layout=widgets.Layout(align_items='inherit', flex='auto', width='100%'))],
                            
-                           
-                           layout=widgets.Layout(display='flex', flex_flow='column', border='solid 1px', 
-                                        align_items='stretch', width='100%')),
                            self._plot_container], layout=widgets.Layout(display='flex', flex_flow='column', 
                                         border='solid 2px', align_items='initial', width='100%'))
                 
@@ -268,15 +234,10 @@ class App_GetFits:
         ppe_SHIELD_FACE_FULL_ANTI_FOG = self._17_floattext.value
         ppe_RESPIRATOR_PARTICULATE_FILTER_REG = self._18_floattext.value
         ForecastDays = self._19_floattext.value
+        TimeLag = self._20_floattext.value
         
-        Incubation = self._22_floattext.value
-        Infectious = self._23_floattext.value
-        Rho = self._24_floattext.value
-        SocialDist = self._25_floattext.value
-        TimeLag = self._26_floattext.value
         StatePops = self._statepops
-        T0 = self._21_floattext.value
-        N_mod = self._27_floattext.value
+        
         
         # wait to clear the plots/tables until new ones are generated
         self._plot_container.clear_output(wait=True)
@@ -288,8 +249,7 @@ class App_GetFits:
                          ppe_MASK_FACE_PROCEDURE_ANTI_FOG, ppe_MASK_PROCEDURE_FLUID_RESISTANT, 
                          ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                          ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
-                         ForecastDays, Incubation, Infectious, Rho, SocialDist,
-                         TimeLag, StatePops, T0, N_mod)
+                         ForecastDays, TimeLag, StatePops)
             
             plt.show()
             
@@ -299,15 +259,13 @@ class App_GetFits:
                         ppe_MASK_FACE_PROCEDURE_ANTI_FOG, ppe_MASK_PROCEDURE_FLUID_RESISTANT, 
                         ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                         ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
-                        ForecastDays, Incubation, Infectious, Rho, SocialDist,
-                        TimeLag, StatePops, T0, N_mod):
+                        ForecastDays, TimeLag, StatePops):
         
         
         PopSize = StatePops[StatePops['Province/State'] == focal_loc]['PopSize'].tolist()
         PopSize = PopSize[0]
         
-        if N_mod > 0:
-            PopSize =int(N_mod)
+
         
         ArrivalDate = StatePops[StatePops['Province/State'] == focal_loc]['Date_of_first_reported_infection'].tolist()
         ArrivalDate = ArrivalDate[0]
@@ -353,8 +311,8 @@ class App_GetFits:
         yi = list(df_sub)
         
         # declare colors for plotting predictions and forecasts in figure 1 
-        clrs =  ['mistyrose', 'pink', 'lightcoral', 'salmon', 'red']
-        clrs2 = ['powderblue', 'lightskyblue', 'cornflowerblue', 'dodgerblue', 'blue']
+        clrs =  ['darkorchid', 'blue', 'green', 'orange', 'red']
+        clrs2 = ['0.1', '0.2', '0.4', '0.6', '0.8']
         
         # Generate previous days predictions and forecasts
         # 0 is the current day, -1 is yesterday, etc.
@@ -369,11 +327,6 @@ class App_GetFits:
                 DATES = yi[4:j]
                 obs_y_trunc = df_sub.iloc[0,4:j].values
             
-            if self.model == 'SEIR-SD':
-                # prediction and forecasts from the SEIR-SD
-                # model do not change over time
-                DATES = yi[4:]
-                obs_y_trunc = df_sub.iloc[0,4:].values
             
             # remove leading zeros from observed y values 
             # and coordinate it with dates
@@ -392,8 +345,7 @@ class App_GetFits:
             #    predicted y-values
             #    forecasted x and y values
             obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y = fxns.fit_curve(x, y, 
-                                self.model, ForecastDays, PopSize, ArrivalDate, Incubation, 
-                                Infectious, Rho, SocialDist, T0, N_mod)
+                                self.model, ForecastDays, PopSize, ArrivalDate)
             
             # convert y values to numpy array
             y = np.array(y)
@@ -417,7 +369,7 @@ class App_GetFits:
             forecast_vals = np.copy(forecasted_y)
 
             # number of from ArrivalDate to end of forecast window
-            numdays = len(forecasted_x)
+            #numdays = len(forecasted_x)
             latest_date = pd.to_datetime(dates[-1])
             first_date = pd.to_datetime(dates[0])
 
@@ -431,12 +383,10 @@ class App_GetFits:
             # designature plot label for legend
             if j == 0:
                 label='Current forecast'
-                if self.model == 'SEIR-SD':
-                    label = 'Forecast\n'
-            elif self.model != 'SEIR-SD':
+            
+            else:
                 label = str(-j)+' day old forecast'
-            elif self.model == 'SEIR-SD':
-                label = None
+            
             
             # plot forecasted y values vs. dates
             plt.plot(fdates, forecasted_y, c=clrs[i], linewidth=3, label=label)
@@ -500,12 +450,12 @@ class App_GetFits:
             label.set_visible(False)
         
         # cutomize plot title
-        if self.model == 'SEIR-SD':
-            label = 'Model fitting, current ' + r'$r^{2}$' + ' = ' + str(np.round(obs_pred_r2, 2))
+        if self.model == 'SEIR-SD (Requires 1 minute to optimize)':
+            label = 'Model fitting, current ' + r'$r^{2}$' + ' = ' + str(np.round(obs_pred_r2, 3))
             label += '\n(model under development)'
             plt.title(label, fontsize = 14, fontweight = 'bold')
         else:
-            plt.title('Model fitting, current ' + r'$r^{2}$' + ' = ' + str(np.round(obs_pred_r2, 2)), fontsize = 16, fontweight = 'bold')
+            plt.title('Model fitting, current ' + r'$r^{2}$' + ' = ' + str(np.round(obs_pred_r2, 3)), fontsize = 16, fontweight = 'bold')
         
         
         
@@ -962,7 +912,7 @@ class App_GetFits:
             cclr_vals.append(cclr)
             rclr_vals.append(rclr)
             
-        ncol = 9
+        #ncol = 9
         cwp = 0.15
         lim = ForecastDays
         if lim > 18:
