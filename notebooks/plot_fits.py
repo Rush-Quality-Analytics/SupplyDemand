@@ -204,8 +204,14 @@ class App_PlotFits:
             label.set_visible(False)
         
         # cutomize plot title
+        mod = str(model)
+        if mod == 'SEIR-SD (Requires 1-3 minutes to optimize)':
+            mod = 'SEIR-SD'
+        if mod == 'polynomial':
+            mod = '2nd degree polynomial'
+            
         t_label = 'Forecasted cases for ' + focal_loc + '. Population size: ' + f"{popsize:,}"
-        t_label += '\nPredicted via fitting a ' + model + ' model'
+        t_label += '\nPredicted via fitting the ' + mod + ' model'
         t_label += '. Current forecast ' + r'$r^{2}$' + ' = ' + str(np.round(obs_pred_r2, 3)) 
         plt.title(t_label, fontsize = 16, fontweight = 'bold')
         

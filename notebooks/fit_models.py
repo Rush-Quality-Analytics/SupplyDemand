@@ -34,7 +34,7 @@ class App_GetFits:
         ill = available_indicators2.index(lab)
         
         # declare widgets: dropdowns, floattexts, toggle buttons, datepicker, etc.
-        self._1_dropdown = self._create_dropdown(['logistic', 'SEIR-SD (Requires 1 minute to optimize)', 'exponential', 'polynomial'],
+        self._1_dropdown = self._create_dropdown(['logistic', 'SEIR-SD (Requires 1-3 minutes to optimize)', 'exponential', 'polynomial'],
                                                  0, label = 'Choose a model to fit:')
         
         self._2_dropdown = self._create_dropdown(available_indicators2, ill, label = 'Choose a location:')
