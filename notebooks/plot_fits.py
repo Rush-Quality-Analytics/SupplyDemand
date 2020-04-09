@@ -2,7 +2,6 @@ import ipywidgets as widgets # provides interactive functionality
 import matplotlib.pyplot as plt # plotting library
 import pandas as pd # data frame library
 
-import datetime # library for date-time functionality
 import numpy as np # numerical python
 
 
@@ -121,7 +120,7 @@ class App_PlotFits:
         
         
         # declare figure object
-        fig = plt.figure(figsize=(15, 6))
+        fig = plt.figure(figsize=(16, 6))
         # use subplot2grid functionality
         ax = plt.subplot2grid((4, 4), (0, 0), colspan=4, rowspan=4)
         
@@ -134,6 +133,8 @@ class App_PlotFits:
             fdates = sub_df['forecast_dates'].iloc[0]
             forecasted_y = sub_df['forecasted_y'].iloc[0]
             clr = sub_df['fore_clr'].iloc[0]
+            focal_loc = sub_df['focal_loc'].iloc[0]
+            popsize = sub_df['PopSize'].iloc[0]
             
             pred_y = sub_df['pred_y'].iloc[0]
             # plot forecasted y values vs. dates
@@ -203,12 +204,10 @@ class App_PlotFits:
             label.set_visible(False)
         
         # cutomize plot title
-        if model == 'SEIR-SD (Requires 1 minute to optimize)':
-            label = 'Model fitting, current ' + r'$r^{2}$' + ' = ' + str(np.round(obs_pred_r2, 3))
-            label += '\n(model under development)'
-            plt.title(label, fontsize = 14, fontweight = 'bold')
-        else:
-            plt.title('Model fitting, current ' + r'$r^{2}$' + ' = ' + str(np.round(obs_pred_r2, 3)), fontsize = 16, fontweight = 'bold')
+        t_label = 'Forecasted cases for ' + focal_loc + '. Population size: ' + f"{popsize:,}"
+        t_label += '\nPredicted via fitting a ' + model + ' model'
+        t_label += '. Current forecast ' + r'$r^{2}$' + ' = ' + str(np.round(obs_pred_r2, 3)) 
+        plt.title(t_label, fontsize = 16, fontweight = 'bold')
         
         
         plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0, hspace=0)

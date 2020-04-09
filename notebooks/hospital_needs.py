@@ -1,25 +1,10 @@
 import ipywidgets as widgets # provides interactive functionality
-from IPython.display import HTML, display, clear_output # display and html functionality
 import matplotlib.pyplot as plt # plotting library
 import pandas as pd # data frame library
 
-import csv # csv import functionality
-import time # library for time functionality
-import datetime # library for date-time functionality
-from random import choice, shuffle, randint # native randomization functions
 
 import numpy as np # numerical python
-from scipy import stats # scientific python statistical package
 from scipy.stats import binom, poisson # binomial and poisson distribution functions
-from scipy.optimize import curve_fit # optimization for fitting curves
-
-import re # library for using regular expressions (text parsing)
-import warnings # needed for suppression of unnecessary warnings
-import base64 # functionality for encoding binary data to ASCII characters and decoding back to binary data
-#import sys # used to exit the program; for testing 
-
-import model_fxns as fxns
-
 
 
 #### Define the class App_GetFits
@@ -89,8 +74,8 @@ class App_GetNeeds:
         self._18_floattext = self._create_floattext(label = 'RESP. PART. FILTER REG', 
                                                     val=11, minv=0, maxv=1000, boxw='33%', desw='70%')
         
-        self._20_floattext = self._create_floattext(label = 'Avg. visit time lag (days)', 
-                                                    val=0, minv=0, maxv=14, boxw='33%', desw='70%')
+        self._20_floattext = self._create_floattext(label = 'Average time lag between the onset of symptoms and hospital visit (days)', 
+                                                    val=0, minv=0, maxv=14, boxw='70%', desw='90%')
         
         
         
@@ -383,13 +368,9 @@ class App_GetNeeds:
         the_table.auto_set_font_size(True)
         the_table.scale(1, 1.32)
         
-        popsize = float(PopSize)
         # Customize table title
-        if ForecastDays <= 18:
-            plt.title('Forecasted cases for '+ loc + '\nPopulation size: '+f"{popsize:,}", fontsize = 16, fontweight = 'bold')
-        elif ForecastDays > 18:
-            titletext = 'Forecasted cases for '+ loc + '\ndata beyond 18 days is available in the csv (below)'
-            plt.title(titletext, fontsize = 14, fontweight = 'bold')
+        titletext = 'Forecasted cases for '+ loc + '\nData beyond 14 days is available in the csv (below)'
+        plt.title(titletext, fontsize = 14, fontweight = 'bold')
             
         
         
@@ -401,7 +382,7 @@ class App_GetNeeds:
         plt.plot(row_labels, Visits, c='Crimson', label='New visits', linewidth=3)
         plt.plot(row_labels, Admits, c='Steelblue', label='New admits', linewidth=3)
         
-        plt.title('Forecasted census', fontsize = 16, fontweight = 'bold')
+        plt.title('Forecasted visits & admits', fontsize = 16, fontweight = 'bold')
         
         # log-scale y-values to base 10 if the user has chosen
         #if log_scl == True:
@@ -411,7 +392,7 @@ class App_GetNeeds:
         # prevents overcrowding
         ax = plt.gca()
         temp = ax.xaxis.get_ticklabels()
-        temp = list(set(temp) - set(temp[::8]))
+        temp = list(set(temp) - set(temp[::12]))
         for label in temp:
             label.set_visible(False)
             
@@ -509,7 +490,7 @@ class App_GetNeeds:
         # prevents overcrowding
         ax = plt.gca()
         temp = ax.xaxis.get_ticklabels()
-        temp = list(set(temp) - set(temp[::8]))
+        temp = list(set(temp) - set(temp[::12]))
         for label in temp:
             label.set_visible(False)
             
@@ -608,11 +589,8 @@ class App_GetNeeds:
         the_table.scale(1, 1.32)
         
         # Set the plot (table) title
-        if ForecastDays <= 18:
-            plt.title('Beds needed for COVID-19 cases', fontsize = 16, fontweight = 'bold')
-        elif ForecastDays > 18:
-            titletext = 'Beds needed for COVID-19 cases' + '\ndata beyond 18 days is available in the csv (below)'
-            plt.title(titletext, fontsize = 14, fontweight = 'bold')
+        titletext = 'Beds needed for COVID-19 cases' + '\nData beyond 14 days is available in the csv (below)'
+        plt.title(titletext, fontsize = 14, fontweight = 'bold')
             
         
         
@@ -662,17 +640,15 @@ class App_GetNeeds:
         #if log_scl == True:
         #    plt.yscale('log')
         
-        for label in ax.xaxis.get_ticklabels()[::8]:
-            label.set_visible(False)
-
+        
         ax = plt.gca()
         temp = ax.xaxis.get_ticklabels()
-        temp = list(set(temp) - set(temp[::8]))
+        temp = list(set(temp) - set(temp[::12]))
         for label in temp:
             label.set_visible(False)
             
         leg = ax.legend(handlelength=0, handletextpad=0, fancybox=True,
-                        loc=2, frameon=True, fontsize=8)
+                        loc='best', frameon=True, fontsize=8)
 
         for line,text in zip(leg.get_lines(), leg.get_texts()):
             text.set_color(line.get_color())
@@ -682,6 +658,10 @@ class App_GetNeeds:
         
         plt.ylabel('PPE Supplies', fontsize=14, fontweight='bold')
         plt.xlabel('Date', fontsize=14, fontweight='bold')
+        
+        
+        
+        
         
         
         ax = plt.subplot2grid((6, 4), (4, 2), colspan=2, rowspan=2)

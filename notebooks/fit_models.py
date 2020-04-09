@@ -47,7 +47,7 @@ class App_GetFits:
                              layout=widgets.Layout(align_items='flex-start', flex='0 auto auto', width='100%'))],
                            
                            
-                           layout=widgets.Layout(display='flex', flex_flow='column', border='solid 1px', 
+                           layout=widgets.Layout(display='flex', flex_flow='column', border='solid 2px', 
                                         align_items='stretch', width='100%'))
                            
                            
