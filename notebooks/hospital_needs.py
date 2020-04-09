@@ -1,31 +1,16 @@
 import ipywidgets as widgets # provides interactive functionality
-from IPython.display import HTML, display, clear_output # display and html functionality
 import matplotlib.pyplot as plt # plotting library
 import pandas as pd # data frame library
 
-import csv # csv import functionality
-import time # library for time functionality
-import datetime # library for date-time functionality
-from random import choice, shuffle, randint # native randomization functions
 
 import numpy as np # numerical python
-from scipy import stats # scientific python statistical package
 from scipy.stats import binom, poisson # binomial and poisson distribution functions
-from scipy.optimize import curve_fit # optimization for fitting curves
-
-import re # library for using regular expressions (text parsing)
-import warnings # needed for suppression of unnecessary warnings
-import base64 # functionality for encoding binary data to ASCII characters and decoding back to binary data
-#import sys # used to exit the program; for testing 
-
-import model_fxns as fxns
-
 
 
 #### Define the class App_GetFits
 #### Will contain all other functions for modeling, calculation, and plotting
 
-class App_GetFits:
+class App_GetNeeds:
     
     
     
@@ -39,34 +24,23 @@ class App_GetFits:
     # and classes
     
     
-    def __init__(self, df, statepops):
+    def __init__(self, fdates, new_cases, focal_loc, forecasted_y, ForecastDays,
+                 PopSize):
         
-        self.itsProblem = "problem"
+        self.PopSize = float(PopSize)
+        self.ForecastDays = int(ForecastDays)
+        self.forecasted_y = list(forecasted_y)
+        
+        self.focal_loc = str(focal_loc)
+        self.fdates = fdates
+        self.new_cases = list(new_cases)
         
         self.Forecasted_cases_df_for_download = []
         self.Forecasted_patient_census_df_for_download = []
         self.Forecasted_ppe_needs_df_for_download = []
-        self.model = str()
         
-        # df is a copy of the primary dataframe ap_df
-        self._df = df
-        
-        self._statepops = statepops
-        
-        # locations the user can choose
-        available_indicators2 = list(set(self._df['Province/State']))
-        # order the locations alphabetically
-        available_indicators2.sort()
-        
-        # Find the index of your default location
-        lab = 'Illinois'
-        ill = available_indicators2.index(lab)
         
         # declare widgets: dropdowns, floattexts, toggle buttons, datepicker, etc.
-        self._1_dropdown = self._create_dropdown(['logistic', 'SEIR-SD (Requires 1 minute to optimize)', 'exponential', 'polynomial'],
-                                                 0, label = 'Choose a model to fit:')
-        
-        self._2_dropdown = self._create_dropdown(available_indicators2, ill, label = 'Choose a location:')
         
         self._3_floattext = self._create_floattext(label = '% Visiting your hospital', 
                                                    val=10, minv=0, maxv=100, boxw='33%', desw='70%')
@@ -80,7 +54,6 @@ class App_GetFits:
                                                    val=12, minv=1, maxv=180, boxw='33%', desw='70%')
         self._8_floattext = self._create_floattext(label = '% of ICU on vent:',
                                                    val=60, minv=0, maxv=100, boxw='33%', desw='70%')
-        self._9_toggle = self._create_toggle()
         
         self._10_floattext = self._create_floattext(label = 'GLOVE SURGICAL', 
                                                     val=2, minv=0, maxv=1000, boxw='33%', desw='70%')
@@ -101,10 +74,8 @@ class App_GetFits:
         self._18_floattext = self._create_floattext(label = 'RESP. PART. FILTER REG', 
                                                     val=11, minv=0, maxv=1000, boxw='33%', desw='70%')
         
-        self._19_floattext = self._create_floattext(label = 'Forecast length (days)', 
-                                                    val=10, minv=1, maxv=30, boxw='33%', desw='70%')
-        self._20_floattext = self._create_floattext(label = 'Avg. visit time lag (days)', 
-                                                    val=0, minv=0, maxv=14, boxw='33%', desw='70%')
+        self._20_floattext = self._create_floattext(label = 'Average time lag between the onset of symptoms and hospital visit (days)', 
+                                                    val=0, minv=0, maxv=14, boxw='70%', desw='90%')
         
         
         
@@ -112,10 +83,7 @@ class App_GetFits:
         self._plot_container = widgets.Output()
         
         _app_container = widgets.VBox(
-            [widgets.VBox([widgets.HBox([self._9_toggle, self._1_dropdown, self._2_dropdown], 
-                             layout=widgets.Layout(align_items='flex-start', flex='0 auto auto', width='100%')),
-                           
-                           widgets.HBox([self._3_floattext, self._4_floattext, self._5_floattext],
+            [widgets.VBox([widgets.HBox([self._3_floattext, self._4_floattext, self._5_floattext],
                              layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
                            
                            widgets.HBox([self._6_floattext, self._7_floattext, self._8_floattext],
@@ -130,13 +98,12 @@ class App_GetFits:
                            widgets.HBox([self._16_floattext, self._17_floattext, self._18_floattext],
                              layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
                           
-                           widgets.HBox([self._19_floattext, self._20_floattext],
+                           widgets.HBox([self._20_floattext],
                              layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%'))],
                            
                            layout=widgets.Layout(display='flex', flex_flow='column', border='solid 1px', 
                                         align_items='stretch', width='100%')),
              
-                          
                            
                            self._plot_container], layout=widgets.Layout(display='flex', flex_flow='column', 
                                         border='solid 2px', align_items='initial', width='100%'))
@@ -146,21 +113,21 @@ class App_GetFits:
             widgets.HBox([
                 _app_container
             ])
-        ], layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%'))
+        ], layout=widgets.Layout(align_items='flex-start', flex='auto', width='100%'))
         self._update_app()
         
         
     @classmethod
-    def from_url(cls):
-        ap_df = pd.read_csv('COVID-CASES-DF.txt', sep='\t') 
-        ap_df = ap_df[ap_df['Country/Region'] == 'US']
-        ap_df = ap_df[ap_df['Province/State'] != 'US']
-        ap_df.drop(columns=['Unnamed: 0'], inplace=True)
+    def from_url(cls, ForecastDays, model_fits_df, new_cases):
         
-        statepops = pd.read_csv('StatePops.csv')
+        df = model_fits_df[model_fits_df['label'] == 'Current forecast']
+        fdates = df['forecast_dates'].iloc[0]
+        focal_loc = df['focal_loc'].iloc[0]
+        forecasted_y = df['forecasted_y'].iloc[0]
+        PopSize = df['PopSize'].iloc[0]
         
         # reuse primary dataframe when updating the app
-        return cls(ap_df, statepops)
+        return cls(fdates, new_cases, focal_loc, forecasted_y, ForecastDays, PopSize)
         
         
     def _create_dropdown(self, indicators, initial_index, label):
@@ -211,18 +178,18 @@ class App_GetFits:
         self._update_app()
 
     def _update_app(self):
+        
         # update the app when called
         
+        
         # redefine input/parameter values
-        self.model = self._1_dropdown.value
-        focal_loc = self._2_dropdown.value
         per_loc  = self._3_floattext.value
         per_admit = self._4_floattext.value
         per_cc = self._5_floattext.value
         LOS_nc = self._6_floattext.value
         LOS_cc = self._7_floattext.value
         per_vent = self._8_floattext.value
-        log_scl = self._9_toggle.value
+
         
         ppe_GLOVE_SURGICAL = self._10_floattext.value
         ppe_GLOVE_EXAM_NITRILE = self._11_floattext.value
@@ -233,231 +200,44 @@ class App_GetFits:
         ppe_MASK_SURGICAL_ANTI_FOG_W_FILM = self._16_floattext.value
         ppe_SHIELD_FACE_FULL_ANTI_FOG = self._17_floattext.value
         ppe_RESPIRATOR_PARTICULATE_FILTER_REG = self._18_floattext.value
-        ForecastDays = self._19_floattext.value
         TimeLag = self._20_floattext.value
-        
-        StatePops = self._statepops
         
         
         # wait to clear the plots/tables until new ones are generated
         self._plot_container.clear_output(wait=True)
         
         with self._plot_container:
+            #PopSize = self.PopSize 
+            #ForecastDays= self.ForecastDays 
+            #forecasted_y = self.forecasted_y
+            
+            #focal_loc = self.focal_loc
+            #fdates = self.fdates
+            #new_cases = self.new_cases
             # Run the functions to generate figures and tables
-            self._get_fit(focal_loc, per_loc, per_admit, per_cc, LOS_cc, LOS_nc, per_vent, log_scl,
+            self._get_fit(per_loc, per_admit, per_cc, LOS_cc, LOS_nc, per_vent,
                          ppe_GLOVE_SURGICAL, ppe_GLOVE_EXAM_NITRILE, ppe_GLOVE_GLOVE_EXAM_VINYL,
                          ppe_MASK_FACE_PROCEDURE_ANTI_FOG, ppe_MASK_PROCEDURE_FLUID_RESISTANT, 
                          ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                          ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
-                         ForecastDays, TimeLag, StatePops)
+                         TimeLag, self.PopSize, self.ForecastDays, self.forecasted_y, self.focal_loc, self.fdates,
+                         self.new_cases)
             
             plt.show()
             
             
-    def _get_fit(self, focal_loc, per_loc, per_admit, per_cc, LOS_cc, LOS_nc, per_vent, log_scl,
+    def _get_fit(self, per_loc, per_admit, per_cc, LOS_cc, LOS_nc, per_vent,
                         ppe_GLOVE_SURGICAL, ppe_GLOVE_EXAM_NITRILE, ppe_GLOVE_GLOVE_EXAM_VINYL,
                         ppe_MASK_FACE_PROCEDURE_ANTI_FOG, ppe_MASK_PROCEDURE_FLUID_RESISTANT, 
                         ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                         ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
-                        ForecastDays, TimeLag, StatePops):
+                        TimeLag, PopSize, ForecastDays, forecasted_y, focal_loc, fdates,
+                        new_cases):
         
         
-        PopSize = StatePops[StatePops['Province/State'] == focal_loc]['PopSize'].tolist()
-        PopSize = PopSize[0]
-        
-
-        
-        ArrivalDate = StatePops[StatePops['Province/State'] == focal_loc]['Date_of_first_reported_infection'].tolist()
-        ArrivalDate = ArrivalDate[0]
-        
-        
-        
-        # A function to generate all figures and tables
-        
-        # variables:
-            # obs_x: observed x values
-            # obs_y: observed y values
-            # model: the model to fit
-            # T0: likely date of first infection
-            # ForecastDays: number of days ahead to extend predictions
-            # N: population size of interest
-            # ArrivalDate: likely data of first infection (used by SEIR-SD model)
-            # incubation_period: disease-specific epidemilogical parameter
-                # average number of days until an exposed person becomes
-                # begins to exhibit symptoms of infection
-            # infectious_period: disease-specific epidemilogical parameter
-                # average number of days an infected person is infected
-            # rho: disease-specific epidemilogical parameter
-                # aka basic reproductive number
-                # average number of secondary infections produced by a typical case 
-                # of an infection in a population where everyone is susceptible
-            # socdist: population-specific social-distancing parameter
-        
-        # declare the following as global variables so their changes can be 
-        # seen/used by outside functions
-        
-        
-        # add 1 to number of forecast days for indexing purposes
-        ForecastDays = int(ForecastDays+1)
         
         # declare figure object
-        fig = plt.figure(figsize=(11, 17))
-        # use subplot2grid functionality
-        ax = plt.subplot2grid((6, 4), (0, 0), colspan=2, rowspan=2)
-        
-        # filter main dataframe to include only the chosen location
-        df_sub = self._df[self._df['Province/State'] == focal_loc]
-        # get column labels, will filter below to extract dates
-        yi = list(df_sub)
-        
-        # declare colors for plotting predictions and forecasts in figure 1 
-        clrs =  ['darkorchid', 'blue', 'green', 'orange', 'red']
-        clrs2 = ['0.1', '0.2', '0.4', '0.6', '0.8']
-        
-        # Generate previous days predictions and forecasts
-        # 0 is the current day, -1 is yesterday, etc.
-        obs_y_trunc = []
-        for i, j in enumerate([-4,-3,-2,-1, 0]):
-            if j == 0:
-                # get dates for today's predictions/forecast
-                DATES = yi[4:]
-                obs_y_trunc = df_sub.iloc[0,4:].values
-            else:
-                # get dates for previous days predictions/forecast
-                DATES = yi[4:j]
-                obs_y_trunc = df_sub.iloc[0,4:j].values
-            
-            
-            # remove leading zeros from observed y values 
-            # and coordinate it with dates
-            y = []
-            dates = []
-            for ii, val in enumerate(obs_y_trunc):
-                if len(y) > 0 or val > 0:
-                    y.append(val)
-                    dates.append(DATES[ii])
-            
-            # declare x as a list of integers from 0 to len(y)
-            x = list(range(len(y)))
-
-            # Call function to use chosen model to obtain:
-            #    r-square for observed vs. predicted
-            #    predicted y-values
-            #    forecasted x and y values
-            obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y = fxns.fit_curve(x, y, 
-                                self.model, ForecastDays, PopSize, ArrivalDate)
-            
-            # convert y values to numpy array
-            y = np.array(y)
-
-            # because it isn't based on a best fit line,
-            # and the y-intercept is forced through [0,0]
-            # a model can perform so poorly that the 
-            # observed vs predicted r-square is negative (a nonsensical value)
-            # if this happens, report the r-square as 0.0
-            if obs_pred_r2 < 0:
-                obs_pred_r2 = 0.0
-
-            # convert any y-values (observed, predicted, or forecasted)
-            # that are less than 0 (nonsensical values) to 0.
-            y[y < 0] = 0
-            pred_y = np.array(pred_y)
-            pred_y[pred_y < 0] = 0
-
-            forecasted_y = np.array(forecasted_y)
-            forecasted_y[forecasted_y < 0] = 0
-            forecast_vals = np.copy(forecasted_y)
-
-            # number of from ArrivalDate to end of forecast window
-            #numdays = len(forecasted_x)
-            latest_date = pd.to_datetime(dates[-1])
-            first_date = pd.to_datetime(dates[0])
-
-            # get the date of the last day in the forecast window
-            future_date = latest_date + datetime.timedelta(days = ForecastDays-1)
-            
-            # get all dates from ArrivalDate to the last day in the forecast window
-            fdates = pd.date_range(start=first_date, end=future_date)
-            fdates = fdates.strftime('%m/%d')
-            
-            # designature plot label for legend
-            if j == 0:
-                label='Current forecast'
-            
-            else:
-                label = str(-j)+' day old forecast'
-            
-            
-            # plot forecasted y values vs. dates
-            plt.plot(fdates, forecasted_y, c=clrs[i], linewidth=3, label=label)
-            
-            # get dates from ArrivalDate to the current day
-            dates = pd.date_range(start=first_date, end=latest_date)
-            dates = dates.strftime('%m/%d')
-            
-            # plot predicted y values vs. dates
-            plt.plot(dates, pred_y, c=clrs2[i], linewidth=3)
-            plt.scatter(dates, y, c='0.2', s=100, alpha=0.8, linewidths=0.1)
-            
-        
-        # For new cases, subtract today's number from yesterday's
-        # in the case of negative values, reassign as 0
-        new_cases = []
-        for i, val in enumerate(forecast_vals):
-            if i > 0:
-                if forecast_vals[i] - forecast_vals[i-1] > 0:
-                    new_cases.append(forecast_vals[i] - forecast_vals[i-1])
-                else:
-                    new_cases.append(0)
-            if i == 0:
-                new_cases.append(forecast_vals[i])
-
-        # declare figure legend
-        leg = ax.legend(handlelength=0, handletextpad=0, fancybox=False,
-                        loc=2, frameon=False, fontsize=12)
-
-        # color legend text by the color of the line
-        for line,text in zip(leg.get_lines(), leg.get_texts()):
-            text.set_color(line.get_color())
-
-        # set line from legend handle as invisible
-        for item in leg.legendHandles: 
-            item.set_visible(False)
-
-        plt.xticks(rotation=35, ha='center')
-        plt.xlabel('Date', fontsize=14, fontweight='bold')
-        plt.ylabel('Confirmed cases', fontsize=14, fontweight='bold')
-        
-        # log-scale y-values to base 10 if user choose the option
-        if log_scl == True:
-            plt.yscale('log')
-
-        # modify number of dates displayed on x-axis
-        # to avoid over-crowding the axis
-        if len(forecasted_x) < 10:
-            i = 1
-        elif len(forecasted_x) < 20:
-            i = 4
-        elif len(forecasted_x) < 40:
-            i = 6
-        else:
-            i = 8
-
-        ax = plt.gca()
-        temp = ax.xaxis.get_ticklabels()
-        temp = list(set(temp) - set(temp[::i]))
-        for label in temp:
-            label.set_visible(False)
-        
-        # cutomize plot title
-        if self.model == 'SEIR-SD (Requires 1 minute to optimize)':
-            label = 'Model fitting, current ' + r'$r^{2}$' + ' = ' + str(np.round(obs_pred_r2, 3))
-            label += '\n(model under development)'
-            plt.title(label, fontsize = 14, fontweight = 'bold')
-        else:
-            plt.title('Model fitting, current ' + r'$r^{2}$' + ' = ' + str(np.round(obs_pred_r2, 3)), fontsize = 16, fontweight = 'bold')
-        
-        
+        fig = plt.figure(figsize=(15, 17))
         
         # Declare figure axis to hold table of forecasted cases, visits, admits
         ax = plt.subplot2grid((6, 4), (0, 2), colspan=2, rowspan=2)
@@ -475,11 +255,8 @@ class App_GetFits:
 
         # row labels are the dates
         row_labels = fdates.tolist()  
-        # only show the current date and dates in the forecast window
-        row_labels = row_labels[-(ForecastDays):]
         # truncate forecasted_y to only the current day and days 
         # in the forecast window
-        sub_f = forecasted_y[-(ForecastDays):]
         
         # lists to hold table values
         table_vals = []
@@ -490,10 +267,11 @@ class App_GetFits:
         # time lag is modeled as a Poisson distributed 
         # random variable with a mean chosen by the user (TimeLag)
         new_cases_lag = []
+        x = list(range(len(forecasted_y)))
         for i in new_cases:
             lag_pop = i*poisson.pmf(x, TimeLag)
             new_cases_lag.append(lag_pop)
-            
+         
         # Declare a list to hold time-staggered lists
         # This will allow the time-lag effects to
         # be summed across rows (days)
@@ -515,6 +293,11 @@ class App_GetFits:
         # upper truncate for the number of days in observed y values
         ts_lag = ts_lag[:len(new_cases)]
         
+        # row labels are the dates
+        row_labels = fdates.tolist()  
+        # only show the current date and dates in the forecast window
+        row_labels = row_labels[-(ForecastDays):]
+        
         # lower truncate lists for forecast window
         # that is, do not include days before present day
         new_cases = new_cases[-(ForecastDays):]
@@ -525,6 +308,11 @@ class App_GetFits:
         self.Forecasted_cases_df_for_download = pd.DataFrame(columns = ['date'] + col_labels)
         
         # For each date intended for the output table
+        
+        Total = []
+        New = []
+        Visits = []
+        Admits = []
         for i in range(len(row_labels)):
             
             new = new_cases[i]
@@ -536,10 +324,15 @@ class App_GetFits:
             #     time-lagged visits to your hospital,
             #     time-lagged admits to your hospital
             
-            cell = [int(np.round(sub_f[i])), 
+            cell = [int(np.round(forecasted_y[i])), 
                     int(np.round(new)), 
                     int(np.round(val * (per_loc * 0.01))),
                     int(np.round((0.01 * per_admit) * val * (per_loc * 0.01)))]
+            
+            Total.append(cell[0])
+            New.append(cell[1])
+            Visits.append(cell[2])
+            Admits.append(cell[3])
             
             # Add the row to the dataframe
             df_row = [row_labels[i]]
@@ -561,9 +354,7 @@ class App_GetFits:
 
         # Generate and customize table for output
         ncol = 4
-        lim = ForecastDays
-        if lim > 18:
-            lim = 19
+        lim = 15
             
         the_table = plt.table(cellText=table_vals[0:lim],
                         colWidths=[0.32, 0.32, 0.32, 0.32],
@@ -578,12 +369,50 @@ class App_GetFits:
         the_table.scale(1, 1.32)
         
         # Customize table title
-        if ForecastDays <= 18:
-            plt.title('Forecasted cases for '+ loc + '\nPopulation size: '+f"{PopSize:,}", fontsize = 16, fontweight = 'bold')
-        elif ForecastDays > 18:
-            titletext = 'Forecasted cases for '+ loc + '\ndata beyond 18 days is available in the csv (below)'
-            plt.title(titletext, fontsize = 14, fontweight = 'bold')
+        titletext = 'Forecasted cases for '+ loc + '\nData beyond 14 days is available in the csv (below)'
+        plt.title(titletext, fontsize = 14, fontweight = 'bold')
             
+        
+        
+        
+        ax = plt.subplot2grid((6, 4), (0, 0), colspan=2, rowspan=2)
+        
+        #plt.plot(row_labels, Total, c='0.2', label='Total cases', linewidth=3)
+        #plt.plot(row_labels, New, c='0.5', label='New cases', linewidth=3)
+        plt.plot(row_labels, Visits, c='Crimson', label='New visits', linewidth=3)
+        plt.plot(row_labels, Admits, c='Steelblue', label='New admits', linewidth=3)
+        
+        plt.title('Forecasted visits & admits', fontsize = 16, fontweight = 'bold')
+        
+        # log-scale y-values to base 10 if the user has chosen
+        #if log_scl == True:
+        #    plt.yscale('log')
+        
+        # As before, limit dates displayed on the x-axis
+        # prevents overcrowding
+        ax = plt.gca()
+        temp = ax.xaxis.get_ticklabels()
+        temp = list(set(temp) - set(temp[::12]))
+        for label in temp:
+            label.set_visible(False)
+            
+        # As before, remove legend line handles and change the color of 
+        # the text to match the color of the line
+        leg = ax.legend(handlelength=0, handletextpad=0, fancybox=False,
+                        loc='best', frameon=False, fontsize=14)
+
+        for line,text in zip(leg.get_lines(), leg.get_texts()):
+            text.set_color(line.get_color())
+
+        for item in leg.legendHandles: 
+            item.set_visible(False)
+        
+        plt.ylabel('COVID-19 cases', fontsize=14, fontweight='bold')
+        plt.xlabel('Date', fontsize=14, fontweight='bold')
+        
+        
+        
+        
         
         
         
@@ -649,19 +478,19 @@ class App_GetFits:
             
         # Plot the critical care and non-critical care patient census over the 
         # forecasted time frame
-        plt.plot(fdates, total_cc, c='Crimson', label='Critical care', linewidth=3)
-        plt.plot(fdates, total_nc, c='0.3', label='Non-critical care', linewidth=3)
+        plt.plot(fdates, total_cc, c='m', label='Critical care', linewidth=3)
+        plt.plot(fdates, total_nc, c='0.4', label='Non-critical care', linewidth=3)
         plt.title('Forecasted census', fontsize = 16, fontweight = 'bold')
         
         # log-scale y-values to base 10 if the user has chosen
-        if log_scl == True:
-            plt.yscale('log')
+        #if log_scl == True:
+        #    plt.yscale('log')
         
         # As before, limit dates displayed on the x-axis
         # prevents overcrowding
         ax = plt.gca()
         temp = ax.xaxis.get_ticklabels()
-        temp = list(set(temp) - set(temp[::8]))
+        temp = list(set(temp) - set(temp[::12]))
         for label in temp:
             label.set_visible(False)
             
@@ -744,9 +573,7 @@ class App_GetFits:
             
         # limit the number of displayed table rows    
         ncol = 4
-        lim = ForecastDays
-        if lim > 18:
-            lim = 19
+        lim = 15
         
         # declare and customize the table
         the_table = plt.table(cellText=table_vals[0:lim],
@@ -762,11 +589,8 @@ class App_GetFits:
         the_table.scale(1, 1.32)
         
         # Set the plot (table) title
-        if ForecastDays <= 18:
-            plt.title('Beds needed for COVID-19 cases', fontsize = 16, fontweight = 'bold')
-        elif ForecastDays > 18:
-            titletext = 'Beds needed for COVID-19 cases' + '\ndata beyond 18 days is available in the csv (below)'
-            plt.title(titletext, fontsize = 14, fontweight = 'bold')
+        titletext = 'Beds needed for COVID-19 cases' + '\nData beyond 14 days is available in the csv (below)'
+        plt.title(titletext, fontsize = 14, fontweight = 'bold')
             
         
         
@@ -777,6 +601,7 @@ class App_GetFits:
         #### Construct arrays for critical care and non-critical care patients
         
         # All covid patients expected in house on each forecasted day. PUI is just a name here
+        
         PUI_COVID = np.array(total_nc) + np.array(total_cc) 
         # Preparing to add new visits, fraction of new cases visiting your hospital = 0.01 * per_loc 
         new_visits_your_hospital = ts_lag * (0.01 * per_loc)
@@ -815,17 +640,15 @@ class App_GetFits:
         #if log_scl == True:
         #    plt.yscale('log')
         
-        for label in ax.xaxis.get_ticklabels()[::8]:
-            label.set_visible(False)
-
+        
         ax = plt.gca()
         temp = ax.xaxis.get_ticklabels()
-        temp = list(set(temp) - set(temp[::8]))
+        temp = list(set(temp) - set(temp[::12]))
         for label in temp:
             label.set_visible(False)
             
         leg = ax.legend(handlelength=0, handletextpad=0, fancybox=True,
-                        loc=2, frameon=True, fontsize=8)
+                        loc='best', frameon=True, fontsize=8)
 
         for line,text in zip(leg.get_lines(), leg.get_texts()):
             text.set_color(line.get_color())
@@ -835,8 +658,7 @@ class App_GetFits:
         
         plt.ylabel('PPE Supplies', fontsize=14, fontweight='bold')
         plt.xlabel('Date', fontsize=14, fontweight='bold')
-        if log_scl == True:
-            plt.yscale('log')
+        
         
         
         
@@ -914,9 +736,7 @@ class App_GetFits:
             
         #ncol = 9
         cwp = 0.15
-        lim = ForecastDays
-        if lim > 18:
-            lim = 19
+        lim = 15
             
         the_table = plt.table(cellText=table_vals[0:lim],
                         colWidths=[cwp]*9,
@@ -956,6 +776,7 @@ class App_GetFits:
             xycoords='axes fraction', ha='left', va='bottom', 
             rotation=-25, size=8, c=val[1])
             count+=1
+        
         
         plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=1.1, hspace=1.1)
         
