@@ -201,7 +201,7 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate):
         forecasted_y, forecasted_x, pred_y = get_polynomial(obs_x, obs_y, ForecastDays)
         obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
         
-    elif model == 'SEIR-SD (Requires 1-3 minutes to optimize)':        
+    elif model == 'SEIR-SD (Requires <1 minute to optimize)':        
         forecasted_y, forecasted_x, pred_y = get_seir(obs_x, obs_y, ForecastDays, N)
         obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
         
@@ -311,16 +311,21 @@ def get_seir(obs_x, obs_y, ForecastDays, N):
     
     sd_o = 0
     pred_y_o = []
-    forecasted_y_o = []
     
-    ct = 0
-    while ct < 100:
+    r2_o = 0
+    alpha_o = 0
+    beta_o = 0
+    gamma_o = 0
+    t_max_o = 0
+    sd_o = 0
+    
+    for i in range(20000):
         
-        incubation_period = np.random.uniform(1, 10)
-        infectious_period = np.random.uniform(1, 14)
+        incubation_period = np.random.uniform(4, 6)
+        infectious_period = np.random.uniform(4, 10)
         rho = np.random.uniform(1, 6)
         sd = np.random.uniform(0, 100)
-        d1 = np.random.randint(1, 50)
+        d1 = np.random.randint(1, 60)
         
         ArrivalDate = today - datetime.timedelta(days = d1 + len(obs_x))
         t_max = (today - ArrivalDate).days
@@ -331,23 +336,23 @@ def get_seir(obs_x, obs_y, ForecastDays, N):
 
         pred_y = seir(obs_x, alpha, beta, gamma, t_max, sd)
         
-        
         obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
         
-        
-        if obs_pred_r2 > 0.99:
-            ct += 1
+        if obs_pred_r2 > r2_o:
             
-            pred_y_o.append(pred_y)
+            alpha_o = float(alpha)
+            beta_o = float(beta)
+            gamma_o = float(gamma)
+            t_max_o = float(t_max)
+            sd_o = float(sd)
             
-            forecasted_y = seir(obs_x, alpha, beta, gamma, t_max, sd, ForecastDays-1)
-            forecasted_y_o.append(forecasted_y)
+            r2_o = float(obs_pred_r2)
             
-            
-    pred_y = [float(sum(col))/len(col) for col in zip(*pred_y_o)]
-    forecasted_y = [float(sum(col))/len(col) for col in zip(*forecasted_y_o)]
+            pred_y_o = pred_y
     
+    
+    forecasted_y = seir(obs_x, alpha_o, beta_o, gamma_o, t_max_o, sd_o, ForecastDays-1)
     forecasted_x = list(range(len(forecasted_y)))
     
     # return the forecasted x-y values and predicted y values
-    return forecasted_y, forecasted_x, pred_y
+    return forecasted_y, forecasted_x, pred_y_o
