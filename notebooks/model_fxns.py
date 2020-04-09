@@ -201,7 +201,7 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate):
         forecasted_y, forecasted_x, pred_y = get_polynomial(obs_x, obs_y, ForecastDays)
         obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
         
-    elif model == 'SEIR-SD (Requires 1 minute to optimize)':        
+    elif model == 'SEIR-SD (Requires 1-3 minutes to optimize)':        
         forecasted_y, forecasted_x, pred_y = get_seir(obs_x, obs_y, ForecastDays, N)
         obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
         
@@ -316,7 +316,7 @@ def get_seir(obs_x, obs_y, ForecastDays, N):
     ct = 0
     while ct < 100:
         
-        incubation_period = np.random.uniform(4, 6)
+        incubation_period = np.random.uniform(1, 10)
         infectious_period = np.random.uniform(1, 14)
         rho = np.random.uniform(1, 6)
         sd = np.random.uniform(0, 100)
