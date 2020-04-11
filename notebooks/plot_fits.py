@@ -205,8 +205,7 @@ class App_PlotFits:
         
         # cutomize plot title
         mod = str(model)
-        if mod == 'SEIR-SD (Requires <1 minute to optimize)':
-            mod = 'SEIR-SD'
+        
         if mod == 'polynomial':
             mod = '2nd degree polynomial'
             

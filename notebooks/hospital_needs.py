@@ -25,8 +25,9 @@ class App_GetNeeds:
     
     
     def __init__(self, fdates, new_cases, focal_loc, forecasted_y, ForecastDays,
-                 PopSize):
+                 PopSize, model):
         
+        self.model = str(model)
         self.PopSize = float(PopSize)
         self.ForecastDays = int(ForecastDays)
         self.forecasted_y = list(forecasted_y)
@@ -125,9 +126,13 @@ class App_GetNeeds:
         focal_loc = df['focal_loc'].iloc[0]
         forecasted_y = df['forecasted_y'].iloc[0]
         PopSize = df['PopSize'].iloc[0]
+        model = df['model'].iloc[0]
+        
+        if model == 'SEIR-SD':
+            new_cases = new_cases[0:-1]
         
         # reuse primary dataframe when updating the app
-        return cls(fdates, new_cases, focal_loc, forecasted_y, ForecastDays, PopSize)
+        return cls(fdates, new_cases, focal_loc, forecasted_y, ForecastDays, PopSize, model)
         
         
     def _create_dropdown(self, indicators, initial_index, label):
@@ -175,12 +180,19 @@ class App_GetNeeds:
     
     def _on_change(self, _):
         # do the following when app inputs change
+        self.Forecasted_cases_df_for_download = []
+        self.Forecasted_patient_census_df_for_download = []
+        self.Forecasted_ppe_needs_df_for_download = []
+        
         self._update_app()
 
     def _update_app(self):
         
         # update the app when called
         
+        self.Forecasted_cases_df_for_download = []
+        self.Forecasted_patient_census_df_for_download = []
+        self.Forecasted_ppe_needs_df_for_download = []
         
         # redefine input/parameter values
         per_loc  = self._3_floattext.value
@@ -207,6 +219,11 @@ class App_GetNeeds:
         self._plot_container.clear_output(wait=True)
         
         with self._plot_container:
+            
+            self.Forecasted_cases_df_for_download = []
+            self.Forecasted_patient_census_df_for_download = []
+            self.Forecasted_ppe_needs_df_for_download = []
+        
             #PopSize = self.PopSize 
             #ForecastDays= self.ForecastDays 
             #forecasted_y = self.forecasted_y
@@ -221,7 +238,7 @@ class App_GetNeeds:
                          ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                          ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
                          TimeLag, self.PopSize, self.ForecastDays, self.forecasted_y, self.focal_loc, self.fdates,
-                         self.new_cases)
+                         self.new_cases, self.model)
             
             plt.show()
             
@@ -232,7 +249,7 @@ class App_GetNeeds:
                         ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                         ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
                         TimeLag, PopSize, ForecastDays, forecasted_y, focal_loc, fdates,
-                        new_cases):
+                        new_cases, model):
         
         
         
@@ -255,6 +272,7 @@ class App_GetNeeds:
 
         # row labels are the dates
         row_labels = fdates.tolist()  
+        
         # truncate forecasted_y to only the current day and days 
         # in the forecast window
         
@@ -292,17 +310,18 @@ class App_GetNeeds:
         ts_lag = np.sum(ar, axis=0)
         # upper truncate for the number of days in observed y values
         ts_lag = ts_lag[:len(new_cases)]
+        ts_lag = ts_lag[:len(new_cases)]
         
         # row labels are the dates
         row_labels = fdates.tolist()  
         # only show the current date and dates in the forecast window
-        row_labels = row_labels[-(ForecastDays):]
+        row_labels = row_labels[-(ForecastDays+1):]
         
         # lower truncate lists for forecast window
         # that is, do not include days before present day
-        new_cases = new_cases[-(ForecastDays):]
-        forecasted_y = forecasted_y[-(ForecastDays):]
-        ts_lag2 = ts_lag[-(ForecastDays):]
+        new_cases = new_cases[-(ForecastDays+1):]
+        forecasted_y = forecasted_y[-(ForecastDays+1):]
+        ts_lag2 = ts_lag[-(ForecastDays+1):]
         
         # Declare pandas dataframe to hold data for download
         self.Forecasted_cases_df_for_download = pd.DataFrame(columns = ['date'] + col_labels)
@@ -529,9 +548,9 @@ class App_GetNeeds:
         
         # truncate row labels and values to the present day
         # and days in the forecast window
-        row_labels = row_labels[-(ForecastDays):]
-        total_nc_trunc = total_nc[-(ForecastDays):]
-        total_cc_trunc = total_cc[-(ForecastDays):]
+        row_labels = row_labels[-(ForecastDays+1):]
+        total_nc_trunc = total_nc[-(ForecastDays+1):]
+        total_cc_trunc = total_cc[-(ForecastDays+1):]
         
         # declare lists to hold table cell values and
         # row colors
@@ -670,7 +689,7 @@ class App_GetNeeds:
         
         #### Construct arrays for critical care and non-critical care patients
         #PUI_COVID = np.array(total_nc) + np.array(total_cc)
-        PUI_COVID = PUI_COVID[-(ForecastDays):]
+        PUI_COVID = PUI_COVID[-(ForecastDays+1):]
         
         glove_surgical = np.round(ppe_GLOVE_SURGICAL * PUI_COVID).astype('int')
         glove_nitrile = np.round(ppe_GLOVE_EXAM_NITRILE * PUI_COVID).astype('int')
@@ -703,7 +722,7 @@ class App_GetNeeds:
                       ppe_ls[6][1], ppe_ls[7][1], ppe_ls[8][1]]
 
         row_labels = fdates.tolist()        
-        row_labels = row_labels[-(ForecastDays):]
+        row_labels = row_labels[-(ForecastDays+1):]
         
         table_vals = []
         cclr_vals = []
