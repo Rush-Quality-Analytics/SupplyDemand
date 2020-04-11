@@ -5,7 +5,7 @@ import datetime # library for date-time functionality
 import numpy as np # numerical python
 import model_fxns as fxns
 
-
+import sys
 
 #### Define the class App_GetFits
 #### Will contain all other functions for modeling, calculation, and plotting
@@ -14,11 +14,11 @@ class App_GetFits:
     
     # Dataframe containing data aggregated from Johns Hopkins daily reports
     
-    def __init__(self, ap_df, statepops):
+    def __init__(self, ap_df, statepops, seir_fits_df):
         
         # df is a copy of the primary dataframe ap_df
         
-        
+        self._seir_fits_df = seir_fits_df
         self._df = ap_df
         self._statepops = statepops
         
@@ -34,7 +34,7 @@ class App_GetFits:
         ill = available_indicators2.index(lab)
         
         # declare widgets: dropdowns, floattexts, toggle buttons, datepicker, etc.
-        self._1_dropdown = self._create_dropdown(['logistic', 'SEIR-SD (Requires <1 minute to optimize)', 'exponential', 'polynomial'],
+        self._1_dropdown = self._create_dropdown(['logistic', 'SEIR-SD', 'exponential', 'polynomial'],
                                                  0, label = 'Choose a model to fit:')
         
         self._2_dropdown = self._create_dropdown(available_indicators2, ill, label = 'Choose a location:')
@@ -62,10 +62,10 @@ class App_GetFits:
         
         
     @classmethod
-    def fits(cls, ap_df, statepops):  
+    def fits(cls, ap_df, statepops, seir_fits_df):  
         
         # reuse primary dataframe when updating the app
-        return cls(ap_df, statepops)
+        return cls(ap_df, statepops, seir_fits_df)
         
         
     def _create_dropdown(self, indicators, initial_index, label):
@@ -122,11 +122,11 @@ class App_GetFits:
         
         with self._plot_container:
             # Run the functions to generate figures and tables
-            self._get_fit(focal_loc, self.ForecastDays, StatePops, self.model)
+            self._get_fit(focal_loc, self.ForecastDays, StatePops, self.model, self._seir_fits_df)
             
             
             
-    def _get_fit(self, focal_loc, ForecastDays, StatePops, model):
+    def _get_fit(self, focal_loc, ForecastDays, StatePops, model, seir_fits_df):
         
         
         PopSize = StatePops[StatePops['Province/State'] == focal_loc]['PopSize'].tolist()
@@ -135,6 +135,7 @@ class App_GetFits:
         ArrivalDate = StatePops[StatePops['Province/State'] == focal_loc]['Date_of_first_reported_infection'].tolist()
         ArrivalDate = ArrivalDate[0]
         
+        SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == focal_loc]
         
         # A function to generate all figures and tables
         
@@ -192,15 +193,22 @@ class App_GetFits:
                 obs_y_trunc = df_sub.iloc[0,4:j].values
             
             
+            
             # remove leading zeros from observed y values 
             # and coordinate it with dates
-            y = []
-            dates = []
-            for ii, val in enumerate(obs_y_trunc):
-                if len(y) > 0 or val > 0:
-                    y.append(val)
-                    dates.append(DATES[ii])
+            #y = []
+            #dates = []
+            #for ii, val in enumerate(obs_y_trunc):
+            #    if len(y) > 0 or val > 0:
+            #        y.append(val)
+            #       dates.append(DATES[ii])
             
+            ii = 0
+            while obs_y_trunc[ii] == 0: ii+=1
+            y = obs_y_trunc[ii:]
+            dates = DATES[ii:]
+            
+    
             # declare x as a list of integers from 0 to len(y)
             x = list(range(len(y)))
 
@@ -208,8 +216,9 @@ class App_GetFits:
             #    r-square for observed vs. predicted
             #    predicted y-values
             #    forecasted x and y values
-            obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y = fxns.fit_curve(x, y, 
-                                model, ForecastDays, PopSize, ArrivalDate)
+            iterations = 1000
+            obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = fxns.fit_curve(x, y, 
+                                model, ForecastDays, PopSize, ArrivalDate, j, iterations, SEIR_Fit)
             
             # convert y values to numpy array
             y = np.array(y)
