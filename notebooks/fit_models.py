@@ -113,7 +113,7 @@ class App_GetFits:
         
         # redefine input/parameter values
         self.model = self._1_dropdown.value
-        focal_loc = self._2_dropdown.value
+        self.focal_loc = self._2_dropdown.value
         StatePops = self._statepops
         
         
@@ -122,7 +122,7 @@ class App_GetFits:
         
         with self._plot_container:
             # Run the functions to generate figures and tables
-            self._get_fit(focal_loc, self.ForecastDays, StatePops, self.model, self._seir_fits_df)
+            self._get_fit(self.focal_loc, self.ForecastDays, StatePops, self.model, self._seir_fits_df)
             
             
             

@@ -25,8 +25,9 @@ class App_GetNeeds:
     
     
     def __init__(self, fdates, new_cases, focal_loc, forecasted_y, ForecastDays,
-                 PopSize, model):
+                 PopSize, model, model_fits_df):
         
+        self.model_fits_df = model_fits_df.copy()
         self.model = str(model)
         self.PopSize = float(PopSize)
         self.ForecastDays = int(ForecastDays)
@@ -129,10 +130,11 @@ class App_GetNeeds:
         model = df['model'].iloc[0]
         
         if model == 'SEIR-SD':
-            new_cases = new_cases[0:-1]
+            new_cases = new_cases[1:]
         
         # reuse primary dataframe when updating the app
-        return cls(fdates, new_cases, focal_loc, forecasted_y, ForecastDays, PopSize, model)
+        return cls(fdates, new_cases, focal_loc, forecasted_y, ForecastDays, 
+                   PopSize, model, model_fits_df)
         
         
     def _create_dropdown(self, indicators, initial_index, label):
@@ -180,19 +182,12 @@ class App_GetNeeds:
     
     def _on_change(self, _):
         # do the following when app inputs change
-        self.Forecasted_cases_df_for_download = []
-        self.Forecasted_patient_census_df_for_download = []
-        self.Forecasted_ppe_needs_df_for_download = []
         
         self._update_app()
 
     def _update_app(self):
         
         # update the app when called
-        
-        self.Forecasted_cases_df_for_download = []
-        self.Forecasted_patient_census_df_for_download = []
-        self.Forecasted_ppe_needs_df_for_download = []
         
         # redefine input/parameter values
         per_loc  = self._3_floattext.value
@@ -220,25 +215,21 @@ class App_GetNeeds:
         
         with self._plot_container:
             
-            self.Forecasted_cases_df_for_download = []
-            self.Forecasted_patient_census_df_for_download = []
-            self.Forecasted_ppe_needs_df_for_download = []
-        
-            #PopSize = self.PopSize 
-            #ForecastDays= self.ForecastDays 
-            #forecasted_y = self.forecasted_y
             
-            #focal_loc = self.focal_loc
-            #fdates = self.fdates
-            #new_cases = self.new_cases
             # Run the functions to generate figures and tables
-            self._get_fit(per_loc, per_admit, per_cc, LOS_cc, LOS_nc, per_vent,
+            df1, df2, df3 = self._get_fit(per_loc, per_admit, per_cc, LOS_cc, LOS_nc, per_vent,
                          ppe_GLOVE_SURGICAL, ppe_GLOVE_EXAM_NITRILE, ppe_GLOVE_GLOVE_EXAM_VINYL,
                          ppe_MASK_FACE_PROCEDURE_ANTI_FOG, ppe_MASK_PROCEDURE_FLUID_RESISTANT, 
                          ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                          ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
                          TimeLag, self.PopSize, self.ForecastDays, self.forecasted_y, self.focal_loc, self.fdates,
-                         self.new_cases, self.model)
+                         self.new_cases, self.model, self.Forecasted_cases_df_for_download,
+                         self.Forecasted_patient_census_df_for_download,
+                         self.Forecasted_ppe_needs_df_for_download)
+            
+            self.Forecasted_cases_df_for_download = df1
+            self.Forecasted_patient_census_df_for_download = df2
+            self.Forecasted_ppe_needs_df_for_download = df3
             
             plt.show()
             
@@ -249,7 +240,9 @@ class App_GetNeeds:
                         ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                         ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
                         TimeLag, PopSize, ForecastDays, forecasted_y, focal_loc, fdates,
-                        new_cases, model):
+                        new_cases, model, Forecasted_cases_df_for_download,
+                        Forecasted_patient_census_df_for_download,
+                        Forecasted_ppe_needs_df_for_download):
         
         
         
@@ -324,7 +317,7 @@ class App_GetNeeds:
         ts_lag2 = ts_lag[-(ForecastDays+1):]
         
         # Declare pandas dataframe to hold data for download
-        self.Forecasted_cases_df_for_download = pd.DataFrame(columns = ['date'] + col_labels)
+        Forecasted_cases_df_for_download = pd.DataFrame(columns = ['date'] + col_labels)
         
         # For each date intended for the output table
         
@@ -358,7 +351,7 @@ class App_GetNeeds:
             df_row.extend(cell)
             labs = ['date'] + col_labels
             temp = pd.DataFrame([df_row], columns=labs)
-            self.Forecasted_cases_df_for_download = pd.concat([self.Forecasted_cases_df_for_download, temp])
+            Forecasted_cases_df_for_download = pd.concat([Forecasted_cases_df_for_download, temp])
             
             # color the first row grey and remaining rows white
             if i == 0:
@@ -557,7 +550,7 @@ class App_GetNeeds:
         table_vals, cclr_vals, rclr_vals = [], [], []
         
         # declare pandas dataframe to hold patient census data for download
-        self.Forecasted_patient_census_df_for_download = pd.DataFrame(columns = ['date'] + col_labels)
+        Forecasted_patient_census_df_for_download = pd.DataFrame(columns = ['date'] + col_labels)
         # For each row...
         for i in range(len(row_labels)):
             # Each cell is a row that holds:
@@ -575,7 +568,7 @@ class App_GetNeeds:
             df_row.extend(cell)
             labs = ['date'] + col_labels
             temp = pd.DataFrame([df_row], columns=labs)
-            self.Forecasted_patient_census_df_for_download = pd.concat([self.Forecasted_patient_census_df_for_download, temp])
+            Forecasted_patient_census_df_for_download = pd.concat([Forecasted_patient_census_df_for_download, temp])
             
             # set colors of rows
             if i == 0:
@@ -728,7 +721,7 @@ class App_GetNeeds:
         cclr_vals = []
         rclr_vals = []
         
-        self.Forecasted_ppe_needs_df_for_download = pd.DataFrame(columns = ['date'] + col_labels)
+        Forecasted_ppe_needs_df_for_download = pd.DataFrame(columns = ['date'] + col_labels)
         for i in range(len(row_labels)):
                 
             cell = [ppe_ls[0][0][i], ppe_ls[1][0][i], ppe_ls[2][0][i], 
@@ -740,7 +733,7 @@ class App_GetNeeds:
             
             labs = ['date'] + col_labels
             temp = pd.DataFrame([df_row], columns=labs)
-            self.Forecasted_ppe_needs_df_for_download = pd.concat([self.Forecasted_ppe_needs_df_for_download, temp])
+            Forecasted_ppe_needs_df_for_download = pd.concat([Forecasted_ppe_needs_df_for_download, temp])
             
             if i == 0:
                 rclr = '0.8'
@@ -798,4 +791,5 @@ class App_GetNeeds:
         
         
         plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=1.1, hspace=1.1)
+        return Forecasted_cases_df_for_download, Forecasted_patient_census_df_for_download, Forecasted_ppe_needs_df_for_download
         
