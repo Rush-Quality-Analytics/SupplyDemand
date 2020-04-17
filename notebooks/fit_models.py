@@ -5,7 +5,7 @@ import datetime # library for date-time functionality
 import numpy as np # numerical python
 import model_fxns as fxns
 
-import sys
+
 
 #### Define the class App_GetFits
 #### Will contain all other functions for modeling, calculation, and plotting
@@ -34,7 +34,7 @@ class App_GetFits:
         ill = available_indicators2.index(lab)
         
         # declare widgets: dropdowns, floattexts, toggle buttons, datepicker, etc.
-        self._1_dropdown = self._create_dropdown(['logistic', 'SEIR-SD', 'exponential', 'polynomial'],
+        self._1_dropdown = self._create_dropdown(['logistic', 'SEIR-SD', 'exponential', 'quadratic', '3rd degree polynomial'],
                                                  0, label = 'Choose a model to fit:')
         
         self._2_dropdown = self._create_dropdown(available_indicators2, ill, label = 'Choose a location:')
