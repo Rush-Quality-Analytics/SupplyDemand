@@ -768,7 +768,7 @@ class App_GetNeeds:
                 the_table[(j, i)].get_text().set_color(clr)
         
         # set values for diagonal column labels
-        hoffset = -0.4 #find this number from trial and error
+        hoffset = -0.3 #find this number from trial and error
         voffset = 1.0 #find this number from trial and error
         col_width = [0.06, 0.09, 0.09, 0.12, 0.133, 0.138, 0.128, 0.135, 0.142]
         

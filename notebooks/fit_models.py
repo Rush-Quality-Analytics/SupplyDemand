@@ -44,7 +44,7 @@ class App_GetFits:
         self._plot_container = widgets.Output()
         
         _app_container = widgets.VBox([widgets.HBox([self._1_dropdown, self._2_dropdown], 
-                             layout=widgets.Layout(align_items='flex-start', flex='0 auto auto', width='100%'))],
+                             layout=widgets.Layout(align_items='flex-start', flex='auto auto', width='100%'))],
                            
                            
                            layout=widgets.Layout(display='flex', flex_flow='column', border='solid 2px', 
@@ -71,8 +71,8 @@ class App_GetFits:
     def _create_dropdown(self, indicators, initial_index, label):
         # create a dropdown widget
         dropdown = widgets.Dropdown(options=indicators, 
-                                    layout={'width': '60%'},
-                                    style={'description_width': '49%'},
+                                    layout={'width': '100%'},
+                                    style={'description_width': '60%'},
                                     value=indicators[initial_index],
                                    description=label)
         
@@ -216,7 +216,7 @@ class App_GetFits:
             #    r-square for observed vs. predicted
             #    predicted y-values
             #    forecasted x and y values
-            iterations = 1000
+            iterations = 2
             obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = fxns.fit_curve(x, y, 
                                 model, ForecastDays, PopSize, ArrivalDate, j, iterations, SEIR_Fit)
             
