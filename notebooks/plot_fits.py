@@ -205,9 +205,6 @@ class App_PlotFits:
         
         # cutomize plot title
         mod = str(model)
-        
-        if mod == 'polynomial':
-            mod = '2nd degree polynomial'
             
         t_label = 'Forecasted cases for ' + focal_loc + '. Population size: ' + f"{popsize:,}"
         t_label += '\nPredicted via fitting the ' + mod + ' model. '
