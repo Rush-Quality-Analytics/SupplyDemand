@@ -65,14 +65,11 @@ def get_logistic(obs_x, obs_y, ForecastDays):
                     obs_y[i] = obs_y[i-1]
                 except:
                     pass
-        # if the minimum y value is still less than zero
-        # then use the polynomial model
-        if np.min(forecasted_y) < 0:
-            forecasted_y, forecasted_x, pred_y = get_polynomial(obs_x, obs_y, ForecastDays)
+        
     except:
         # if the logistic model totally fails to fit
         # then use the polynomial model
-        forecasted_y, forecasted_x, pred_y = get_polynomial(obs_x, obs_y, ForecastDays)
+        forecasted_y, forecasted_x, pred_y, params = get_polynomial(obs_x, obs_y, ForecastDays)
     
     # return the forecasted x-y values and predicted y values
     params = []
