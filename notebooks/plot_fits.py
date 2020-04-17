@@ -210,8 +210,8 @@ class App_PlotFits:
             mod = '2nd degree polynomial'
             
         t_label = 'Forecasted cases for ' + focal_loc + '. Population size: ' + f"{popsize:,}"
-        t_label += '\nPredicted via fitting the ' + mod + ' model'
-        t_label += '. Current forecast ' + r'$r^{2}$' + ' = ' + str(np.round(obs_pred_r2, 3)) 
+        t_label += '\nPredicted via fitting the ' + mod + ' model. '
+        t_label += r'$r^{2}$' + ' of current prediction (gray line): ' + str(np.round(obs_pred_r2, 3)) 
         plt.title(t_label, fontsize = 16, fontweight = 'bold')
         
         
