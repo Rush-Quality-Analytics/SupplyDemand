@@ -490,8 +490,8 @@ class App_GetNeeds:
             
         # Plot the critical care and non-critical care patient census over the 
         # forecasted time frame
-        plt.plot(fdates, total_cc, c='m', label='Critical care', linewidth=3)
-        plt.plot(fdates, total_nc, c='0.4', label='Non-critical care', linewidth=3)
+        plt.plot(fdates[-(ForecastDays+1):], total_cc[-(ForecastDays+1):], c='m', label='Critical care', linewidth=3)
+        plt.plot(fdates[-(ForecastDays+1):], total_nc[-(ForecastDays+1):], c='0.4', label='Non-critical care', linewidth=3)
         plt.title('Forecasted census', fontsize = 16, fontweight = 'bold')
         
         # log-scale y-values to base 10 if the user has chosen
@@ -646,7 +646,7 @@ class App_GetNeeds:
                       'dotted', 'dashed', 'dashdot']
         
         for i, ppe in enumerate(ppe_ls):
-            plt.plot(fdates, ppe[0], c=ppe[2], label=ppe[1], linewidth=2, ls=linestyles[i])
+            plt.plot(fdates[-(ForecastDays+1):], ppe[0][-(ForecastDays+1):], c=ppe[2], label=ppe[1], linewidth=2, ls=linestyles[i])
     
         plt.title('Forecasted PPE needs', fontsize = 16, fontweight = 'bold')
         #if log_scl == True:
