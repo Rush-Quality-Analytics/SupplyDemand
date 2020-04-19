@@ -34,7 +34,9 @@ class App_GetFits:
         ill = available_indicators2.index(lab)
         
         # declare widgets: dropdowns, floattexts, toggle buttons, datepicker, etc.
-        self._1_dropdown = self._create_dropdown(['logistic', 'SEIR-SD', 'exponential', 'quadratic', '3rd degree polynomial'],
+        self._1_dropdown = self._create_dropdown(['Logistic', 'SEIR-SD', 'Exponential', 
+                                                  'Quadratic', '3rd degree polynomial',
+                                                  'Gaussian'],
                                                  0, label = 'Choose a model to fit:')
         
         self._2_dropdown = self._create_dropdown(available_indicators2, ill, label = 'Choose a location:')
@@ -176,10 +178,13 @@ class App_GetFits:
         
         
         obs_y_trunc = []
-        fore_clrs =  ['darkorchid', 'blue', 'green', 'orange', 'red']
-        pred_clrs = ['0.1', '0.2', '0.4', '0.6', '0.8']
+        fore_clrs =  ['purple',  'mediumorchid', 'plum', 'blue', 'deepskyblue', 'darkturquoise',
+                      'green', 'limegreen', 'gold', 'orange', 'red']
+        pred_clrs = ['0.0', '0.1', '0.2', '0.25', '0.3', '0.35', '0.4', '0.5',
+                     '0.6', '0.7', '0.8']
         
-        for i, j in enumerate([-4,-3,-2,-1, 0]):
+        
+        for i, j in enumerate(list(range(-10, 1))):
             pred_clr = pred_clrs[i]
             fore_clr = fore_clrs[i]
             
@@ -192,16 +197,6 @@ class App_GetFits:
                 DATES = yi[4:j]
                 obs_y_trunc = df_sub.iloc[0,4:j].values
             
-            
-            
-            # remove leading zeros from observed y values 
-            # and coordinate it with dates
-            #y = []
-            #dates = []
-            #for ii, val in enumerate(obs_y_trunc):
-            #    if len(y) > 0 or val > 0:
-            #        y.append(val)
-            #       dates.append(DATES[ii])
             
             ii = 0
             while obs_y_trunc[ii] == 0: ii+=1
