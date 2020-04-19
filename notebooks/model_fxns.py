@@ -2,15 +2,14 @@ import pandas as pd # data frame library
 
 import time # library for time functionality
 import datetime # library for date-time functionality
-
+from scipy.integrate import odeint
 import numpy as np # numerical python
 from scipy import stats # scientific python statistical package
 from scipy.optimize import curve_fit # optimization for fitting curves
-
+from math import pi
 
 
 #### FUNCTIONS FOR MODELING THE SPREAD OF COVID-19 CASES
-
 
 def obs_pred_rsquare(obs, pred):
     # Determines the prop of variability in a data set accounted for by a model
@@ -20,14 +19,130 @@ def obs_pred_rsquare(obs, pred):
 
 ################ Simple growth-based statistical models
 
-def logistic(x, a, b, c):
-    # A general logistic function
-    # x is observed data
-    # a, b, c are optimized by scipy optimize curve fit
-    return a / (np.exp(-c * x) + b)
+
+def get_seir(obs_x, obs_y, ForecastDays, N):
+   
+    def deriv(y, ts, N, beta, gamma, delta, s):
+        
+        S, E, I, R = y
+        
+        dSdt = -beta * S * I / N
+        dEdt = beta * S * I / N - s * delta * E
+        dIdt = s * delta * E - gamma * I
+        dRdt = gamma * I
+        
+        return dSdt, dEdt, dIdt, dRdt
+    
+    
+    def seir(x, beta, gamma, delta, s, t):
+        
+        
+        ts = np.linspace(0, len(x)+int(t), len(x)+int(t)) # Grid of time points (in days)
+        
+        y0 = N-1, 1, 0, 0 # Initial conditions vector
+        
+        ret = odeint(deriv, y0, ts, args=(N, beta, gamma, delta, s))
+        S, E, I, R = ret.T
+        I = I.tolist()
+        I = I[-len(x):]
+        I = np.array(I)
+        return I
+
+
+    # obs_x: observed x values
+    # obs_y: observd y values
+    # ForecastDays: number of days ahead to extend prediction
+    
+    # convert obs_x to numpy array
+    obs_x = np.array(obs_x) 
+    # In fitting this model, assume that trailing zeros in obs_y data 
+    # are not real but instead represent a lack of information
+    # Otherwise, the logistic model will fail to fit
+    
+    # convert obs_y to numpy array
+    obs_y = np.array(obs_y)
+    
+    try:
+        # attempt to fit the logistic model to the observed data
+        # popt: optimized model parameter values
+        popt, pcov = curve_fit(seir, obs_x, obs_y)
+        # get predicted y values
+        pred_y = seir(obs_x, *popt)
+        # extend x values by number of ForecastDays
+        forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+        # get corresponding forecasted y values, i.e., extend the predictions
+        forecasted_y = seir(forecasted_x, *popt)
+        
+        # prevent use of negative y values and
+        # trailing zero-valued y values
+        
+        
+        
+    except:
+        # if the logistic model totally fails to fit
+        # then use the polynomial model
+        forecasted_y, forecasted_x, pred_y, params = get_polynomial(obs_x, obs_y, ForecastDays, 1)
+    
+    # return the forecasted x-y values and predicted y values
+    params = []
+    return forecasted_y, forecasted_x, pred_y, params
+
+
+
+
+def get_gaussian(obs_x, obs_y, ForecastDays):
+    
+    
+    def gaussian(x, n, s, m):  
+        return n**2 * (1/(s*((2*pi)**0.5))) * np.exp(-0.5 * ((x - m)/s)**2)
+
+
+    # obs_x: observed x values
+    # obs_y: observd y values
+    # ForecastDays: number of days ahead to extend prediction
+    
+    # convert obs_x to numpy array
+    obs_x = np.array(obs_x) 
+    # In fitting this model, assume that trailing zeros in obs_y data 
+    # are not real but instead represent a lack of information
+    # Otherwise, the logistic model will fail to fit
+    
+    # convert obs_y to numpy array
+    obs_y = np.array(obs_y)
+    
+    try:
+        # attempt to fit the logistic model to the observed data
+        # popt: optimized model parameter values
+        popt, pcov = curve_fit(gaussian, obs_x, obs_y)
+        # get predicted y values
+        pred_y = gaussian(obs_x, *popt)
+        # extend x values by number of ForecastDays
+        forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+        # get corresponding forecasted y values, i.e., extend the predictions
+        forecasted_y = gaussian(forecasted_x, *popt)
+        
+        
+    except:
+        # if the logistic model totally fails to fit
+        # then use the polynomial model
+        forecasted_y, forecasted_x, pred_y, params = get_polynomial(obs_x, obs_y, ForecastDays, 3)
+    
+    # return the forecasted x-y values and predicted y values
+    params = []
+    return forecasted_y, forecasted_x, pred_y, params
+
+
 
 
 def get_logistic(obs_x, obs_y, ForecastDays):
+    
+    def logistic(x, a, b, c, d):
+        # A general logistic function
+        # x is observed data
+        # a, b, c are optimized by scipy optimize curve fit
+        return a / (d + np.exp(-c * x + b))
+
+
     # obs_x: observed x values
     # obs_y: observd y values
     # ForecastDays: number of days ahead to extend prediction
@@ -66,6 +181,7 @@ def get_logistic(obs_x, obs_y, ForecastDays):
                 except:
                     pass
         
+        
     except:
         # if the logistic model totally fails to fit
         # then use the polynomial model
@@ -74,6 +190,9 @@ def get_logistic(obs_x, obs_y, ForecastDays):
     # return the forecasted x-y values and predicted y values
     params = []
     return forecasted_y, forecasted_x, pred_y, params
+
+
+
 
 
 def get_exponential(obs_x, obs_y, ForecastDays):
@@ -161,6 +280,8 @@ def get_polynomial(obs_x, obs_y, ForecastDays, degree=2):
 
 
 def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations, SEIR_Fit=0):
+    global seirN
+    seirN = int(N)
     # A function to fit various models to observed COVID-19 cases data according to:
     # obs_x: observed x values
     # obs_y: observed y values
@@ -189,11 +310,15 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
     
     # Get the forecasted values, predicted values, and observed vs predicted r-square
     # value for the chosen model
-    if model == 'logistic':
+    if model == 'Logistic':
         forecasted_y, forecasted_x, pred_y, params = get_logistic(obs_x, obs_y, ForecastDays)
         obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+        
+    elif model == 'Gaussian':
+        forecasted_y, forecasted_x, pred_y, params = get_gaussian(obs_x, obs_y, ForecastDays)
+        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
     
-    elif model == 'exponential':
+    elif model == 'Exponential':
         forecasted_y, forecasted_x, pred_y, params = get_exponential(obs_x, obs_y, ForecastDays)
         obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
     
@@ -201,12 +326,13 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
         forecasted_y, forecasted_x, pred_y, params = get_polynomial(obs_x, obs_y, ForecastDays, 3)
         obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
     
-    elif model == 'quadratic':
+    elif model == 'Quadratic':
         forecasted_y, forecasted_x, pred_y, params = get_polynomial(obs_x, obs_y, ForecastDays)
         obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
         
-    elif model == 'SEIR-SD':    
-        forecasted_y, forecasted_x, pred_y, params = get_seir(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day)
+    elif model == 'SEIR-SD':
+        forecasted_y, forecasted_x, pred_y, params = get_seir_sd(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day)
+        #forecasted_y, forecasted_x, pred_y, params = get_seir(obs_x, obs_y, ForecastDays, N)
         obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
         
     # return the r-square and observed, predicted, and forecasted values
@@ -220,12 +346,11 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
 
 
 
-def get_seir(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
+def get_seir_sd(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
     
-    def correct_beta(sd, beta, fraction_infected):
+    def correct_beta(sd, beta, pi):
         # A function to adjust the contact rate (beta) by the percent infected
         
-        pi = fraction_infected
         beta = beta/(sd*pi + 1)
         
         return beta
@@ -242,8 +367,9 @@ def get_seir(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
         return 1/(1+np.exp(-0.1*i+5.8))
     
     
-    def seir(obs_x, alpha, beta, gamma, d1, sd, fdays=0):
+    def seir(obs_x, alpha, beta, gamma, d1, sd, s, im, fdays=0):
         
+        sN = int(N)
         today = pd.to_datetime('today', format='%Y/%m/%d')
         ArrivalDate = today - datetime.timedelta(days = d1 + len(obs_x))
         t_max = (today - ArrivalDate).days
@@ -252,14 +378,15 @@ def get_seir(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
         t = list(range(int(t_max))) 
         
         # unpack initial values
-        S = [1 - 1/N] # fraction susceptible
-        E = [1/N] # fraction exposed
+        S = [1 - 1/sN] # fraction susceptible
+        E = [1/sN] # fraction exposed
         I = [0] # fraction infected
         R = [0] # fraction recovered
+        Q = [0] # fraction quarantined
         
         # declare a list that will hold testing-corrected
         # number of infections
-        Ir = list(I)
+        Ir = [0]
         
         # loop through time steps from date of first likely infection
         
@@ -275,21 +402,42 @@ def get_seir(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
             beta = correct_beta(sd, beta, I[-1])
             
             # No. susceptible at time t = S - beta*S*I
-            next_S = S[-1] - beta *S[-1]*I[-1]
+            next_S = S[-1] - beta * S[-1] * I[-1]
             
             # No. exposed at time t = S - beta*S*I - alpha*E
-            next_E = E[-1] + beta *S[-1]*I[-1] - alpha*E[-1]
+            next_E = E[-1] + beta * S[-1] * I[-1] - alpha * E[-1] 
             
             # No. infected at time t = I + alpha*E - gamma*I
-            next_I = I[-1] + alpha*E[-1] - gamma*I[-1] #* 0.1
+            next_I = I[-1] + alpha * E[-1] - gamma * I[-1] 
+            
+            next_Q = 0 #Q[-1] + s * alpha * E[-1] - gamma * Q[-1]
             
             # No. recovered at time t = R - gamma*I
-            next_R = R[-1] + (gamma*I[-1])
+            next_R = R[-1] + gamma*I[-1] #+ gamma*Q[-1]
+            
+            
+            tS = next_S * sN
+            tE = next_E * sN
+            tI = next_I * sN
+            tR = next_R * sN
+            tQ = next_Q * sN
+            
+            sN = sN + im*sN
+            tE = tE + im*sN
+            
+            next_S = tS/sN
+            next_E = tE/sN
+            next_I = tI/sN
+            next_R = tR/sN
+            next_Q = tQ/sN
+            
             
             S.append(next_S)
             E.append(next_E)
             I.append(next_I)
             R.append(next_R)
+            Q.append(next_Q)
+            
             
             # get the testing lag
             test_lag = test_effect(i)
@@ -297,7 +445,7 @@ def get_seir(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
             Ir.append(next_I * test_lag)
         
         # multiply array of apparent percent infected by N
-        I = np.array(Ir)*N
+        I = np.array(Ir) * sN + np.array(Q) * sN
         # convert I to a list
         I = I.tolist()
         
@@ -314,7 +462,7 @@ def get_seir(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
 
     forecasted_y, forecasted_x, pred_y = [], [], []
     pred_y_o = []
-    alpha_o, beta_o, gamma_o, d1_o, sd_o = 1,1,1,1,1
+    alpha_o, beta_o, gamma_o, d1_o, sd_o, s_o, im_o = 1,1,1,1,1,1,1
     
     if SEIR_Fit is not 0:
         ref_date = SEIR_Fit['reference_date'].iloc[day-1]
@@ -333,7 +481,7 @@ def get_seir(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
         params = SEIR_Fit['params'].iloc[0]
         params = eval(params)
     
-        alpha_o, beta_o, gamma_o, d1_o, sd_o = params
+        alpha_o, beta_o, gamma_o, d1_o, sd_o, s_o, im_o = params
     
     
     incubation_period = 1/alpha_o
@@ -347,31 +495,38 @@ def get_seir(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
     gamma = float(gamma_o)
     d1 = float(d1_o)
     sd = float(sd_o)
+    s = float(s_o)
+    im = float(im_o)
+    
     r2_o = 0
 
 
     obs_x = obs_x.tolist()
-    
+    iterations = 2
     for i in range(iterations):
         
-        pred_y = seir(obs_x, alpha, beta, gamma, d1, sd)   
-        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+        pred_y = seir(obs_x, alpha, beta, gamma, d1, sd, s, im)   
+        obs_pred_r2 = obs_pred_rsquare(obs_y[0:], pred_y[0:])
         
-        if obs_pred_r2 >= r2_o:
+        if i == 0 or obs_pred_r2 >= r2_o:
             
             alpha_o = float(alpha)
             beta_o = float(beta)
             gamma_o = float(gamma)
             d1_o = float(d1)
             sd_o = float(sd)
+            s_o = float(s)
             r2_o = float(obs_pred_r2)
             pred_y_o = list(pred_y)
+            im_o = float(im)
             
         incubation_period = np.random.uniform(4, 6)
         infectious_period = np.random.uniform(4, 10)
         rho = np.random.uniform(1, 6)
-        sd = np.random.uniform(0, 100)
+        sd = np.random.uniform(1, 100)
         d1 = np.random.randint(1, 60)
+        s = np.random.uniform(0, 1)
+        im = 10**np.random.uniform(-7, -4)
         
         alpha = 1/incubation_period 
         gamma = 1/infectious_period
@@ -379,8 +534,8 @@ def get_seir(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
     
     
     
-    forecasted_y = seir(obs_x, alpha_o, beta_o, gamma_o, d1_o, sd_o, ForecastDays)
-    params = [alpha_o, beta_o, gamma_o, d1_o, sd_o]
+    forecasted_y = seir(obs_x, alpha_o, beta_o, gamma_o, d1_o, sd_o, s_o, im_o, ForecastDays-1)
+    params = [alpha_o, beta_o, gamma_o, d1_o, sd_o, s_o, im_o]
     
     # return the forecasted x-y values and predicted y values
     return forecasted_y, forecasted_x, pred_y_o, params

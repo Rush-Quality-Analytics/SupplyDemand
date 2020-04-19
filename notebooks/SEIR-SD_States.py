@@ -13,7 +13,7 @@ col_names =  ['obs_y', 'pred_y', 'pred_dates,',
 model_fits_df  = pd.DataFrame(columns = col_names)
 
 
-model = 'SEIR-SD (Requires <1 minute to optimize)'
+model = 'SEIR-SD'
 ap_df = pd.read_csv('COVID-CASES-DF.txt', sep='\t') 
 ap_df = ap_df[ap_df['Country/Region'] == 'US']
 ap_df = ap_df[ap_df['Province/State'] != 'US']
