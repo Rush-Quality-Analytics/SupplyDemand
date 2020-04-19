@@ -129,8 +129,8 @@ class App_GetNeeds:
         PopSize = df['PopSize'].iloc[0]
         model = df['model'].iloc[0]
         
-        if model == 'SEIR-SD':
-            new_cases = new_cases[1:]
+        #if model == 'SEIR-SD':
+        #    new_cases = new_cases[1:]
         
         # reuse primary dataframe when updating the app
         return cls(fdates, new_cases, focal_loc, forecasted_y, ForecastDays, 
