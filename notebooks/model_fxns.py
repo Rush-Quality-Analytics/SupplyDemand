@@ -8,7 +8,7 @@ from scipy import stats # scientific python statistical package
 from scipy.optimize import curve_fit # optimization for fitting curves
 from math import pi
 
-
+import sys
 #### FUNCTIONS FOR MODELING THE SPREAD OF COVID-19 CASES
 
 def obs_pred_rsquare(obs, pred):
@@ -19,75 +19,26 @@ def obs_pred_rsquare(obs, pred):
 
 ################ Simple growth-based statistical models
 
+import pandas as pd # data frame library
 
-def get_seir(obs_x, obs_y, ForecastDays, N):
-   
-    def deriv(y, ts, N, beta, gamma, delta, s):
-        
-        S, E, I, R = y
-        
-        dSdt = -beta * S * I / N
-        dEdt = beta * S * I / N - s * delta * E
-        dIdt = s * delta * E - gamma * I
-        dRdt = gamma * I
-        
-        return dSdt, dEdt, dIdt, dRdt
-    
-    
-    def seir(x, beta, gamma, delta, s, t):
-        
-        
-        ts = np.linspace(0, len(x)+int(t), len(x)+int(t)) # Grid of time points (in days)
-        
-        y0 = N-1, 1, 0, 0 # Initial conditions vector
-        
-        ret = odeint(deriv, y0, ts, args=(N, beta, gamma, delta, s))
-        S, E, I, R = ret.T
-        I = I.tolist()
-        I = I[-len(x):]
-        I = np.array(I)
-        return I
+import time # library for time functionality
+import datetime # library for date-time functionality
+from scipy.integrate import odeint
+import numpy as np # numerical python
+from scipy import stats # scientific python statistical package
+from scipy.optimize import curve_fit # optimization for fitting curves
+from math import pi
 
 
-    # obs_x: observed x values
-    # obs_y: observd y values
-    # ForecastDays: number of days ahead to extend prediction
-    
-    # convert obs_x to numpy array
-    obs_x = np.array(obs_x) 
-    # In fitting this model, assume that trailing zeros in obs_y data 
-    # are not real but instead represent a lack of information
-    # Otherwise, the logistic model will fail to fit
-    
-    # convert obs_y to numpy array
-    obs_y = np.array(obs_y)
-    
-    try:
-        # attempt to fit the logistic model to the observed data
-        # popt: optimized model parameter values
-        popt, pcov = curve_fit(seir, obs_x, obs_y)
-        # get predicted y values
-        pred_y = seir(obs_x, *popt)
-        # extend x values by number of ForecastDays
-        forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
-        # get corresponding forecasted y values, i.e., extend the predictions
-        forecasted_y = seir(forecasted_x, *popt)
-        
-        # prevent use of negative y values and
-        # trailing zero-valued y values
-        
-        
-        
-    except:
-        # if the logistic model totally fails to fit
-        # then use the polynomial model
-        forecasted_y, forecasted_x, pred_y, params = get_polynomial(obs_x, obs_y, ForecastDays, 1)
-    
-    # return the forecasted x-y values and predicted y values
-    params = []
-    return forecasted_y, forecasted_x, pred_y, params
+#### FUNCTIONS FOR MODELING THE SPREAD OF COVID-19 CASES
 
+def obs_pred_rsquare(obs, pred):
+    # Determines the prop of variability in a data set accounted for by a model
+    # In other words, this determines the proportion of variation explained by
+    # the 1:1 line in an observed-predicted plot.
+    return 1 - sum((obs - pred) ** 2) / sum((obs - np.mean(obs)) ** 2)
 
+################ Simple growth-based statistical models
 
 
 def get_gaussian(obs_x, obs_y, ForecastDays):
@@ -276,6 +227,7 @@ def get_polynomial(obs_x, obs_y, ForecastDays, degree=2):
     params = []
     # return the forecasted x-y values and predicted y values
     return forecasted_y, forecasted_x, pred_y, params
+
 
 
 
