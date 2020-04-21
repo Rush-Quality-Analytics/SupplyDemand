@@ -96,7 +96,7 @@ else:
                                     model, ForecastDays, PopSize, ArrivalDate, j, iterations, SEIR_fit)
             
              
-            print(obs_pred_r2)
+            print(focal_loc, obs_pred_r2, len(params))
             
             if obs_pred_r2 < 0:
                 obs_pred_r2 = 0.0
