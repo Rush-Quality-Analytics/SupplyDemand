@@ -454,7 +454,6 @@ def get_seir_sd(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
 
 
     obs_x = obs_x.tolist()
-    iterations = 2
     for i in range(iterations):
         
         pred_y = seir(obs_x, alpha, beta, gamma, d1, sd, s, im)   
