@@ -2,28 +2,7 @@ import pandas as pd # data frame library
 
 import time # library for time functionality
 import datetime # library for date-time functionality
-from scipy.integrate import odeint
-import numpy as np # numerical python
-from scipy import stats # scientific python statistical package
-from scipy.optimize import curve_fit # optimization for fitting curves
-from math import pi
-
-import sys
-#### FUNCTIONS FOR MODELING THE SPREAD OF COVID-19 CASES
-
-def obs_pred_rsquare(obs, pred):
-    # Determines the prop of variability in a data set accounted for by a model
-    # In other words, this determines the proportion of variation explained by
-    # the 1:1 line in an observed-predicted plot.
-    return 1 - sum((obs - pred) ** 2) / sum((obs - np.mean(obs)) ** 2)
-
-################ Simple growth-based statistical models
-
-import pandas as pd # data frame library
-
-import time # library for time functionality
-import datetime # library for date-time functionality
-from scipy.integrate import odeint
+#from scipy.integrate import odeint
 import numpy as np # numerical python
 from scipy import stats # scientific python statistical package
 from scipy.optimize import curve_fit # optimization for fitting curves
