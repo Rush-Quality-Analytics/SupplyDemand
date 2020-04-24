@@ -180,7 +180,7 @@ class App_PlotFits:
 
         plt.xticks(rotation=35, ha='center')
         plt.xlabel('Date', fontsize=14, fontweight='bold')
-        plt.ylabel('Confirmed cases', fontsize=14, fontweight='bold')
+        plt.ylabel('Estimated active cases', fontsize=14, fontweight='bold')
         
         # log-scale y-values to base 10 if user choose the option
         if log_scl == True:
