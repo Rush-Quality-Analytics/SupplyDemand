@@ -68,8 +68,7 @@ def dataframe():
     except:
         pass
 
-    df_main['Confirmed active'] = df_main['Confirmed'] - (df_main['Recovered'] + df_main['Deaths'])
-    df_sums = df_main.groupby(['Province/State','date'])['Confirmed active'].sum().reset_index()
+    df_sums = df_main.groupby(['Province/State','date'])['Confirmed'].sum().reset_index()
     
     return df_sums, df_main, dates
     
@@ -77,7 +76,9 @@ def dataframe():
 df_sums, df_main, dates = dataframe()
 
 
-
+print(list(df_sums))
+print(df_sums.shape)
+print(len(dates))
 
 
 col_names = ['Province/State', 'Country/Region', 'Lat', 'Long']
@@ -106,7 +107,7 @@ for ps in provstates:
     
     ps_ls = [ps, 'US', lat, long]
     cases = df_sums[df_sums['Province/State'].str.contains(ps)]
-    st_cases = cases['Confirmed active'].tolist()
+    st_cases = cases['Confirmed'].tolist()
     st_dates = cases['date'].tolist()
     
     c = []
