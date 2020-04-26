@@ -35,8 +35,7 @@ class App_GetFits:
         
         # declare widgets: dropdowns, floattexts, toggle buttons, datepicker, etc.
         self._1_dropdown = self._create_dropdown(['Logistic', 'SEIR-SD', 'Exponential', 
-                                                  'Quadratic', '3rd degree polynomial',
-                                                  'Gaussian'],
+                                                  'Quadratic', 'Gaussian'],
                                                  0, label = 'Choose a model to fit:')
         
         self._2_dropdown = self._create_dropdown(available_indicators2, ill, label = 'Choose a location:')

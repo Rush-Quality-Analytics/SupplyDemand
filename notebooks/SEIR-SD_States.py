@@ -83,7 +83,7 @@ for focal_loc in states:
         # declare x as a list of integers from 0 to len(y)
         x = list(range(len(obs_y_trunc)))
          
-        iterations = 20000
+        iterations = 50000
         SEIR_fit = 0
         
         obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = fxns.fit_curve(x, obs_y_trunc, 
