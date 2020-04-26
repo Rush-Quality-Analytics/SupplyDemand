@@ -227,6 +227,16 @@ def get_polynomial(obs_x, obs_y, ForecastDays, degree=2):
         # will throw an error
         pass
     
+    for i, val in enumerate(pred_y):
+        if i > 0:
+            if val < pred_y[i-1]:
+                pred_y[i] = pred_y[i-1]
+                
+    for i, val in enumerate(forecasted_y):
+        if i > 0:
+            if val < forecasted_y[i-1]:
+                forecasted_y[i] = forecasted_y[i-1]
+        
     params = []
     # return the forecasted x-y values and predicted y values
     return forecasted_y, forecasted_x, pred_y, params
