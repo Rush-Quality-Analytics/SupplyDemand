@@ -76,9 +76,9 @@ def dataframe():
 df_sums, df_main, dates = dataframe()
 
 
-print(list(df_sums))
-print(df_sums.shape)
-print(len(dates))
+#print(list(df_sums))
+#print(df_sums.shape)
+#print(len(dates))
 
 
 col_names = ['Province/State', 'Country/Region', 'Lat', 'Long']
