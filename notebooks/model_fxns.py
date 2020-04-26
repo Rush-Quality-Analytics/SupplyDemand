@@ -1,14 +1,11 @@
 import pandas as pd # data frame library
 
-from scipy.integrate import odeint
-import time # library for time functionality
 import datetime # library for date-time functionality
-#from scipy.integrate import odeint
 import numpy as np # numerical python
 import scipy as sc
 from scipy import stats # scientific python statistical package
 from scipy.optimize import curve_fit # optimization for fitting curves
-from math import pi
+
 
 
 #### FUNCTIONS FOR MODELING THE SPREAD OF COVID-19 CASES
@@ -226,16 +223,6 @@ def get_polynomial(obs_x, obs_y, ForecastDays, degree=2):
         # if the polynomial model fails, the lack of a substitute here
         # will throw an error
         pass
-    
-    for i, val in enumerate(pred_y):
-        if i > 0:
-            if val < pred_y[i-1]:
-                pred_y[i] = pred_y[i-1]
-                
-    for i, val in enumerate(forecasted_y):
-        if i > 0:
-            if val < forecasted_y[i-1]:
-                forecasted_y[i] = forecasted_y[i-1]
         
     params = []
     # return the forecasted x-y values and predicted y values
