@@ -5,7 +5,7 @@ import pandas as pd # data frame library
 
 import numpy as np # numerical python
 import scipy as sc
-from scipy.stats import poisson # binomial and poisson distribution functions
+from scipy.stats import poisson, binom # binomial and poisson distribution functions
 
 
 #### Define the class App_GetFits
@@ -447,7 +447,7 @@ class App_GetNeeds:
         # Model length of stay (LOS) as a lognormally distributed
         # random variable
         
-        sigma = 0.9
+        sigma = 0.5
         n_cc = np.log(LOS_cc) - (sigma**2)/2
         n_nc = np.log(LOS_nc) - (sigma**2)/2
     
@@ -455,6 +455,30 @@ class App_GetNeeds:
         
         p_nc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_nc)/(2**0.5*sigma))
         p_cc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_cc)/(2**0.5*sigma))
+        
+        
+        # Model length of stay (LOS) as a binomially distributed
+        # random variable according to binomial parameters p and n
+        #    p: used to obtain a symmetrical distribution 
+        #    n: (n_cc & n_nc) = 2 * LOS will produce a binomial
+        #       distribution with a mean equal to the LOS
+        
+        #p = 0.5
+        #n_cc = LOS_cc*2
+        #n_nc = LOS_nc*2
+        
+        # get the binomial random variable properties
+        #rv_nc = binom(n_nc, p)
+        # Use the binomial cumulative distribution function
+        #p_nc = rv_nc.cdf(np.array(range(1, len(fdates)+1)))
+        
+        # get the binomial random variable properties
+        #rv_cc = binom(n_cc, p)
+        # Use the binomial cumulative distribution function
+        #p_cc = rv_cc.cdf(np.array(range(1, len(fdates)+1)))
+        
+        
+        
     
         # Initiate lists to hold numbers of critical care and non-critical care patients
         # who are expected as new admits (index 0), as 1 day patients, 2 day patients, etc.
