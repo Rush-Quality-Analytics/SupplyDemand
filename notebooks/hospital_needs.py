@@ -44,46 +44,47 @@ class App_GetNeeds:
         
         
         # declare widgets: dropdowns, floattexts, toggle buttons, datepicker, etc.
-        
+        d = '70%'
+        b = '23%'
         self._3_floattext = self._create_floattext(label = '% Visiting your hospital', 
-                                                   val=9.5, minv=0, maxv=100, boxw='25%', desw='70%')
+                                                   val=9.5, minv=0, maxv=100, boxw=b, desw=d)
         self._4_floattext = self._create_floattext(label = '% Admitted to your hospital', 
-                                                   val=10, minv=0, maxv=100, boxw='25%', desw='70%')
+                                                   val=10, minv=0, maxv=100, boxw=b, desw=d)
         self._5_floattext = self._create_floattext(label = '% Admitted to critical care:', 
-                                                   val=35, minv=0, maxv=100, boxw='25%', desw='70%')
+                                                   val=35, minv=0, maxv=100, boxw=b, desw=d)
         self._6_floattext = self._create_floattext(label = 'LOS (non-critical care)', 
-                                                   val=8, minv=1, maxv=180, boxw='25%', desw='70%')
+                                                   val=8, minv=1, maxv=180, boxw=b, desw=d)
         self._7_floattext = self._create_floattext(label = 'LOS (critical care)', 
-                                                   val=18, minv=1, maxv=180, boxw='25%', desw='70%')
+                                                   val=18, minv=1, maxv=180, boxw=b, desw=d)
         self._8_floattext = self._create_floattext(label = '% of ICU on vent:',
-                                                   val=70, minv=0, maxv=100, boxw='25%', desw='70%')
+                                                   val=70, minv=0, maxv=100, boxw=b, desw=d)
         
         self._9_floattext = self._create_floattext(label = 'Skewness of ICU LOS:',
-                                                   val=0.3, minv=0, maxv=2, boxw='25%', desw='70%')
+                                                   val=0.3, minv=0, maxv=2, boxw=b, desw=d)
         self._21_floattext = self._create_floattext(label = 'Skewness of non-ICU LOS:',
-                                                   val=0.3, minv=0, maxv=2, boxw='25%', desw='70%')
+                                                   val=0.3, minv=0, maxv=2, boxw=b, desw=d)
         
         self._10_floattext = self._create_floattext(label = 'GLOVE SURGICAL', 
-                                                    val=2, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=2, minv=0, maxv=1000, boxw=b, desw=d)
         self._11_floattext = self._create_floattext(label = 'GLOVE EXAM NITRILE', 
-                                                    val=260, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=260, minv=0, maxv=1000, boxw=b, desw=d)
         self._12_floattext = self._create_floattext(label = 'GLOVE EXAM VINYL', 
-                                                    val=10, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=10, minv=0, maxv=1000, boxw=b, desw=d)
         self._13_floattext = self._create_floattext(label = 'MASK FACE PROC. ANTI FOG', 
-                                                    val=45, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=45, minv=0, maxv=1000, boxw=b, desw=d)
         self._14_floattext = self._create_floattext(label = 'MASK PROC. FLUID RESISTANT', 
-                                                    val=1, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=1, minv=0, maxv=1000, boxw=b, desw=d)
         self._15_floattext = self._create_floattext(label = 'GOWN ISOLATION XL YELLOW', 
-                                                    val=2, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=2, minv=0, maxv=1000, boxw=b, desw=d)
         self._16_floattext = self._create_floattext(label = 'MASK SURG. ANTI FOG W/FILM', 
-                                                    val=1, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=1, minv=0, maxv=1000, boxw=b, desw=d)
         self._17_floattext = self._create_floattext(label = 'SHIELD FACE FULL ANTI FOG', 
-                                                    val=1, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=1, minv=0, maxv=1000, boxw=b, desw=d)
         self._18_floattext = self._create_floattext(label = 'RESP. PART. FILTER REG', 
-                                                    val=11, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=11, minv=0, maxv=1000, boxw=b, desw=d)
         
         self._20_floattext = self._create_floattext(label = 'Average time lag between the onset of symptoms and hospital visit (days)', 
-                                                    val=0, minv=0, maxv=14, boxw='70%', desw='90%')
+                                                    val=0, minv=0, maxv=14, boxw=b, desw=d)
         
         
         
@@ -92,22 +93,21 @@ class App_GetNeeds:
         
         _app_container = widgets.VBox(
             [widgets.VBox([widgets.HBox([self._3_floattext, self._4_floattext, self._5_floattext, self._8_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 0 0', width='100%')),
+                             layout=widgets.Layout(align_items='center', flex='auto auto auto auto', width='100%')),
                            
                            widgets.HBox([self._6_floattext, self._9_floattext, self._7_floattext, self._21_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 0 0', width='100%')),
+                             layout=widgets.Layout(align_items='center', flex='auto auto auto auto', width='100%')),
                           
-                           widgets.HBox([self._10_floattext, self._11_floattext, self._12_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
+                           widgets.HBox([self._10_floattext, self._11_floattext, self._12_floattext, self._13_floattext, ],
+                             layout=widgets.Layout(align_items='flex-start', flex='auto auto auto auto', width='100%')),
                            
-                           widgets.HBox([self._13_floattext, self._14_floattext, self._15_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
+                           widgets.HBox([self._14_floattext, self._15_floattext, self._16_floattext, self._17_floattext],
+                             layout=widgets.Layout(align_items='flex-start', flex='auto auto auto auto', width='100%')),
                            
-                           widgets.HBox([self._16_floattext, self._17_floattext, self._18_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
+                           widgets.HBox([ self._18_floattext, self._20_floattext],
+                             layout=widgets.Layout(align_items='flex-start', flex='auto auto', width='100%')),
                           
-                           widgets.HBox([self._20_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%'))],
+                           ],
                            
                            layout=widgets.Layout(display='flex', flex_flow='column', border='solid 1px', 
                                         align_items='stretch', width='100%')),
