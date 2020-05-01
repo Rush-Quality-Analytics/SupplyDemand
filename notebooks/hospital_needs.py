@@ -46,17 +46,22 @@ class App_GetNeeds:
         # declare widgets: dropdowns, floattexts, toggle buttons, datepicker, etc.
         
         self._3_floattext = self._create_floattext(label = '% Visiting your hospital', 
-                                                   val=9.5, minv=0, maxv=100, boxw='33%', desw='70%')
+                                                   val=9.5, minv=0, maxv=100, boxw='25%', desw='70%')
         self._4_floattext = self._create_floattext(label = '% Admitted to your hospital', 
-                                                   val=10, minv=0, maxv=100, boxw='33%', desw='70%')
+                                                   val=10, minv=0, maxv=100, boxw='25%', desw='70%')
         self._5_floattext = self._create_floattext(label = '% Admitted to critical care:', 
-                                                   val=35, minv=0, maxv=100, boxw='33%', desw='70%')
+                                                   val=35, minv=0, maxv=100, boxw='25%', desw='70%')
         self._6_floattext = self._create_floattext(label = 'LOS (non-critical care)', 
-                                                   val=8, minv=1, maxv=180, boxw='33%', desw='70%')
+                                                   val=8, minv=1, maxv=180, boxw='25%', desw='70%')
         self._7_floattext = self._create_floattext(label = 'LOS (critical care)', 
-                                                   val=18, minv=1, maxv=180, boxw='33%', desw='70%')
+                                                   val=18, minv=1, maxv=180, boxw='25%', desw='70%')
         self._8_floattext = self._create_floattext(label = '% of ICU on vent:',
-                                                   val=70, minv=0, maxv=100, boxw='33%', desw='70%')
+                                                   val=70, minv=0, maxv=100, boxw='25%', desw='70%')
+        
+        self._9_floattext = self._create_floattext(label = 'Skewness of ICU LOS:',
+                                                   val=0.3, minv=0, maxv=2, boxw='25%', desw='70%')
+        self._21_floattext = self._create_floattext(label = 'Skewness of non-ICU LOS:',
+                                                   val=0.3, minv=0, maxv=2, boxw='25%', desw='70%')
         
         self._10_floattext = self._create_floattext(label = 'GLOVE SURGICAL', 
                                                     val=2, minv=0, maxv=1000, boxw='33%', desw='70%')
@@ -86,11 +91,11 @@ class App_GetNeeds:
         self._plot_container = widgets.Output()
         
         _app_container = widgets.VBox(
-            [widgets.VBox([widgets.HBox([self._3_floattext, self._4_floattext, self._5_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
+            [widgets.VBox([widgets.HBox([self._3_floattext, self._4_floattext, self._5_floattext, self._8_floattext],
+                             layout=widgets.Layout(align_items='flex-start', flex='0 0 0 0', width='100%')),
                            
-                           widgets.HBox([self._6_floattext, self._7_floattext, self._8_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
+                           widgets.HBox([self._6_floattext, self._9_floattext, self._7_floattext, self._21_floattext],
+                             layout=widgets.Layout(align_items='flex-start', flex='0 0 0 0', width='100%')),
                           
                            widgets.HBox([self._10_floattext, self._11_floattext, self._12_floattext],
                              layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
@@ -108,7 +113,7 @@ class App_GetNeeds:
                                         align_items='stretch', width='100%')),
              
                            
-                           self._plot_container], layout=widgets.Layout(display='flex', flex_flow='column', 
+                           self._plot_container], layout=widgets.Layout(
                                         border='solid 2px', align_items='initial', width='100%'))
                 
         # 'flex-start', 'flex-end', 'center', 'baseline', 'stretch', 'inherit', 'initial', 'unset'
