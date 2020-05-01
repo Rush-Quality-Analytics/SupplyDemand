@@ -44,7 +44,7 @@ class App_GetNeeds:
         
         
         # declare widgets: dropdowns, floattexts, toggle buttons, datepicker, etc.
-        d = '70%'
+        d = '65%'
         b = '23%'
         self._3_floattext = self._create_floattext(label = '% Visiting your hospital', 
                                                    val=9.5, minv=0, maxv=100, boxw=b, desw=d)
@@ -84,44 +84,46 @@ class App_GetNeeds:
                                                     val=11, minv=0, maxv=1000, boxw=b, desw=d)
         
         self._20_floattext = self._create_floattext(label = 'Average time lag between the onset of symptoms and hospital visit (days)', 
-                                                    val=0, minv=0, maxv=14, boxw=b, desw=d)
+                                                    val=0, minv=0, maxv=14, boxw='50%', desw='80%')
         
         
         
         # define containers to hold the widgets, plots, and additional outputs
         self._plot_container = widgets.Output()
-        
+        w = '100%'
+        f = '0 0 0 0'
+        f = 'auto auto auto auto'
         _app_container = widgets.VBox(
             [widgets.VBox([widgets.HBox([self._3_floattext, self._4_floattext, self._5_floattext, self._8_floattext],
-                             layout=widgets.Layout(align_items='center', flex='auto auto auto auto', width='100%')),
+                             layout=widgets.Layout(align_items='center', flex=f, width=w)),
                            
                            widgets.HBox([self._6_floattext, self._9_floattext, self._7_floattext, self._21_floattext],
-                             layout=widgets.Layout(align_items='center', flex='auto auto auto auto', width='100%')),
+                             layout=widgets.Layout(align_items='center', flex=f, width=w)),
                           
                            widgets.HBox([self._10_floattext, self._11_floattext, self._12_floattext, self._13_floattext, ],
-                             layout=widgets.Layout(align_items='flex-start', flex='auto auto auto auto', width='100%')),
+                             layout=widgets.Layout(align_items='flex-start', flex=f, width=w)),
                            
                            widgets.HBox([self._14_floattext, self._15_floattext, self._16_floattext, self._17_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='auto auto auto auto', width='100%')),
+                             layout=widgets.Layout(align_items='flex-start', flex=f, width=w)),
                            
                            widgets.HBox([ self._18_floattext, self._20_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='auto auto', width='100%')),
+                             layout=widgets.Layout(align_items='flex-start', flex='auto auto', width=w)),
                           
                            ],
                            
-                           layout=widgets.Layout(display='flex', flex_flow='column', border='solid 1px', 
-                                        align_items='stretch', width='100%')),
+                           layout=widgets.Layout(border='solid 1px', 
+                                        align_items='stretch', width=w)),
              
                            
                            self._plot_container], layout=widgets.Layout(
-                                        border='solid 2px', align_items='initial', width='100%'))
+                                        border='solid 2px'))
                 
         # 'flex-start', 'flex-end', 'center', 'baseline', 'stretch', 'inherit', 'initial', 'unset'
         self.container = widgets.VBox([
             widgets.HBox([
                 _app_container
             ])
-        ], layout=widgets.Layout(align_items='flex-start', flex='auto', width='100%'))
+        ], layout=widgets.Layout())
         self._update_app()
         
         
@@ -143,16 +145,6 @@ class App_GetNeeds:
                    PopSize, model, model_fits_df)
         
         
-    def _create_dropdown(self, indicators, initial_index, label):
-        # create a dropdown widget
-        dropdown = widgets.Dropdown(options=indicators, 
-                                    layout={'width': '60%'},
-                                    style={'description_width': '49%'},
-                                    value=indicators[initial_index],
-                                   description=label)
-        
-        dropdown.observe(self._on_change, names=['value'])
-        return dropdown
     
     def _create_floattext(self, label, val, minv, maxv, boxw, desw):
         # create a floattext widget
@@ -167,23 +159,6 @@ class App_GetNeeds:
                 )
         obj.observe(self._on_change, names=['value'])
         return obj
-    
-    
-    
-    def _create_toggle(self): 
-        # create a toggle button widget
-        obj = widgets.ToggleButton(
-                    value=False,
-                    description='log-scale',
-                    disabled=False,
-                    button_style='', # 'success', 'info', 'warning', 'danger' or ''
-                    tooltip='Description',
-                    icon='check' # (FontAwesome names without the `fa-` prefix)
-                )
-        obj.observe(self._on_change, names=['value'])
-        return obj
-    
-    
     
     
     def _on_change(self, _):
@@ -215,6 +190,9 @@ class App_GetNeeds:
         ppe_RESPIRATOR_PARTICULATE_FILTER_REG = self._18_floattext.value
         TimeLag = self._20_floattext.value
         
+        cc_sigma = self._9_floattext.value
+        nc_sigma = self._21_floattext.value
+        
         
         # wait to clear the plots/tables until new ones are generated
         self._plot_container.clear_output(wait=True)
@@ -228,6 +206,7 @@ class App_GetNeeds:
                          ppe_MASK_FACE_PROCEDURE_ANTI_FOG, ppe_MASK_PROCEDURE_FLUID_RESISTANT, 
                          ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                          ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
+                         cc_sigma, nc_sigma,
                          TimeLag, self.PopSize, self.ForecastDays, self.forecasted_y, self.focal_loc, self.fdates,
                          self.new_cases, self.model, self.Forecasted_cases_df_for_download,
                          self.Forecasted_patient_census_df_for_download,
@@ -245,6 +224,7 @@ class App_GetNeeds:
                         ppe_MASK_FACE_PROCEDURE_ANTI_FOG, ppe_MASK_PROCEDURE_FLUID_RESISTANT, 
                         ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                         ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
+                        cc_sigma, nc_sigma,
                         TimeLag, PopSize, ForecastDays, forecasted_y, focal_loc, fdates,
                         new_cases, model, Forecasted_cases_df_for_download,
                         Forecasted_patient_census_df_for_download,
@@ -253,7 +233,7 @@ class App_GetNeeds:
         
         
         # declare figure object
-        fig = plt.figure(figsize=(15, 17))
+        fig = plt.figure(figsize=(16, 17))
         
         # Declare figure axis to hold table of forecasted cases, visits, admits
         ax = plt.subplot2grid((6, 4), (0, 2), colspan=2, rowspan=2)
@@ -452,14 +432,14 @@ class App_GetNeeds:
         # Model length of stay (LOS) as a lognormally distributed
         # random variable
         
-        sigma = 0.3
-        n_cc = np.log(LOS_cc) - (sigma**2)/2
-        n_nc = np.log(LOS_nc) - (sigma**2)/2
+        
+        n_cc = np.log(LOS_cc) - (cc_sigma**2)/2
+        n_nc = np.log(LOS_nc) - (nc_sigma**2)/2
     
         x_vars = np.array(list(range(1, len(fdates)+1)))
         
-        p_nc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_nc)/(2**0.5*sigma))
-        p_cc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_cc)/(2**0.5*sigma))
+        p_nc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_nc)/(2**0.5*nc_sigma))
+        p_cc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_cc)/(2**0.5*cc_sigma))
         
         
         # Model length of stay (LOS) as a binomially distributed
