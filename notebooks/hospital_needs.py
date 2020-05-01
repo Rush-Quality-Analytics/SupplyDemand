@@ -46,17 +46,17 @@ class App_GetNeeds:
         # declare widgets: dropdowns, floattexts, toggle buttons, datepicker, etc.
         
         self._3_floattext = self._create_floattext(label = '% Visiting your hospital', 
-                                                   val=10, minv=0, maxv=100, boxw='33%', desw='70%')
+                                                   val=9.5, minv=0, maxv=100, boxw='33%', desw='70%')
         self._4_floattext = self._create_floattext(label = '% Admitted to your hospital', 
-                                                   val=30, minv=0, maxv=100, boxw='33%', desw='70%')
+                                                   val=10, minv=0, maxv=100, boxw='33%', desw='70%')
         self._5_floattext = self._create_floattext(label = '% Admitted to critical care:', 
-                                                   val=25, minv=0, maxv=100, boxw='33%', desw='70%')
+                                                   val=35, minv=0, maxv=100, boxw='33%', desw='70%')
         self._6_floattext = self._create_floattext(label = 'LOS (non-critical care)', 
-                                                   val=3, minv=1, maxv=180, boxw='33%', desw='70%')
+                                                   val=8, minv=1, maxv=180, boxw='33%', desw='70%')
         self._7_floattext = self._create_floattext(label = 'LOS (critical care)', 
-                                                   val=12, minv=1, maxv=180, boxw='33%', desw='70%')
+                                                   val=18, minv=1, maxv=180, boxw='33%', desw='70%')
         self._8_floattext = self._create_floattext(label = '% of ICU on vent:',
-                                                   val=60, minv=0, maxv=100, boxw='33%', desw='70%')
+                                                   val=70, minv=0, maxv=100, boxw='33%', desw='70%')
         
         self._10_floattext = self._create_floattext(label = 'GLOVE SURGICAL', 
                                                     val=2, minv=0, maxv=1000, boxw='33%', desw='70%')
@@ -447,7 +447,7 @@ class App_GetNeeds:
         # Model length of stay (LOS) as a lognormally distributed
         # random variable
         
-        sigma = 0.5
+        sigma = 0.3
         n_cc = np.log(LOS_cc) - (sigma**2)/2
         n_nc = np.log(LOS_nc) - (sigma**2)/2
     
