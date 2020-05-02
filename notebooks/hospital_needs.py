@@ -44,79 +44,90 @@ class App_GetNeeds:
         
         
         # declare widgets: dropdowns, floattexts, toggle buttons, datepicker, etc.
-        
+        d = '65%'
+        b = '23%'
         self._3_floattext = self._create_floattext(label = '% Visiting your hospital', 
-                                                   val=9.5, minv=0, maxv=100, boxw='33%', desw='70%')
+                                                   val=9.5, minv=0, maxv=100, boxw=b, desw=d)
         self._4_floattext = self._create_floattext(label = '% Admitted to your hospital', 
-                                                   val=10, minv=0, maxv=100, boxw='33%', desw='70%')
+                                                   val=20, minv=0, maxv=100, boxw=b, desw=d)
         self._5_floattext = self._create_floattext(label = '% Admitted to critical care:', 
-                                                   val=35, minv=0, maxv=100, boxw='33%', desw='70%')
-        self._6_floattext = self._create_floattext(label = 'LOS (non-critical care)', 
-                                                   val=8, minv=1, maxv=180, boxw='33%', desw='70%')
-        self._7_floattext = self._create_floattext(label = 'LOS (critical care)', 
-                                                   val=18, minv=1, maxv=180, boxw='33%', desw='70%')
+                                                   val=35, minv=0, maxv=100, boxw=b, desw=d)
         self._8_floattext = self._create_floattext(label = '% of ICU on vent:',
-                                                   val=70, minv=0, maxv=100, boxw='33%', desw='70%')
+                                                   val=70, minv=0, maxv=100, boxw=b, desw=d)
+        
+        
+        self._6_floattext = self._create_floattext(label = 'mean ICU Length of stay', 
+                                                   val=18, minv=1, maxv=30, boxw=b, desw=d)
+        self._9_floattext = self._create_floattext(label = 'median ICU Length of stay',
+                                                   val=10, minv=1, maxv=30, boxw=b, desw=d)
+        
+        self._7_floattext = self._create_floattext(label = 'mean non-ICU Length of stay', 
+                                                   val=9, minv=1, maxv=30, boxw=b, desw=d)
+        
+        self._21_floattext = self._create_floattext(label = 'median non-ICU length of stay',
+                                                   val=4, minv=1, maxv=30, boxw=b, desw=d)
+        
         
         self._10_floattext = self._create_floattext(label = 'GLOVE SURGICAL', 
-                                                    val=2, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=2, minv=0, maxv=1000, boxw=b, desw=d)
         self._11_floattext = self._create_floattext(label = 'GLOVE EXAM NITRILE', 
-                                                    val=260, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=260, minv=0, maxv=1000, boxw=b, desw=d)
         self._12_floattext = self._create_floattext(label = 'GLOVE EXAM VINYL', 
-                                                    val=10, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=10, minv=0, maxv=1000, boxw=b, desw=d)
         self._13_floattext = self._create_floattext(label = 'MASK FACE PROC. ANTI FOG', 
-                                                    val=45, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=45, minv=0, maxv=1000, boxw=b, desw=d)
         self._14_floattext = self._create_floattext(label = 'MASK PROC. FLUID RESISTANT', 
-                                                    val=1, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=1, minv=0, maxv=1000, boxw=b, desw=d)
         self._15_floattext = self._create_floattext(label = 'GOWN ISOLATION XL YELLOW', 
-                                                    val=2, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=2, minv=0, maxv=1000, boxw=b, desw=d)
         self._16_floattext = self._create_floattext(label = 'MASK SURG. ANTI FOG W/FILM', 
-                                                    val=1, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=1, minv=0, maxv=1000, boxw=b, desw=d)
         self._17_floattext = self._create_floattext(label = 'SHIELD FACE FULL ANTI FOG', 
-                                                    val=1, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=1, minv=0, maxv=1000, boxw=b, desw=d)
         self._18_floattext = self._create_floattext(label = 'RESP. PART. FILTER REG', 
-                                                    val=11, minv=0, maxv=1000, boxw='33%', desw='70%')
+                                                    val=11, minv=0, maxv=1000, boxw=b, desw=d)
         
         self._20_floattext = self._create_floattext(label = 'Average time lag between the onset of symptoms and hospital visit (days)', 
-                                                    val=0, minv=0, maxv=14, boxw='70%', desw='90%')
+                                                    val=1, minv=0, maxv=14, boxw='50%', desw='80%')
         
         
         
         # define containers to hold the widgets, plots, and additional outputs
         self._plot_container = widgets.Output()
-        
+        w = '100%'
+        f = '0 0 0 0'
+        f = 'auto auto auto auto'
         _app_container = widgets.VBox(
-            [widgets.VBox([widgets.HBox([self._3_floattext, self._4_floattext, self._5_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
+            [widgets.VBox([widgets.HBox([self._3_floattext, self._4_floattext, self._5_floattext, self._8_floattext],
+                             layout=widgets.Layout(align_items='center', flex=f, width=w)),
                            
-                           widgets.HBox([self._6_floattext, self._7_floattext, self._8_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
+                           widgets.HBox([self._6_floattext, self._9_floattext, self._7_floattext, self._21_floattext],
+                             layout=widgets.Layout(align_items='center', flex=f, width=w)),
                           
-                           widgets.HBox([self._10_floattext, self._11_floattext, self._12_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
+                           widgets.HBox([self._10_floattext, self._11_floattext, self._12_floattext, self._13_floattext, ],
+                             layout=widgets.Layout(align_items='flex-start', flex=f, width=w)),
                            
-                           widgets.HBox([self._13_floattext, self._14_floattext, self._15_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
+                           widgets.HBox([self._14_floattext, self._15_floattext, self._16_floattext, self._17_floattext],
+                             layout=widgets.Layout(align_items='flex-start', flex=f, width=w)),
                            
-                           widgets.HBox([self._16_floattext, self._17_floattext, self._18_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%')),
+                           widgets.HBox([ self._18_floattext, self._20_floattext],
+                             layout=widgets.Layout(align_items='flex-start', flex='auto auto', width=w)),
                           
-                           widgets.HBox([self._20_floattext],
-                             layout=widgets.Layout(align_items='flex-start', flex='0 0 auto', width='100%'))],
+                           ],
                            
-                           layout=widgets.Layout(display='flex', flex_flow='column', border='solid 1px', 
-                                        align_items='stretch', width='100%')),
+                           layout=widgets.Layout(border='solid 1px', 
+                                        align_items='stretch', width=w)),
              
                            
-                           self._plot_container], layout=widgets.Layout(display='flex', flex_flow='column', 
-                                        border='solid 2px', align_items='initial', width='100%'))
+                           self._plot_container], layout=widgets.Layout(
+                                        border='solid 2px'))
                 
         # 'flex-start', 'flex-end', 'center', 'baseline', 'stretch', 'inherit', 'initial', 'unset'
         self.container = widgets.VBox([
             widgets.HBox([
                 _app_container
             ])
-        ], layout=widgets.Layout(align_items='flex-start', flex='auto', width='100%'))
+        ], layout=widgets.Layout())
         self._update_app()
         
         
@@ -138,16 +149,6 @@ class App_GetNeeds:
                    PopSize, model, model_fits_df)
         
         
-    def _create_dropdown(self, indicators, initial_index, label):
-        # create a dropdown widget
-        dropdown = widgets.Dropdown(options=indicators, 
-                                    layout={'width': '60%'},
-                                    style={'description_width': '49%'},
-                                    value=indicators[initial_index],
-                                   description=label)
-        
-        dropdown.observe(self._on_change, names=['value'])
-        return dropdown
     
     def _create_floattext(self, label, val, minv, maxv, boxw, desw):
         # create a floattext widget
@@ -164,23 +165,6 @@ class App_GetNeeds:
         return obj
     
     
-    
-    def _create_toggle(self): 
-        # create a toggle button widget
-        obj = widgets.ToggleButton(
-                    value=False,
-                    description='log-scale',
-                    disabled=False,
-                    button_style='', # 'success', 'info', 'warning', 'danger' or ''
-                    tooltip='Description',
-                    icon='check' # (FontAwesome names without the `fa-` prefix)
-                )
-        obj.observe(self._on_change, names=['value'])
-        return obj
-    
-    
-    
-    
     def _on_change(self, _):
         # do the following when app inputs change
         
@@ -194,8 +178,6 @@ class App_GetNeeds:
         per_loc  = self._3_floattext.value
         per_admit = self._4_floattext.value
         per_cc = self._5_floattext.value
-        LOS_nc = self._6_floattext.value
-        LOS_cc = self._7_floattext.value
         per_vent = self._8_floattext.value
 
         
@@ -210,6 +192,12 @@ class App_GetNeeds:
         ppe_RESPIRATOR_PARTICULATE_FILTER_REG = self._18_floattext.value
         TimeLag = self._20_floattext.value
         
+        mean_LOS_cc = self._6_floattext.value
+        median_LOS_cc = self._9_floattext.value
+        
+        mean_LOS_nc = self._7_floattext.value
+        median_LOS_nc = self._21_floattext.value
+        
         
         # wait to clear the plots/tables until new ones are generated
         self._plot_container.clear_output(wait=True)
@@ -218,11 +206,12 @@ class App_GetNeeds:
             
             
             # Run the functions to generate figures and tables
-            df1, df2, df3 = self._get_fit(per_loc, per_admit, per_cc, LOS_cc, LOS_nc, per_vent,
+            df1, df2, df3 = self._get_fit(per_loc, per_admit, per_cc, mean_LOS_cc, mean_LOS_nc, per_vent,
                          ppe_GLOVE_SURGICAL, ppe_GLOVE_EXAM_NITRILE, ppe_GLOVE_GLOVE_EXAM_VINYL,
                          ppe_MASK_FACE_PROCEDURE_ANTI_FOG, ppe_MASK_PROCEDURE_FLUID_RESISTANT, 
                          ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                          ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
+                         median_LOS_cc, median_LOS_nc,
                          TimeLag, self.PopSize, self.ForecastDays, self.forecasted_y, self.focal_loc, self.fdates,
                          self.new_cases, self.model, self.Forecasted_cases_df_for_download,
                          self.Forecasted_patient_census_df_for_download,
@@ -235,11 +224,12 @@ class App_GetNeeds:
             plt.show()
             
             
-    def _get_fit(self, per_loc, per_admit, per_cc, LOS_cc, LOS_nc, per_vent,
+    def _get_fit(self, per_loc, per_admit, per_cc, mean_LOS_cc, mean_LOS_nc, per_vent,
                         ppe_GLOVE_SURGICAL, ppe_GLOVE_EXAM_NITRILE, ppe_GLOVE_GLOVE_EXAM_VINYL,
                         ppe_MASK_FACE_PROCEDURE_ANTI_FOG, ppe_MASK_PROCEDURE_FLUID_RESISTANT, 
                         ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                         ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
+                        median_LOS_cc, median_LOS_nc,
                         TimeLag, PopSize, ForecastDays, forecasted_y, focal_loc, fdates,
                         new_cases, model, Forecasted_cases_df_for_download,
                         Forecasted_patient_census_df_for_download,
@@ -248,7 +238,7 @@ class App_GetNeeds:
         
         
         # declare figure object
-        fig = plt.figure(figsize=(15, 17))
+        fig = plt.figure(figsize=(16, 17))
         
         # Declare figure axis to hold table of forecasted cases, visits, admits
         ax = plt.subplot2grid((6, 4), (0, 2), colspan=2, rowspan=2)
@@ -446,15 +436,16 @@ class App_GetNeeds:
         
         # Model length of stay (LOS) as a lognormally distributed
         # random variable
+        mu_cc = np.log(median_LOS_cc)
+        mu_nc = np.log(median_LOS_nc)
         
-        sigma = 0.3
-        n_cc = np.log(LOS_cc) - (sigma**2)/2
-        n_nc = np.log(LOS_nc) - (sigma**2)/2
-    
+        sigma_cc = ((np.log(mean_LOS_cc) - mu_cc)*2)**0.5
+        sigma_nc = ((np.log(mean_LOS_nc) - mu_nc)*2)**0.5
+        
         x_vars = np.array(list(range(1, len(fdates)+1)))
         
-        p_nc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_nc)/(2**0.5*sigma))
-        p_cc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_cc)/(2**0.5*sigma))
+        p_nc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - mu_nc)/(2**0.5*sigma_nc))
+        p_cc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - mu_cc)/(2**0.5*sigma_cc))
         
         
         # Model length of stay (LOS) as a binomially distributed
@@ -464,8 +455,8 @@ class App_GetNeeds:
         #       distribution with a mean equal to the LOS
         
         #p = 0.5
-        #n_cc = LOS_cc*2
-        #n_nc = LOS_nc*2
+        #n_cc = mean_LOS_cc*2
+        #n_nc = mean_LOS_nc*2
         
         # get the binomial random variable properties
         #rv_nc = binom(n_nc, p)
