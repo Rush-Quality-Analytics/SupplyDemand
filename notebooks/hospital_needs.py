@@ -49,20 +49,24 @@ class App_GetNeeds:
         self._3_floattext = self._create_floattext(label = '% Visiting your hospital', 
                                                    val=9.5, minv=0, maxv=100, boxw=b, desw=d)
         self._4_floattext = self._create_floattext(label = '% Admitted to your hospital', 
-                                                   val=10, minv=0, maxv=100, boxw=b, desw=d)
+                                                   val=20, minv=0, maxv=100, boxw=b, desw=d)
         self._5_floattext = self._create_floattext(label = '% Admitted to critical care:', 
                                                    val=35, minv=0, maxv=100, boxw=b, desw=d)
-        self._6_floattext = self._create_floattext(label = 'LOS (non-critical care)', 
-                                                   val=8, minv=1, maxv=180, boxw=b, desw=d)
-        self._7_floattext = self._create_floattext(label = 'LOS (critical care)', 
-                                                   val=18, minv=1, maxv=180, boxw=b, desw=d)
         self._8_floattext = self._create_floattext(label = '% of ICU on vent:',
                                                    val=70, minv=0, maxv=100, boxw=b, desw=d)
         
-        self._9_floattext = self._create_floattext(label = 'Skewness of ICU LOS:',
-                                                   val=0.3, minv=0, maxv=2, boxw=b, desw=d)
-        self._21_floattext = self._create_floattext(label = 'Skewness of non-ICU LOS:',
-                                                   val=0.3, minv=0, maxv=2, boxw=b, desw=d)
+        
+        self._6_floattext = self._create_floattext(label = 'mean ICU Length of stay', 
+                                                   val=18, minv=1, maxv=30, boxw=b, desw=d)
+        self._9_floattext = self._create_floattext(label = 'median ICU Length of stay',
+                                                   val=10, minv=1, maxv=30, boxw=b, desw=d)
+        
+        self._7_floattext = self._create_floattext(label = 'mean non-ICU Length of stay', 
+                                                   val=9, minv=1, maxv=30, boxw=b, desw=d)
+        
+        self._21_floattext = self._create_floattext(label = 'median non-ICU length of stay',
+                                                   val=4, minv=1, maxv=30, boxw=b, desw=d)
+        
         
         self._10_floattext = self._create_floattext(label = 'GLOVE SURGICAL', 
                                                     val=2, minv=0, maxv=1000, boxw=b, desw=d)
@@ -84,7 +88,7 @@ class App_GetNeeds:
                                                     val=11, minv=0, maxv=1000, boxw=b, desw=d)
         
         self._20_floattext = self._create_floattext(label = 'Average time lag between the onset of symptoms and hospital visit (days)', 
-                                                    val=0, minv=0, maxv=14, boxw='50%', desw='80%')
+                                                    val=1, minv=0, maxv=14, boxw='50%', desw='80%')
         
         
         
@@ -174,8 +178,6 @@ class App_GetNeeds:
         per_loc  = self._3_floattext.value
         per_admit = self._4_floattext.value
         per_cc = self._5_floattext.value
-        LOS_nc = self._6_floattext.value
-        LOS_cc = self._7_floattext.value
         per_vent = self._8_floattext.value
 
         
@@ -190,8 +192,11 @@ class App_GetNeeds:
         ppe_RESPIRATOR_PARTICULATE_FILTER_REG = self._18_floattext.value
         TimeLag = self._20_floattext.value
         
-        cc_sigma = self._9_floattext.value
-        nc_sigma = self._21_floattext.value
+        mean_LOS_cc = self._6_floattext.value
+        median_LOS_cc = self._9_floattext.value
+        
+        mean_LOS_nc = self._7_floattext.value
+        median_LOS_nc = self._21_floattext.value
         
         
         # wait to clear the plots/tables until new ones are generated
@@ -201,12 +206,12 @@ class App_GetNeeds:
             
             
             # Run the functions to generate figures and tables
-            df1, df2, df3 = self._get_fit(per_loc, per_admit, per_cc, LOS_cc, LOS_nc, per_vent,
+            df1, df2, df3 = self._get_fit(per_loc, per_admit, per_cc, mean_LOS_cc, mean_LOS_nc, per_vent,
                          ppe_GLOVE_SURGICAL, ppe_GLOVE_EXAM_NITRILE, ppe_GLOVE_GLOVE_EXAM_VINYL,
                          ppe_MASK_FACE_PROCEDURE_ANTI_FOG, ppe_MASK_PROCEDURE_FLUID_RESISTANT, 
                          ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                          ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
-                         cc_sigma, nc_sigma,
+                         median_LOS_cc, median_LOS_nc,
                          TimeLag, self.PopSize, self.ForecastDays, self.forecasted_y, self.focal_loc, self.fdates,
                          self.new_cases, self.model, self.Forecasted_cases_df_for_download,
                          self.Forecasted_patient_census_df_for_download,
@@ -219,12 +224,12 @@ class App_GetNeeds:
             plt.show()
             
             
-    def _get_fit(self, per_loc, per_admit, per_cc, LOS_cc, LOS_nc, per_vent,
+    def _get_fit(self, per_loc, per_admit, per_cc, mean_LOS_cc, mean_LOS_nc, per_vent,
                         ppe_GLOVE_SURGICAL, ppe_GLOVE_EXAM_NITRILE, ppe_GLOVE_GLOVE_EXAM_VINYL,
                         ppe_MASK_FACE_PROCEDURE_ANTI_FOG, ppe_MASK_PROCEDURE_FLUID_RESISTANT, 
                         ppe_GOWN_ISOLATION_XLARGE_YELLOW, ppe_MASK_SURGICAL_ANTI_FOG_W_FILM,
                         ppe_SHIELD_FACE_FULL_ANTI_FOG, ppe_RESPIRATOR_PARTICULATE_FILTER_REG,
-                        cc_sigma, nc_sigma,
+                        median_LOS_cc, median_LOS_nc,
                         TimeLag, PopSize, ForecastDays, forecasted_y, focal_loc, fdates,
                         new_cases, model, Forecasted_cases_df_for_download,
                         Forecasted_patient_census_df_for_download,
@@ -431,15 +436,16 @@ class App_GetNeeds:
         
         # Model length of stay (LOS) as a lognormally distributed
         # random variable
+        mu_cc = np.log(median_LOS_cc)
+        mu_nc = np.log(median_LOS_nc)
         
+        sigma_cc = ((np.log(mean_LOS_cc) - mu_cc)*2)**0.5
+        sigma_nc = ((np.log(mean_LOS_nc) - mu_nc)*2)**0.5
         
-        n_cc = np.log(LOS_cc) - (cc_sigma**2)/2
-        n_nc = np.log(LOS_nc) - (nc_sigma**2)/2
-    
         x_vars = np.array(list(range(1, len(fdates)+1)))
         
-        p_nc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_nc)/(2**0.5*nc_sigma))
-        p_cc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_cc)/(2**0.5*cc_sigma))
+        p_nc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - mu_nc)/(2**0.5*sigma_nc))
+        p_cc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - mu_cc)/(2**0.5*sigma_cc))
         
         
         # Model length of stay (LOS) as a binomially distributed
@@ -449,8 +455,8 @@ class App_GetNeeds:
         #       distribution with a mean equal to the LOS
         
         #p = 0.5
-        #n_cc = LOS_cc*2
-        #n_nc = LOS_nc*2
+        #n_cc = mean_LOS_cc*2
+        #n_nc = mean_LOS_nc*2
         
         # get the binomial random variable properties
         #rv_nc = binom(n_nc, p)
