@@ -472,10 +472,10 @@ def get_seir_sd(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
             im_o = float(im)
             
         incubation_period = np.random.uniform(4, 6)
-        infectious_period = np.random.uniform(4, 10)
+        infectious_period = np.random.uniform(5, 9)
         rho = np.random.uniform(1, 6)
         sd = np.random.uniform(1, 100)
-        d1 = np.random.randint(1, 60)
+        d1 = np.random.randint(1, 30)
         s = np.random.uniform(0, 1)
         im = 10**np.random.uniform(-7, -4)
         
