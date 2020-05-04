@@ -454,6 +454,7 @@ def get_seir_sd(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
 
 
     obs_x = obs_x.tolist()
+    #iterations = 50000
     for i in range(iterations):
         
         pred_y = seir(obs_x, alpha, beta, gamma, d1, sd, s, im)   
@@ -472,12 +473,12 @@ def get_seir_sd(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
             im_o = float(im)
             
         incubation_period = np.random.uniform(4, 6)
-        infectious_period = np.random.uniform(5, 9)
+        infectious_period = np.random.uniform(4, 14)
         rho = np.random.uniform(1, 6)
         sd = np.random.uniform(1, 100)
-        d1 = np.random.randint(1, 30)
+        d1 = np.random.randint(1, 60)
         s = np.random.uniform(0, 1)
-        im = 10**np.random.uniform(-7, -4)
+        im = 10**np.random.uniform(-7, -3)
         
         alpha = 1/incubation_period 
         gamma = 1/infectious_period
