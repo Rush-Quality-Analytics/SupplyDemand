@@ -66,21 +66,26 @@ def get_gaussian(obs_x, obs_y, ForecastDays):
 
 
 
-def get_logistic(obs_x, obs_y, ForecastDays):
+def get_sine_logistic(obs_x, obs_y, ForecastDays):
     
-    def logistic(x, a, b, c, d):
+    def lapse_logistic(x, a, b, c, d):
         # A general logistic function
         # x is observed data
         # a, b, c are optimized by scipy optimize curve fit
         return a / (d + np.exp(-c * x + b))
-
+    
+    
+    def sine_logistic(x, a, b, c, d, f, g):
+        # A general logistic function
+        # x is observed data
+        # a, b, c are optimized by scipy optimize curve fit
+        return a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))
+        
 
     # obs_x: observed x values
     # obs_y: observd y values
     # ForecastDays: number of days ahead to extend prediction
     
-    # convert obs_x to numpy array
-    obs_x = np.array(obs_x) 
     # In fitting this model, assume that trailing zeros in obs_y data 
     # are not real but instead represent a lack of information
     # Otherwise, the logistic model will fail to fit
@@ -90,38 +95,173 @@ def get_logistic(obs_x, obs_y, ForecastDays):
                 obs_y[i] = obs_y[i-1]
             except:
                 pass
-    # convert obs_y to numpy array
-    obs_y = np.array(obs_y)
     
     try:
+        
         # attempt to fit the logistic model to the observed data
         # popt: optimized model parameter values
-        popt, pcov = curve_fit(logistic, obs_x, obs_y)
-        # get predicted y values
-        pred_y = logistic(obs_x, *popt)
-        # extend x values by number of ForecastDays
-        forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
-        # get corresponding forecasted y values, i.e., extend the predictions
-        forecasted_y = logistic(forecasted_x, *popt)
+        popt, pcov = curve_fit(sine_logistic, 
+                               np.float64(obs_x), 
+                               np.float64(obs_y), 
+                               method='lm', maxfev=5000)
         
-        # prevent use of negative y values and
-        # trailing zero-valued y values
-        for i, val in enumerate(forecasted_y):
-            if val <= 0:
-                try:
-                    obs_y[i] = obs_y[i-1]
-                except:
-                    pass
+        # get predicted y values
+        if np.isinf(pcov[0][0]) == True:
+            check = 'check' + pcov[0][0]
+        
+        pred_y = sine_logistic(np.float64(obs_x), *popt)
+        # extend x values by number of ForecastDays
+        if ForecastDays > 0:
+            forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+            # get corresponding forecasted y values, i.e., extend the predictions
+            forecasted_y = sine_logistic(np.float64(forecasted_x), *popt)
+        
+        else:
+            forecasted_y = np.copy(pred_y)
+            forecasted_x = np.copy(obs_x)
+            
+                        
         
         
     except:
-        # if the logistic model totally fails to fit
-        # then use the polynomial model
-        forecasted_y, forecasted_x, pred_y, params = get_polynomial(obs_x, obs_y, ForecastDays, 3)
+        # attempt to fit the logistic model to the observed data
+        # popt: optimized model parameter values
+        popt, pcov = curve_fit(lapse_logistic, 
+                               np.float64(obs_x), 
+                               np.float64(obs_y), 
+                               method='lm', maxfev=5000)
+        # get predicted y values
+        pred_y = lapse_logistic(np.float64(obs_x), *popt)
+        # extend x values by number of ForecastDays
+        if ForecastDays > 0:
+            forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+            # get corresponding forecasted y values, i.e., extend the predictions
+            forecasted_y = lapse_logistic(np.float64(forecasted_x), *popt)
+        
+        else:
+            forecasted_y = np.copy(pred_y)
+            forecasted_x = np.copy(obs_x)
     
-    # return the forecasted x-y values and predicted y values
     params = []
-    return forecasted_y, forecasted_x, pred_y, params
+    fy = []
+    for i, val in enumerate(forecasted_y):
+        if val > 10*max(pred_y):
+            fy.append(10*max(pred_y))
+            
+        elif val < 1:
+            fy.append(10*max(pred_y))
+            
+        else:
+            fy.append(val)
+    
+    # prevent use of negative y values and
+    # trailing zero-valued y values
+    #for i, val in enumerate(fy):
+    #    if val < 1:
+    #        try:
+    #            obs_y[i] = obs_y[i-1]
+    #        except:
+    #            pass
+                    
+    fy = np.array(fy)
+    return fy, forecasted_x, pred_y, params
+
+
+
+
+
+def get_logistic(obs_x, obs_y, ForecastDays):
+    
+    def logistic(x, a, b, c, d):
+        # A general logistic function
+        # x is observed data
+        # a, b, c are optimized by scipy optimize curve fit
+        return a / (d + np.exp(-c * x + b))
+        
+
+    # obs_x: observed x values
+    # obs_y: observd y values
+    # ForecastDays: number of days ahead to extend prediction
+    
+    # In fitting this model, assume that trailing zeros in obs_y data 
+    # are not real but instead represent a lack of information
+    # Otherwise, the logistic model will fail to fit
+    for i, val in enumerate(obs_y):
+        if val == 0:
+            try:
+                obs_y[i] = obs_y[i-1]
+            except:
+                pass
+    
+    try:
+        
+        # attempt to fit the logistic model to the observed data
+        # popt: optimized model parameter values
+        popt, pcov = curve_fit(logistic, 
+                               np.float64(obs_x), 
+                               np.float64(obs_y), 
+                               method='lm', maxfev=5000)
+        
+        # get predicted y values
+        if np.isinf(pcov[0][0]) == True:
+            check = 'check' + pcov[0][0]
+        
+        pred_y = logistic(np.float64(obs_x), *popt)
+        # extend x values by number of ForecastDays
+        if ForecastDays > 0:
+            forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+            # get corresponding forecasted y values, i.e., extend the predictions
+            forecasted_y = logistic(np.float64(forecasted_x), *popt)
+        
+        else:
+            forecasted_y = np.copy(pred_y)
+            forecasted_x = np.copy(obs_x)
+            
+                        
+        
+        
+    except:
+        # attempt to fit the logistic model to the observed data
+        # popt: optimized model parameter values
+        popt, pcov = curve_fit(logistic, 
+                               np.float64(obs_x), 
+                               np.float64(obs_y), 
+                               method='lm', maxfev=5000)
+        # get predicted y values
+        pred_y = logistic(np.float64(obs_x), *popt)
+        # extend x values by number of ForecastDays
+        if ForecastDays > 0:
+            forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+            # get corresponding forecasted y values, i.e., extend the predictions
+            forecasted_y = logistic(np.float64(forecasted_x), *popt)
+        
+        else:
+            forecasted_y = np.copy(pred_y)
+            forecasted_x = np.copy(obs_x)
+    
+    params = []
+    fy = []
+    for i, val in enumerate(forecasted_y):
+        if val > 10*max(pred_y):
+            fy.append(10*max(pred_y))
+            
+        elif val < 1:
+            fy.append(10*max(pred_y))
+            
+        else:
+            fy.append(val)
+    
+    # prevent use of negative y values and
+    # trailing zero-valued y values
+    #for i, val in enumerate(fy):
+    #    if val < 1:
+    #        try:
+    #            obs_y[i] = obs_y[i-1]
+    #        except:
+    #            pass
+                    
+    fy = np.array(fy)
+    return fy, forecasted_x, pred_y, params
 
 
 
@@ -261,7 +401,196 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
     
     # Get the forecasted values, predicted values, and observed vs predicted r-square
     # value for the chosen model
-    if model == 'Logistic':
+    
+    if model == '2 phase sine-logistic':
+        
+        max_r2 = 0
+        b_pt = 60
+        for i in range(60, 90):
+        
+            obs_x1 = obs_x[0:i]
+            obs_y1 = obs_y[0:i]
+        
+            obs_x2 = obs_x[i:]
+            obs_y2 = obs_y[i:]
+            
+            
+            miny = max(obs_y1) * 0.7    
+            obs_y2 = np.array(obs_y2) - miny
+            
+            minx = min(obs_x2)
+            obs_x2 = np.array(obs_x2) - minx
+            
+            
+            forecasted_y1, forecasted_x1, pred_y1, params1 = get_sine_logistic(obs_x1, obs_y1, 0)
+            forecasted_y2, forecasted_x2, pred_y2, params2 = get_sine_logistic(obs_x2, obs_y2, ForecastDays)
+            
+            obs_y2 = np.array(obs_y2) + miny
+            forecasted_y2 = np.array(forecasted_y2) + miny
+            pred_y2 = np.array(pred_y2) + miny
+            
+            obs_x2 = np.array(obs_x2) + minx
+            forecasted_x2 = np.array(forecasted_x2) + minx
+    
+            
+            forecasted_x = forecasted_x1.tolist() + forecasted_x2.tolist()
+            forecasted_y = forecasted_y1.tolist() + forecasted_y2.tolist()
+            pred_y = pred_y1.tolist() + pred_y2.tolist()
+            obs_y = obs_y1.tolist() + obs_y2.tolist()
+            
+            pred_y = np.array(pred_y)
+            obs_y = np.array(obs_y)
+            forecasted_x = np.array(forecasted_x)
+            forecasted_y = np.array(forecasted_y)
+            
+            obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+            if obs_pred_r2 > max_r2:
+                max_r2 = obs_pred_r2
+                b_pt = i
+        
+        obs_x1 = obs_x[0:b_pt]
+        obs_y1 = obs_y[0:b_pt]
+        
+        obs_x2 = obs_x[b_pt:]
+        obs_y2 = obs_y[b_pt:]
+            
+            
+        miny = max(obs_y1) * 0.7    
+        obs_y2 = np.array(obs_y2) - miny
+            
+        minx = min(obs_x2)
+        obs_x2 = np.array(obs_x2) - minx
+            
+            
+        forecasted_y1, forecasted_x1, pred_y1, params1 = get_sine_logistic(obs_x1, obs_y1, 0)
+        forecasted_y2, forecasted_x2, pred_y2, params2 = get_sine_logistic(obs_x2, obs_y2, ForecastDays)
+            
+        obs_y2 = np.array(obs_y2) + miny
+        forecasted_y2 = np.array(forecasted_y2) + miny
+        pred_y2 = np.array(pred_y2) + miny
+            
+        obs_x2 = np.array(obs_x2) + minx
+        forecasted_x2 = np.array(forecasted_x2) + minx
+    
+            
+        forecasted_x = forecasted_x1.tolist() + forecasted_x2.tolist()
+        forecasted_y = forecasted_y1.tolist() + forecasted_y2.tolist()
+        pred_y = pred_y1.tolist() + pred_y2.tolist()
+        obs_y = obs_y1.tolist() + obs_y2.tolist()
+            
+        pred_y = np.array(pred_y)
+        obs_y = np.array(obs_y)
+        forecasted_x = np.array(forecasted_x)
+        forecasted_y = np.array(forecasted_y)
+            
+        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+            
+        #print('\n')
+        #print(obs_y)
+        #print(pred_y)
+        #print(obs_pred_r2)
+        
+        params = params1.extend(params2)
+        
+    elif model == 'Sine-logistic':
+        forecasted_y, forecasted_x, pred_y, params = get_sine_logistic(obs_x, obs_y, ForecastDays)
+        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+    
+    
+    elif model == '2 phase logistic':
+        
+        max_r2 = 0
+        b_pt = 60
+        for i in range(60, 90):
+        
+            obs_x1 = obs_x[0:i]
+            obs_y1 = obs_y[0:i]
+        
+            obs_x2 = obs_x[i:]
+            obs_y2 = obs_y[i:]
+            
+            
+            miny = max(obs_y1) * 0.7    
+            obs_y2 = np.array(obs_y2) - miny
+            
+            minx = min(obs_x2)
+            obs_x2 = np.array(obs_x2) - minx
+            
+            
+            forecasted_y1, forecasted_x1, pred_y1, params1 = get_logistic(obs_x1, obs_y1, 0)
+            forecasted_y2, forecasted_x2, pred_y2, params2 = get_logistic(obs_x2, obs_y2, ForecastDays)
+            
+            obs_y2 = np.array(obs_y2) + miny
+            forecasted_y2 = np.array(forecasted_y2) + miny
+            pred_y2 = np.array(pred_y2) + miny
+            
+            obs_x2 = np.array(obs_x2) + minx
+            forecasted_x2 = np.array(forecasted_x2) + minx
+    
+            
+            forecasted_x = forecasted_x1.tolist() + forecasted_x2.tolist()
+            forecasted_y = forecasted_y1.tolist() + forecasted_y2.tolist()
+            pred_y = pred_y1.tolist() + pred_y2.tolist()
+            obs_y = obs_y1.tolist() + obs_y2.tolist()
+            
+            pred_y = np.array(pred_y)
+            obs_y = np.array(obs_y)
+            forecasted_x = np.array(forecasted_x)
+            forecasted_y = np.array(forecasted_y)
+            
+            obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+            if obs_pred_r2 > max_r2:
+                max_r2 = obs_pred_r2
+                b_pt = i
+        
+        obs_x1 = obs_x[0:b_pt]
+        obs_y1 = obs_y[0:b_pt]
+        
+        obs_x2 = obs_x[b_pt:]
+        obs_y2 = obs_y[b_pt:]
+            
+            
+        miny = max(obs_y1) * 0.7    
+        obs_y2 = np.array(obs_y2) - miny
+            
+        minx = min(obs_x2)
+        obs_x2 = np.array(obs_x2) - minx
+            
+            
+        forecasted_y1, forecasted_x1, pred_y1, params1 = get_logistic(obs_x1, obs_y1, 0)
+        forecasted_y2, forecasted_x2, pred_y2, params2 = get_logistic(obs_x2, obs_y2, ForecastDays)
+            
+        obs_y2 = np.array(obs_y2) + miny
+        forecasted_y2 = np.array(forecasted_y2) + miny
+        pred_y2 = np.array(pred_y2) + miny
+            
+        obs_x2 = np.array(obs_x2) + minx
+        forecasted_x2 = np.array(forecasted_x2) + minx
+    
+            
+        forecasted_x = forecasted_x1.tolist() + forecasted_x2.tolist()
+        forecasted_y = forecasted_y1.tolist() + forecasted_y2.tolist()
+        pred_y = pred_y1.tolist() + pred_y2.tolist()
+        obs_y = obs_y1.tolist() + obs_y2.tolist()
+            
+        pred_y = np.array(pred_y)
+        obs_y = np.array(obs_y)
+        forecasted_x = np.array(forecasted_x)
+        forecasted_y = np.array(forecasted_y)
+            
+        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+            
+        #print('\n')
+        #print(obs_y)
+        #print(pred_y)
+        #print(obs_pred_r2)
+        
+        params = params1.extend(params2)
+        
+    
+    
+    
+    elif model == 'Logistic':
         forecasted_y, forecasted_x, pred_y, params = get_logistic(obs_x, obs_y, ForecastDays)
         obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
         
