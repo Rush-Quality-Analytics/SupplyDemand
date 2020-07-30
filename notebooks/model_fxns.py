@@ -408,47 +408,52 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
         
         max_r2 = 0
         b_pt = 60
-        for i in range(60, 90):
+        for i in range(60, len(obs_x)):
+            
+            try:
         
-            obs_x1 = obs_x[0:i]
-            obs_y1 = obs_y[0:i]
+                obs_x1 = obs_x[0:i]
+                obs_y1 = obs_y[0:i]
+            
+                obs_x2 = obs_x[i:]
+                obs_y2 = obs_y[i:]
+                
+                
+                miny = max(obs_y1) * 0.7    
+                obs_y2 = np.array(obs_y2) - miny
+                
+                minx = min(obs_x2)
+                obs_x2 = np.array(obs_x2) - minx
+                
+                
+                forecasted_y1, forecasted_x1, pred_y1, params1 = get_sine_logistic(obs_x1, obs_y1, 0)
+                forecasted_y2, forecasted_x2, pred_y2, params2 = get_sine_logistic(obs_x2, obs_y2, ForecastDays)
+                
+                obs_y2 = np.array(obs_y2) + miny
+                forecasted_y2 = np.array(forecasted_y2) + miny
+                pred_y2 = np.array(pred_y2) + miny
+                
+                obs_x2 = np.array(obs_x2) + minx
+                forecasted_x2 = np.array(forecasted_x2) + minx
         
-            obs_x2 = obs_x[i:]
-            obs_y2 = obs_y[i:]
-            
-            
-            miny = max(obs_y1) * 0.7    
-            obs_y2 = np.array(obs_y2) - miny
-            
-            minx = min(obs_x2)
-            obs_x2 = np.array(obs_x2) - minx
-            
-            
-            forecasted_y1, forecasted_x1, pred_y1, params1 = get_sine_logistic(obs_x1, obs_y1, 0)
-            forecasted_y2, forecasted_x2, pred_y2, params2 = get_sine_logistic(obs_x2, obs_y2, ForecastDays)
-            
-            obs_y2 = np.array(obs_y2) + miny
-            forecasted_y2 = np.array(forecasted_y2) + miny
-            pred_y2 = np.array(pred_y2) + miny
-            
-            obs_x2 = np.array(obs_x2) + minx
-            forecasted_x2 = np.array(forecasted_x2) + minx
-    
-            
-            forecasted_x = forecasted_x1.tolist() + forecasted_x2.tolist()
-            forecasted_y = forecasted_y1.tolist() + forecasted_y2.tolist()
-            pred_y = pred_y1.tolist() + pred_y2.tolist()
-            obs_y = obs_y1.tolist() + obs_y2.tolist()
-            
-            pred_y = np.array(pred_y)
-            obs_y = np.array(obs_y)
-            forecasted_x = np.array(forecasted_x)
-            forecasted_y = np.array(forecasted_y)
-            
-            obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
-            if obs_pred_r2 > max_r2:
-                max_r2 = obs_pred_r2
-                b_pt = i
+                
+                forecasted_x = forecasted_x1.tolist() + forecasted_x2.tolist()
+                forecasted_y = forecasted_y1.tolist() + forecasted_y2.tolist()
+                pred_y = pred_y1.tolist() + pred_y2.tolist()
+                obs_y = obs_y1.tolist() + obs_y2.tolist()
+                
+                pred_y = np.array(pred_y)
+                obs_y = np.array(obs_y)
+                forecasted_x = np.array(forecasted_x)
+                forecasted_y = np.array(forecasted_y)
+                
+                obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+                if obs_pred_r2 > max_r2:
+                    max_r2 = obs_pred_r2
+                    b_pt = i
+                    
+            except:
+                continue
         
         obs_x1 = obs_x[0:b_pt]
         obs_y1 = obs_y[0:b_pt]
@@ -503,47 +508,52 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
         
         max_r2 = 0
         b_pt = 60
-        for i in range(60, 90):
+        for i in range(60, len(obs_x)):
+            
+            try:
         
-            obs_x1 = obs_x[0:i]
-            obs_y1 = obs_y[0:i]
+                obs_x1 = obs_x[0:i]
+                obs_y1 = obs_y[0:i]
+            
+                obs_x2 = obs_x[i:]
+                obs_y2 = obs_y[i:]
+                
+                
+                miny = max(obs_y1) * 0.7    
+                obs_y2 = np.array(obs_y2) - miny
+                
+                minx = min(obs_x2)
+                obs_x2 = np.array(obs_x2) - minx
+                
+                
+                forecasted_y1, forecasted_x1, pred_y1, params1 = get_logistic(obs_x1, obs_y1, 0)
+                forecasted_y2, forecasted_x2, pred_y2, params2 = get_logistic(obs_x2, obs_y2, ForecastDays)
+                
+                obs_y2 = np.array(obs_y2) + miny
+                forecasted_y2 = np.array(forecasted_y2) + miny
+                pred_y2 = np.array(pred_y2) + miny
+                
+                obs_x2 = np.array(obs_x2) + minx
+                forecasted_x2 = np.array(forecasted_x2) + minx
         
-            obs_x2 = obs_x[i:]
-            obs_y2 = obs_y[i:]
-            
-            
-            miny = max(obs_y1) * 0.7    
-            obs_y2 = np.array(obs_y2) - miny
-            
-            minx = min(obs_x2)
-            obs_x2 = np.array(obs_x2) - minx
-            
-            
-            forecasted_y1, forecasted_x1, pred_y1, params1 = get_logistic(obs_x1, obs_y1, 0)
-            forecasted_y2, forecasted_x2, pred_y2, params2 = get_logistic(obs_x2, obs_y2, ForecastDays)
-            
-            obs_y2 = np.array(obs_y2) + miny
-            forecasted_y2 = np.array(forecasted_y2) + miny
-            pred_y2 = np.array(pred_y2) + miny
-            
-            obs_x2 = np.array(obs_x2) + minx
-            forecasted_x2 = np.array(forecasted_x2) + minx
-    
-            
-            forecasted_x = forecasted_x1.tolist() + forecasted_x2.tolist()
-            forecasted_y = forecasted_y1.tolist() + forecasted_y2.tolist()
-            pred_y = pred_y1.tolist() + pred_y2.tolist()
-            obs_y = obs_y1.tolist() + obs_y2.tolist()
-            
-            pred_y = np.array(pred_y)
-            obs_y = np.array(obs_y)
-            forecasted_x = np.array(forecasted_x)
-            forecasted_y = np.array(forecasted_y)
-            
-            obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
-            if obs_pred_r2 > max_r2:
-                max_r2 = obs_pred_r2
-                b_pt = i
+                
+                forecasted_x = forecasted_x1.tolist() + forecasted_x2.tolist()
+                forecasted_y = forecasted_y1.tolist() + forecasted_y2.tolist()
+                pred_y = pred_y1.tolist() + pred_y2.tolist()
+                obs_y = obs_y1.tolist() + obs_y2.tolist()
+                
+                pred_y = np.array(pred_y)
+                obs_y = np.array(obs_y)
+                forecasted_x = np.array(forecasted_x)
+                forecasted_y = np.array(forecasted_y)
+                
+                obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+                if obs_pred_r2 > max_r2:
+                    max_r2 = obs_pred_r2
+                    b_pt = i
+                    
+            except:
+                continue
         
         obs_x1 = obs_x[0:b_pt]
         obs_y1 = obs_y[0:b_pt]
