@@ -16,12 +16,11 @@ import urllib
 
 #import io
 #import flask
-import sys 
+#import sys 
 
 
 testing_df_mrd = pd.read_pickle('data/Testing_Dataframe_Most_Recent_Day.pkl')
 testing_df = pd.read_pickle('data/Testing_Dataframe.pkl')
-
 
 col_names1 =  ['obs_y', 'pred_y', 'forecasted_y', 'pred_dates', 'label', 
                'forecast_dates',  'obs_pred_r2', 'model', 'focal_loc', 
@@ -46,31 +45,12 @@ app.config.suppress_callback_exceptions = True
 BASE_PATH = pathlib.Path(__file__).parent.resolve()
 DATA_PATH = BASE_PATH.joinpath("data").resolve()
 
-# Read data
-#try:
-#    seir_fits_df = pd.read_csv('https://raw.githubusercontent.com/Rush-Quality-Analytics/SupplyDemand/master/notebooks/data/SEIR-SD_States.txt', sep='\t')
-#except:
 seir_fits_df = pd.read_csv('data/SEIR-SD_States_Update.txt', sep='\t')
 
-
-#try: 
-#    path = 'https://raw.githubusercontent.com/Rush-Quality-Analytics/SupplyDemand/master/notebooks/data/StatePops.csv'
-#    statepops = pd.read_csv('path')
-#except:
 statepops = pd.read_csv('data/StatePops.csv')
 
-    
-#try:
-#    ap_df = pd.read_csv('https://raw.githubusercontent.com/Rush-Quality-Analytics/SupplyDemand/master/notebooks/data/COVID-CASES-DF.txt', sep='\t') 
-#    ap_df = ap_df[ap_df['Country/Region'] == 'US']
-#    ap_df = ap_df[ap_df['Province/State'] != 'US']
-#    ap_df = ap_df[ap_df['Province/State'] != 'American Samoa']
-#    ap_df = ap_df[ap_df['Province/State'] != 'Northern Mariana Islands']
-#    ap_df.drop(columns=['Unnamed: 0'], inplace=True)
-#except:
 locs_df = pd.read_csv('data/COVID-CASES-DF.txt', sep='\t') 
 locs_df = locs_df[locs_df['Country/Region'] == 'US']
-
 locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
                                                 'Diamond Princess', 'Grand Princess', 'Recovered', 
                                                  'United States Virgin Islands', 'Virgin Islands, U.S.',
