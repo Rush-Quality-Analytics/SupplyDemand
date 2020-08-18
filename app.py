@@ -20,6 +20,10 @@ import urllib
 
 
 testing_df_mrd = pd.read_pickle('data/Testing_Dataframe_Most_Recent_Day.pkl')
+
+#print(list(testing_df_mrd))
+#sys.exit()
+
 testing_df = pd.read_pickle('data/Testing_Dataframe.pkl')
 
 col_names1 =  ['obs_y', 'pred_y', 'forecasted_y', 'pred_dates', 'label', 
@@ -1571,12 +1575,13 @@ def generate_ppe_table(df, reset):
 def map1(reset):
     
     fig = go.Figure(data=go.Choropleth(
-    locations=testing_df_mrd['state'], # Spatial coordinates
+    locations = testing_df_mrd['state'], # Spatial coordinates
     z = testing_df_mrd['Testing_Rate'].astype(float), # Data to be color-coded
     locationmode = 'USA-states', # set of locations match entries in `locations`
     colorscale = 'Plasma',
     colorbar_title = "Testing Rate",
     marker_line_color='grey',
+    text = testing_df_mrd['date'],
     ))
 
     fig.update_layout(
@@ -1599,6 +1604,7 @@ def map2(reset):
     colorscale = 'Viridis',
     colorbar_title = "Positives per capita",
     marker_line_color='grey',
+    text = testing_df_mrd['date'],
     ))
 
     fig.update_layout(
@@ -1621,6 +1627,7 @@ def map3(reset):
     colorscale = 'Cividis',
     colorbar_title = "Percent positive",
     marker_line_color='grey',
+    text = testing_df_mrd['date'],
     ))
 
     fig.update_layout(
@@ -1643,6 +1650,7 @@ def map4(reset):
     colorscale = 'haline',
     colorbar_title = "Change in testing rate",
     marker_line_color='grey',
+    text = testing_df_mrd['date'],
     ))
 
     fig.update_layout(
@@ -1667,6 +1675,7 @@ def map5(reset):
     colorscale = 'haline',
     colorbar_title = "Hospitalization rate",
     marker_line_color='grey',
+    text = testing_df_mrd['date'],
     ))
 
     fig.update_layout(
@@ -1691,6 +1700,7 @@ def map6(reset):
     colorscale = 'haline',
     colorbar_title = "Hospitilizations",
     marker_line_color='grey',
+    text = testing_df_mrd['date'],
     ))
 
     fig.update_layout(
