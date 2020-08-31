@@ -1619,11 +1619,11 @@ def map4(reset):
 def map5(reset):
     
     fig = go.Figure(data=go.Choropleth(
-    locations=testing_df_mrd['state'], # Spatial coordinates
-    z = testing_df_mrd['Hospitalization_Rate'].astype(float), # Data to be color-coded
+    locations = testing_df_mrd['state'], # Spatial coordinates
+    z = testing_df_mrd['hospitalizedCurrently'].astype(float), # Data to be color-coded
     locationmode = 'USA-states', # set of locations match entries in `locations`
     colorscale = 'haline',
-    colorbar_title = "Hospitalization rate",
+    colorbar_title = "Hospitalized",
     marker_line_color='grey',
     text = testing_df_mrd['date'],
     ))
@@ -1643,12 +1643,13 @@ def map5(reset):
 
 def map6(reset):
     
+    
     fig = go.Figure(data=go.Choropleth(
     locations=testing_df_mrd['state'], # Spatial coordinates
-    z = testing_df['hospitalizedCumulative'].astype(float), # Data to be color-coded
+    z = testing_df_mrd['inIcuCurrently'].astype(float), # Data to be color-coded
     locationmode = 'USA-states', # set of locations match entries in `locations`
     colorscale = 'haline',
-    colorbar_title = "Hospitilizations",
+    colorbar_title = "In ICU",
     marker_line_color='grey',
     text = testing_df_mrd['date'],
     ))
