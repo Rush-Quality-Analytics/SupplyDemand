@@ -340,7 +340,8 @@ app.layout = html.Div([
                     id="map5",
                     style={'fontSize':16},
                     children=[
-                        html.B("Hospitalization rate: Total number hospitalized / Number confirmed cases"),
+                        html.B("Currently hospitalized. "),
+                        html.B(" Data on hospitalization rate are not currently available"),
                         html.Hr(),
                         dcc.Graph(id="hospitilization_rate_map"),
                     ],
@@ -368,7 +369,7 @@ app.layout = html.Div([
                     id="map6",
                     style={'fontSize':16},
                     children=[
-                        html.B("Cumulative hospitalizations"),
+                        html.B("Currently in ICU"),
                         html.Hr(),
                         dcc.Graph(id="cumulative_hospitalizations_map"),
                     ],
