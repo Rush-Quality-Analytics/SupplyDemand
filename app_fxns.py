@@ -14,8 +14,8 @@ import model_fxns as fxns
 
 
 
-testing_df_mrd = pd.read_pickle('data/Testing_Dataframe_Most_Recent_Day.pkl')
-testing_df = pd.read_pickle('data/Testing_Dataframe.pkl')
+testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
+testing_df = pd.read_pickle('DataUpdate/data/Testing_Dataframe.pkl')
 
 col_names1 =  ['obs_y', 'pred_y', 'forecasted_y', 'pred_dates', 'label', 
                'forecast_dates',  'obs_pred_r2', 'model', 'focal_loc', 
@@ -29,10 +29,10 @@ col_names2 = ['Total cases', 'New cases', 'New visits', 'New admits',
                   'Discharged from non-ICU alive']
 census_df = pd.DataFrame(columns = col_names2)
 
-seir_fits_df = pd.read_csv('data/SEIR-SD_States_Update.txt', sep='\t')
-statepops = pd.read_csv('data/StatePops.csv')
+seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
+statepops = pd.read_csv('DataUpdate/data/StatePops.csv')
 
-locs_df = pd.read_csv('data/COVID-CASES-DF.txt', sep='\t') 
+locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
 locs_df = locs_df[locs_df['Country/Region'] == 'US']
 locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
                                                 'Diamond Princess', 'Grand Princess', 'Recovered', 
