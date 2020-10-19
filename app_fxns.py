@@ -661,7 +661,7 @@ def generate_model_forecasts(loc,  model, reset):
             
         fits_df.loc[len(fits_df)] = output_list
 
-    fits_df = fits_df.to_dict()
+    fits_df = fits_df.to_json()
     return fits_df
 
 
@@ -669,7 +669,7 @@ def generate_model_forecasts(loc,  model, reset):
     
 
 def generate_model_forecast_plot(fits_df, reset):
-    fits_df = pd.DataFrame.from_dict(fits_df)
+    fits_df = pd.read_json(fits_df)
     
     ForecastDays = 60
     #labels = fits_df['label'].tolist()
@@ -784,57 +784,57 @@ def generate_model_forecast_plot(fits_df, reset):
 
 
 def generate_model_forecast_table(fits_df, reset):
-    df = pd.DataFrame.from_dict(fits_df)
+    df = pd.read_json(fits_df)
     df_table = pd.DataFrame()
     
-    col0 = df.forecast_dates[-1]
+    col0 = df.forecast_dates.iloc[-1]
     max_len = len(col0)
     
-    col1 = df.obs_y[-1]    
+    col1 = df.obs_y.iloc[-1]    
     zs = [0] * (max_len - len(col1))
     col1.extend(zs)
     
-    col2 = df.forecasted_y[-1]
+    col2 = df.forecasted_y.iloc[-1]
     zs = [0] * (max_len - len(col2))
     col2.extend(zs)
     
-    col3 = df.forecasted_y[-2]
+    col3 = df.forecasted_y.iloc[-2]
     zs = [0] * (max_len - len(col3))
     col3.extend(zs)
     
-    col4 = df.forecasted_y[-3]
+    col4 = df.forecasted_y.iloc[-3]
     zs = [0] * (max_len - len(col4))
     col4.extend(zs)
     
-    col5 = df.forecasted_y[-4]
+    col5 = df.forecasted_y.iloc[-4]
     zs = [0] * (max_len - len(col5))
     col5.extend(zs)
     
-    col6 = df.forecasted_y[-5]
+    col6 = df.forecasted_y.iloc[-5]
     zs = [0] * (max_len - len(col6))
     col6.extend(zs)
     
-    col7 = df.forecasted_y[-6]
+    col7 = df.forecasted_y.iloc[-6]
     zs = [0] * (max_len - len(col7))
     col7.extend(zs)
     
-    col8 = df.forecasted_y[-7]
+    col8 = df.forecasted_y.iloc[-7]
     zs = [0] * (max_len - len(col8))
     col8.extend(zs)
     
-    col9 = df.forecasted_y[-8]
+    col9 = df.forecasted_y.iloc[-8]
     zs = [0] * (max_len - len(col9))
     col9.extend(zs)
     
-    col10 = df.forecasted_y[-9]
+    col10 = df.forecasted_y.iloc[-9]
     zs = [0] * (max_len - len(col10))
     col10.extend(zs)
     
-    col11 = df.forecasted_y[-10]
+    col11 = df.forecasted_y.iloc[-10]
     zs = [0] * (max_len - len(col11))
     col11.extend(zs)
     
-    col12 = df.forecasted_y[-11]
+    col12 = df.forecasted_y.iloc[-11]
     zs = [0] * (max_len - len(col12))
     col12.extend(zs)
 
@@ -1146,7 +1146,7 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
         census_df[col] = ppe_df[col].tolist()
     
     
-    census_df = census_df.to_dict()
+    census_df = census_df.to_json()
     
     return census_df
 
@@ -1155,7 +1155,7 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
         
 def generate_plot_patient_census(census_df, reset):
     
-    census_df = pd.DataFrame.from_dict(census_df)
+    census_df = pd.read_json(census_df)
     
     nogo = ['GLOVE SURGICAL', 'GLOVE EXAM NITRILE', 
             'GLOVE EXAM VINYL', 'MASK FACE PROCEDURE ANTI FOG',
@@ -1248,7 +1248,7 @@ def generate_plot_patient_census(census_df, reset):
 
 def generate_plot_discharge_census(census_df, reset):
     
-    census_df = pd.DataFrame.from_dict(census_df)
+    census_df = pd.read_json(census_df)
     
     nogo = ['GLOVE SURGICAL', 'GLOVE EXAM NITRILE', 
             'GLOVE EXAM VINYL', 'MASK FACE PROCEDURE ANTI FOG',
@@ -1335,7 +1335,7 @@ def generate_plot_discharge_census(census_df, reset):
 
 
 def generate_patient_census_table(census_df, reset):
-    df_table = pd.DataFrame.from_dict(census_df)
+    df_table = pd.read_json(census_df)
     
     nogo = ['GLOVE SURGICAL', 'GLOVE EXAM NITRILE', 
             'GLOVE EXAM VINYL', 'MASK FACE PROCEDURE ANTI FOG',
@@ -1385,7 +1385,7 @@ def generate_patient_census_table(census_df, reset):
 
 def generate_plot_ppe(df, reset):
     
-    ppe_df = pd.DataFrame.from_dict(df)
+    ppe_df = pd.read_json(df)
     
     nogo = ['Total cases', 'New cases', 'New visits', 'New admits',
                   'All COVID', 'Non-ICU', 'ICU', 'Vent',
@@ -1468,7 +1468,7 @@ def generate_plot_ppe(df, reset):
 
 
 def generate_ppe_table(df, reset):
-    df_table = pd.DataFrame.from_dict(df)
+    df_table = pd.read_json(df)
     
     nogo = ['Total cases', 'New cases', 'New visits', 'New admits',
                   'All COVID', 'Non-ICU', 'ICU', 'Vent',
