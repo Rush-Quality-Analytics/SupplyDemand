@@ -30,12 +30,12 @@ app.layout = html.Div([
         
         html.Div(
             id='df1', 
-            className='columns',
+            #className='columns',
             style={'display': 'none'}
         ),
         html.Div(
             id='df2', 
-            className='columns',
+            #className='columns',
             style={'display': 'none'}
         ),
         
@@ -733,7 +733,7 @@ def update_output2_22(value):
 
 
 @app.callback(
-     Output("df1", "columns"),
+     Output('df1', 'children'),
     [Input("location-select1", "value"),
      Input("model-select1", "value"),
      Input("reset-btn1", "n_clicks")
@@ -756,7 +756,7 @@ def update_model_forecast1(loc, model, reset_click):
 
 @app.callback(
     Output("model_forecasts_plot1", "figure"),
-    [Input("df1", "columns"),
+    [Input('df1', 'children'),
      Input("reset-btn1", "n_clicks")],
 )
 def update_plot_model_forecast1(df_fits, reset_click):
@@ -776,7 +776,7 @@ def update_plot_model_forecast1(df_fits, reset_click):
 
 @app.callback(
     Output('model_forecast_link', 'href'),
-    [Input("df1", "columns"),
+    [Input('df1', 'children'),
      Input("reset-btn1", "n_clicks")],
 )
 def update_table_model_forecast1(df_fits, reset_click):
@@ -799,7 +799,7 @@ def update_table_model_forecast1(df_fits, reset_click):
 
 
 @app.callback(
-    Output("df2", "columns"),
+    Output('df2', 'children'),
     [Input("location-select1", "value"),
      Input("model-select1", "value"),
      Input("ICU beds1", "value"),
@@ -857,7 +857,7 @@ def update_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_admit
 
 @app.callback(
     Output("patient_census_plot1", "figure"),
-    [Input("df2", "columns"),
+    [Input('df2', 'children'),
      Input("reset-btn1", "n_clicks")],
 )
 
@@ -878,7 +878,7 @@ def update_plot_patient_census(df_census, reset_click):
 
 @app.callback(
     [Output("patient_census_table_plot1", "figure"), Output('Patient_Census_Discharge_link', 'href')],
-    [Input("df2", "columns"),
+    [Input('df2', 'children'),
      Input("reset-btn1", "n_clicks")],
 )
 def update_table_patient_census1(df_census, reset_click):
@@ -898,7 +898,7 @@ def update_table_patient_census1(df_census, reset_click):
 
 @app.callback(
     Output("patient_discharge_plot1", "figure"),
-    [Input("df2", "columns"),
+    [Input('df2', 'children'),
      Input("reset-btn1", "n_clicks")],
 )
 
@@ -923,7 +923,7 @@ def update_plot_patient_discharge(df_census, reset_click):
 
 @app.callback(
     Output("ppe_plot1", "figure"),
-    [Input("df2", "columns"),
+    [Input('df2', 'children'),
      Input("reset-btn1", "n_clicks")],
 )
 
@@ -946,7 +946,7 @@ def update_plot_ppe(df, reset_click):
 
 @app.callback(
     [Output("ppe_table_plot1", "figure"), Output('ppe_link', 'href')],
-    [Input("df2", "columns"),
+    [Input('df2', 'children'),
      Input("reset-btn1", "n_clicks")],
 )
 def update_table_ppe(df, reset_click):
@@ -1211,4 +1211,4 @@ def update_generate_ventilator_vs_ICU_plot(reset_click):
 
 # Run the server
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(host='127.0.0.1', port=8050, debug=True)
