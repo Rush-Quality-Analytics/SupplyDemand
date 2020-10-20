@@ -385,8 +385,8 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
     if model == '2 phase sine-logistic':
         
         max_r2 = 0
-        b_pt = 60
-        for i in range(60, 130):
+        b_pt = 90
+        for i in range(90, 130):
         
             obs_x1 = obs_x[0:i]
             obs_y1 = obs_y[0:i]
@@ -423,7 +423,7 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
             forecasted_x = np.array(forecasted_x)
             forecasted_y = np.array(forecasted_y)
             
-            obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+            obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
             if obs_pred_r2 > max_r2:
                 max_r2 = obs_pred_r2
                 b_pt = i
@@ -463,7 +463,7 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
         forecasted_x = np.array(forecasted_x)
         forecasted_y = np.array(forecasted_y)
             
-        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+        obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
             
         #print('\n')
         #print(obs_y)
@@ -474,14 +474,14 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
         
     elif model == 'Sine-logistic':
         forecasted_y, forecasted_x, pred_y, params = get_sine_logistic(obs_x, obs_y, ForecastDays)
-        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+        obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
     
     
     elif model == '2 phase logistic':
         
         max_r2 = 0
-        b_pt = 60
-        for i in range(60, 130):
+        b_pt = 90
+        for i in range(90, 130):
         
             obs_x1 = obs_x[0:i]
             obs_y1 = obs_y[0:i]
@@ -518,7 +518,7 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
             forecasted_x = np.array(forecasted_x)
             forecasted_y = np.array(forecasted_y)
             
-            obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+            obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
             if obs_pred_r2 > max_r2:
                 max_r2 = obs_pred_r2
                 b_pt = i
@@ -558,12 +558,8 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
         forecasted_x = np.array(forecasted_x)
         forecasted_y = np.array(forecasted_y)
             
-        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+        obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
             
-        #print('\n')
-        #print(obs_y)
-        #print(pred_y)
-        #print(obs_pred_r2)
         
         params = params1.extend(params2)
         
@@ -571,34 +567,28 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
     
     elif model == 'Logistic':
         forecasted_y, forecasted_x, pred_y, params = get_logistic(obs_x, obs_y, ForecastDays)
-        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+        obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
         
     elif model == 'Gaussian':
         forecasted_y, forecasted_x, pred_y, params = get_gaussian(obs_x, obs_y, ForecastDays)
-        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+        obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
     
     elif model == 'Exponential':
         forecasted_y, forecasted_x, pred_y, params = get_exponential(obs_x, obs_y, ForecastDays)
-        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+        obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
     
     elif model == '3rd degree polynomial':
         forecasted_y, forecasted_x, pred_y, params = get_polynomial(obs_x, obs_y, ForecastDays, 3)
-        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+        obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
     
     elif model == 'Quadratic':
         forecasted_y, forecasted_x, pred_y, params = get_polynomial(obs_x, obs_y, ForecastDays)
-        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+        obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
         
     elif model == 'SEIR-SD':
         forecasted_y, forecasted_x, pred_y, params = get_seir_sd(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day)
-        #forecasted_y, forecasted_x, pred_y, params = get_seir(obs_x, obs_y, ForecastDays, N)
-        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
+        obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
         
-    # return the r-square and observed, predicted, and forecasted values
-    #obs_x = [int(i) for i in obs_x]
-    #forecasted_x = [int(i) for i in forecasted_x]
-    #pred_y = [int(i) for i in pred_y]
-    #forecasted_y = [int(i) for i in forecasted_y]
     
     return obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params
 
@@ -769,7 +759,7 @@ def get_seir_sd(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
     for i in range(iterations):
         
         pred_y = seir(obs_x, alpha, beta, gamma, d1, sd, s, im)   
-        obs_pred_r2 = obs_pred_rsquare(obs_y[0:], pred_y[0:])
+        obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
         
         if i == 0 or obs_pred_r2 >= r2_o:
             
