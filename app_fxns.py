@@ -771,7 +771,7 @@ def generate_model_forecast_plot(fits_df, reset):
     
     figure.update_yaxes(range=[0, 1.5*max(obs_y)])
     figure.update_layout(
-        title=dict(text="r<sup>2</sup> values pertain to the fits of models (colored lines) to observed data (black dots).",
+        title=dict(text="r<sup>2</sup> values pertain to the fits of models (colored lines) to the last 30 days of observed data.",
                    font=dict(
                         family='"Open Sans", "HelveticaNeue", "Helvetica Neue",'
                         " Helvetica, Arial, sans-serif",
