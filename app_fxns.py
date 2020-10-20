@@ -314,7 +314,7 @@ def generate_control_card1():
             dcc.Dropdown(
                 id="model-select1",
                 options=[{"label": i, "value": i} for i in models],
-                value='SEIR-SD',
+                value='2 phase sine-logistic',
             ),
             
             
