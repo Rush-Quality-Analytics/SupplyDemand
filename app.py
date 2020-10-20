@@ -3,10 +3,11 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import pathlib
-
+import time
 import app_fxns
 
-
+import pandas as pd
+import json
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
@@ -30,12 +31,10 @@ app.layout = html.Div([
         
         html.Div(
             id='df1', 
-            #className='columns',
             style={'display': 'none'}
         ),
         html.Div(
-            id='df2', 
-            #className='columns',
+            id='df2',
             style={'display': 'none'}
         ),
         
@@ -83,23 +82,32 @@ app.layout = html.Div([
             className="nine columns",
             children=[
                 
-                # Plot of model forecast
                 html.Div(
-                    id="model_forecasts1",
-                    children=[
-                        html.B("Model Forecasts. A ceiling is imposed on extreme exponential behavior."),
-                        html.Hr(),
-                        dcc.Graph(id="model_forecasts_plot1"),
-                    ],
-                    style={'border-radius': '15px',
-                           'box-shadow': '1px 1px 1px grey',
-                           'background-color': '#f0f0f0',
-                           'padding': '10px',
-                           'margin-bottom': '10px',
-                           'fontSize':16
-                            },
-                ),
-                
+                        id="Figure1",
+                        children=[dcc.Loading(
+                            id="loading-1",
+                            type="default",
+                            fullscreen=False,
+                            children=[
+                                # Plot of model forecast
+                                html.Div(
+                                    id="model_forecasts1",
+                                    children=[
+                                        html.B("Model Forecasts. A ceiling is imposed on extreme exponential behavior."),
+                                        html.Hr(),
+                                        dcc.Graph(id="model_forecasts_plot1"),
+                                    ],
+                                    style={'border-radius': '15px',
+                                           'box-shadow': '1px 1px 1px grey',
+                                           'background-color': '#f0f0f0',
+                                           'padding': '10px',
+                                           'margin-bottom': '10px',
+                                           'fontSize':16
+                                            },
+                                ),
+                            ],
+                        ),],),
+                                
                 
                 html.A('Download CSV', id='model_forecast_link', download="model_forecast_data.csv",
                        href="",
@@ -108,58 +116,86 @@ app.layout = html.Div([
                 html.Br(),
                 
                 html.Div(
-                    id="patient_census1",
-                    children=[
-                        html.B("Forecasted Patient Census"),
-                        html.Hr(),
-                        dcc.Graph(id="patient_census_plot1"),
-                    ],
-                    style={'border-radius': '15px',
-                           'box-shadow': '1px 1px 1px grey',
-                           'background-color': '#f0f0f0',
-                           'padding': '10px',
-                           'margin-bottom': '10px',
-                           'fontSize':16
-                            },
-                ),
+                        id="Table1",
+                        children=[dcc.Loading(
+                            id="loading-2",
+                            type="default",
+                            fullscreen=False,
+                            children=[
+                                html.Div(
+                                    id="patient_census1",
+                                    children=[
+                                        html.B("Forecasted Patient Census"),
+                                        html.Hr(),
+                                        dcc.Graph(id="patient_census_plot1"),
+                                    ],
+                                    style={'border-radius': '15px',
+                                           'box-shadow': '1px 1px 1px grey',
+                                           'background-color': '#f0f0f0',
+                                           'padding': '10px',
+                                           'margin-bottom': '10px',
+                                           'fontSize':16
+                                            },
+                                ),
+                            ],
+                        ),],),
                 
                 html.Br(),
                 html.Br(),
                 
                 html.Div(
-                    id="patient_discharge1",
-                    children=[
-                        html.B("Forecasted Patient Discharges"),
-                        html.Hr(),
-                        dcc.Graph(id="patient_discharge_plot1"),
-                    ],
-                    style={'border-radius': '15px',
-                           'box-shadow': '1px 1px 1px grey',
-                           'background-color': '#f0f0f0',
-                           'padding': '10px',
-                           'margin-bottom': '10px',
-                           'fontSize':16
-                            },
-                ),
+                        id="Figure2",
+                        children=[dcc.Loading(
+                            id="loading-3",
+                            type="default",
+                            fullscreen=False,
+                            children=[
+                                html.Div(
+                                    id="patient_discharge1",
+                                    children=[
+                                        html.B("Forecasted Patient Discharges"),
+                                        html.Hr(),
+                                        dcc.Graph(id="patient_discharge_plot1"),
+                                    ],
+                                    style={'border-radius': '15px',
+                                           'box-shadow': '1px 1px 1px grey',
+                                           'background-color': '#f0f0f0',
+                                           'padding': '10px',
+                                           'margin-bottom': '10px',
+                                           'fontSize':16
+                                            },
+                                ),
+                            ],
+                        ),],),
                 
                 html.Br(),
                 html.Br(),
                 
                 html.Div(
-                    id="patient_census_table1",
-                    children=[
-                        html.B("Patient Census and Discharge Table"),
-                        html.Hr(),
-                        dcc.Graph(id="patient_census_table_plot1"),
-                    ],
-                    style={'border-radius': '15px',
-                           'box-shadow': '1px 1px 1px grey',
-                           'background-color': '#f0f0f0',
-                           'padding': '10px',
-                           'margin-bottom': '10px',
-                           'fontSize':16
-                            },
-                ),
+                        id="Table2",
+                        children=[dcc.Loading(
+                            id="loading-4",
+                            type="default",
+                            fullscreen=False,
+                            children=[
+                                html.Div(
+                                    id="patient_census_table1",
+                                    children=[
+                                        html.B("Patient Census and Discharge Table"),
+                                        html.Hr(),
+                                        dcc.Graph(id="patient_census_table_plot1"),
+                                    ],
+                                    style={'border-radius': '15px',
+                                           'box-shadow': '1px 1px 1px grey',
+                                           'background-color': '#f0f0f0',
+                                           'padding': '10px',
+                                           'margin-bottom': '10px',
+                                           'fontSize':16
+                                            },
+                                ),
+                            ],
+                        ),],),
+                
                 html.A('Download CSV', id='Patient_Census_Discharge_link', download="Patient_Census_Discharge_data.csv",
                        href="",
                        target="_blank"),
@@ -168,40 +204,59 @@ app.layout = html.Div([
                 
                 
                 html.Div(
-                    id="ppe1",
-                    children=[
-                        html.B("Forecasted PPE Needs"),
-                        html.Hr(),
-                        dcc.Graph(id="ppe_plot1"),
-                    ],
-                    style={'border-radius': '15px',
-                           'box-shadow': '1px 1px 1px grey',
-                           'background-color': '#f0f0f0',
-                           'padding': '10px',
-                           'margin-bottom': '10px',
-                           'fontSize':16
-                            },
-                ),
+                        id="Figure3",
+                        children=[dcc.Loading(
+                            id="loading-5",
+                            type="default",
+                            fullscreen=False,
+                            children=[
+                                html.Div(
+                                    id="ppe1",
+                                    children=[
+                                        html.B("Forecasted PPE Needs"),
+                                        html.Hr(),
+                                        dcc.Graph(id="ppe_plot1"),
+                                    ],
+                                    style={'border-radius': '15px',
+                                           'box-shadow': '1px 1px 1px grey',
+                                           'background-color': '#f0f0f0',
+                                           'padding': '10px',
+                                           'margin-bottom': '10px',
+                                           'fontSize':16
+                                            },
+                                ),
+                            ],
+                        ),],),
                 
                 
                 html.Br(),
                 html.Br(),
                 
                 html.Div(
-                    id="ppe_table1",
-                    children=[
-                        html.B("PPE Forecast Table"),
-                        html.Hr(),
-                        dcc.Graph(id="ppe_table_plot1"),
-                    ],
-                    style={'border-radius': '15px',
-                           'box-shadow': '1px 1px 1px grey',
-                           'background-color': '#f0f0f0',
-                           'padding': '10px',
-                           'margin-bottom': '10px',
-                           'fontSize':16
-                            },
-                ),
+                        id="Table3",
+                        children=[dcc.Loading(
+                            id="loading-6",
+                            type="default",
+                            fullscreen=False,
+                            children=[
+                                html.Div(
+                                    id="ppe_table1",
+                                    children=[
+                                        html.B("PPE Forecast Table"),
+                                        html.Hr(),
+                                        dcc.Graph(id="ppe_table_plot1"),
+                                    ],
+                                    style={'border-radius': '15px',
+                                           'box-shadow': '1px 1px 1px grey',
+                                           'background-color': '#f0f0f0',
+                                           'padding': '10px',
+                                           'margin-bottom': '10px',
+                                           'fontSize':16
+                                            },
+                                ),
+                            ],
+                        ),],),
+                
                 html.A('Download CSV', id='ppe_link', download="PPE_Forecast_data.csv",
                        href="",
                        target="_blank"),
@@ -477,6 +532,34 @@ app.layout = html.Div([
 ])
 
 
+#########################################################################################
+################################ LOADING CALLBACKS ######################################
+#########################################################################################
+
+'''
+@app.callback(Output("loading-1", "children"), 
+              [Input("model_forecasts1", "children"),
+               Input("reset-btn1", "n_clicks")],
+              )
+def input_triggers_spinner1(value, reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+            
+    time.sleep(1)
+    return value
+'''
+
+
+
+
+
 @app.callback(
     dash.dependencies.Output('ICU beds1-container', 'children'),
     [dash.dependencies.Input('ICU beds1', 'value')])
@@ -733,10 +816,10 @@ def update_output2_22(value):
 
 
 @app.callback(
-     Output('df1', 'children'),
-    [Input("location-select1", "value"),
-     Input("model-select1", "value"),
-     Input("reset-btn1", "n_clicks")
+     [Output('df1', 'children'), Output("model_forecasts_plot1", "figure")],
+     [Input("location-select1", "value"),
+      Input("model-select1", "value"),
+      Input("reset-btn1", "n_clicks")
      ],
 )
 def update_model_forecast1(loc, model, reset_click):
@@ -751,27 +834,11 @@ def update_model_forecast1(loc, model, reset_click):
             reset = True
 
     # Return to original hm(no colored annotation) by resetting
-    return app_fxns.generate_model_forecasts(loc, model, reset)
-
-
-@app.callback(
-    Output("model_forecasts_plot1", "figure"),
-    [Input('df1', 'children'),
-     Input("reset-btn1", "n_clicks")],
-)
-def update_plot_model_forecast1(df_fits, reset_click):
+    df_fits = app_fxns.generate_model_forecasts(loc, model, reset)
+    fig = app_fxns.generate_model_forecast_plot(df_fits, reset)
     
-    reset = False
-    # Find which one has been triggered
-    ctx = dash.callback_context
+    return df_fits, fig
 
-    if ctx.triggered:
-        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
-        if prop_id == "reset-btn1":
-            reset = True
-
-    # Return to original hm(no colored annotation) by resetting
-    return app_fxns.generate_model_forecast_plot(df_fits, reset)
 
 
 @app.callback(
@@ -792,8 +859,6 @@ def update_table_model_forecast1(df_fits, reset_click):
 
     # Return to original hm(no colored annotation) by resetting
     return app_fxns.generate_model_forecast_table(df_fits, reset)
-
-
 
 
 
