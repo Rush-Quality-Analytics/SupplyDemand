@@ -759,7 +759,7 @@ def get_seir_sd(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day):
     for i in range(iterations):
         
         pred_y = seir(obs_x, alpha, beta, gamma, d1, sd, s, im)   
-        obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
+        obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
         
         if i == 0 or obs_pred_r2 >= r2_o:
             
