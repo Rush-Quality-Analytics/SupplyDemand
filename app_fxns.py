@@ -44,7 +44,7 @@ locs_df.drop(columns=['Unnamed: 0'], inplace=True)
 locations = list(set(locs_df['Province/State']))
 locations.sort()
 
-models = ['SEIR-SD', '2 phase sine-logistic', '2 phase logistic', 'Logistic', 'Gaussian', 'Quadratic', 'Exponential']
+models = ['2 phase sine-logistic', 'SEIR-SD', '2 phase logistic', 'Logistic', 'Gaussian', 'Quadratic', 'Exponential']
 day_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 
             'Friday', 'Saturday','Sunday']
 
@@ -314,7 +314,7 @@ def generate_control_card1():
             dcc.Dropdown(
                 id="model-select1",
                 options=[{"label": i, "value": i} for i in models],
-                value='SEIR-SD',
+                value=models[0],
             ),
             
             
@@ -771,7 +771,7 @@ def generate_model_forecast_plot(fits_df, reset):
     
     figure.update_yaxes(range=[0, 1.5*max(obs_y)])
     figure.update_layout(
-        title=dict(text="r<sup>2</sup> values pertain to the fits of models (colored lines) to observed data (black dots).",
+        title=dict(text="r<sup>2</sup> values pertain to the fits of models (colored lines) to the previous 30 days of observed data.",
                    font=dict(
                         family='"Open Sans", "HelveticaNeue", "Helvetica Neue",'
                         " Helvetica, Arial, sans-serif",
