@@ -126,8 +126,12 @@ sum_col = np.array(df.iloc[:, c:].T)[0]
 if sum(sum_col) == 0:
     df = df.drop(df.columns[c], axis=1)
 
+#v1 = float(df.loc[df['Province/State'] == 'Illinois', '10/31/20'])
+#v2 = float(df.loc[df['Province/State'] == 'Illinois', '10/30/20'])
+#print(v1, v2)
 
-df.loc[df['Province/State'] == 'Illinois', '10/31/20'] = df.loc[df['Province/State'] == 'Illinois', '10/30/20'] + 7899
-df.loc[df['Province/State'] == 'Illinois', '11/01/20'] = df.loc[df['Province/State'] == 'Illinois', '10/31/20'] + 6980
+#if v1 == v2:
+#df.loc[df['Province/State'] == 'Illinois', '10/31/20'] = df.loc[df['Province/State'] == 'Illinois', '10/30/20'] + 7899
+#df.loc[df['Province/State'] == 'Illinois', '11/01/20'] = df.loc[df['Province/State'] == 'Illinois', '10/31/20'] + 6980
 
 df.to_csv('data/COVID-CASES-DF.txt', sep='\t')
