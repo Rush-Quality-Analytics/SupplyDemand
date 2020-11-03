@@ -472,7 +472,7 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
         max_r2 = 0
         Fy = []
         Py = []
-        for i in range(90, 210):
+        for i in range(100, 160):
         
             try:
                 obs_x1 = obs_x[0:i]
