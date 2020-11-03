@@ -198,7 +198,7 @@ def get_sine_logistic(obs_x, obs_y, ForecastDays):
         popt, pcov = curve_fit(sine_logistic, 
                                np.float64(obs_x), 
                                np.float64(obs_y), 
-                               method='lm', maxfev=5000)
+                               method='lm', maxfev=2000)
         
         # get predicted y values
         #if np.isinf(pcov[0][0]) == True:
@@ -224,7 +224,7 @@ def get_sine_logistic(obs_x, obs_y, ForecastDays):
         popt, pcov = curve_fit(lapse_logistic, 
                                np.float64(obs_x), 
                                np.float64(obs_y), 
-                               method='lm', maxfev=5000)
+                               method='lm', maxfev=2000)
         # get predicted y values
         pred_y = lapse_logistic(np.float64(obs_x), *popt)
         # extend x values by number of ForecastDays
