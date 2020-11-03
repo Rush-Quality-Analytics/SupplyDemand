@@ -19,6 +19,18 @@ app.config.suppress_callback_exceptions = True
 BASE_PATH = pathlib.Path(__file__).parent.resolve()
 DATA_PATH = BASE_PATH.joinpath("data").resolve()
 
+models = ['Logistic', '2 phase sine-logistic', '2 phase logistic', 'SEIR-SD', 
+           'Gaussian', 'Quadratic', 'Exponential']
+
+counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
+counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
+                                                       'Out of AL', 'Out of IL',
+                                                       'Out of CO', 'Out of GA',
+                                                       'Out of HI', 'Out of LA',
+                                                       'Out of ME', 'Out of MI',
+                                                       'Out of OK', 'Out of PR',
+                                                       'Out of TN', 'Out of UT',
+                                                       ])]
 
 ######################## DASH APP FUNCTIONS ##################################
 
@@ -536,28 +548,6 @@ app.layout = html.Div([
 ################################ LOADING CALLBACKS ######################################
 #########################################################################################
 
-'''
-@app.callback(Output("loading-1", "children"), 
-              [Input("model_forecasts1", "children"),
-               Input("reset-btn1", "n_clicks")],
-              )
-def input_triggers_spinner1(value, reset_click):
-    
-    reset = False
-    # Find which one has been triggered
-    ctx = dash.callback_context
-
-    if ctx.triggered:
-        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
-        if prop_id == "reset-btn1":
-            reset = True
-            
-    time.sleep(1)
-    return value
-'''
-
-
-
 
 
 @app.callback(
@@ -807,22 +797,76 @@ def update_output2_22(value):
 
 
 
+@app.callback( # Select sub-category
+    Output('county-select1', 'value'),
+    [
+     Input('county-select1', 'options'),
+     Input('location-select1', 'value'),
+     ],
+    )
+def update_output15(available_options, v2):
+    return available_options[0]['value']
+
+
+@app.callback( # Select sub-category
+    Output('location-select1', 'value'),
+    [
+     Input('location-select1', 'options'),
+     #Input('county-select1', 'value'),
+     ],
+    )
+def update_output16(available_options):
+    return available_options[0]['value']
+
+
+
+@app.callback( # Update available sub_categories
+    Output('county-select1', 'options'),
+    [
+     Input('location-select1', 'value'),
+     #Input('county-select1', 'value'),
+     ],
+    )
+def update_output13(v1):
+    
+    tdf = counties_df[counties_df['Province/State'] == v1]
+    cts = sorted(list(set(tdf['Admin2'].values.tolist())))
+    l = 'Entire state or territory'
+    cts.insert(0, l)
+    return [{"label": i, "value": i} for i in cts]
 
 
 
 
+@app.callback( # Update available sub_categories
+    Output('model-select1', 'options'),
+    [
+     Input('location-select1', 'value'),
+     Input('county-select1', 'value'),
+     ],
+    )
+def update_output14(loc1, loc2):
+    
+    if loc2 == 'Entire state or territory':
+        m = ['Logistic', '2 phase sine-logistic', '2 phase logistic', 'SEIR-SD', 
+           'Gaussian', 'Quadratic', 'Exponential']
+    else:
+        m = ['Logistic', '2 phase sine-logistic', '2 phase logistic',
+           'Gaussian', 'Quadratic', 'Exponential']
 
+    return [{"label": i, "value": i} for i in m]
 
 
 
 @app.callback(
      [Output('df1', 'children'), Output("model_forecasts_plot1", "figure")],
      [Input("location-select1", "value"),
+      Input("county-select1", "value"),
       Input("model-select1", "value"),
       Input("reset-btn1", "n_clicks")
      ],
 )
-def update_model_forecast1(loc, model, reset_click):
+def update_model_forecast1(loc, county, model, reset_click):
     
     reset = False
     # Find which one has been triggered
@@ -834,7 +878,7 @@ def update_model_forecast1(loc, model, reset_click):
             reset = True
 
     # Return to original hm(no colored annotation) by resetting
-    df_fits = app_fxns.generate_model_forecasts(loc, model, reset)
+    df_fits = app_fxns.generate_model_forecasts(loc, county, model, reset)
     fig = app_fxns.generate_model_forecast_plot(df_fits, reset)
     
     return df_fits, fig
@@ -844,9 +888,11 @@ def update_model_forecast1(loc, model, reset_click):
 @app.callback(
     Output('model_forecast_link', 'href'),
     [Input('df1', 'children'),
+     Input("location-select1", "value"),
+     Input('county-select1', 'value'),
      Input("reset-btn1", "n_clicks")],
 )
-def update_table_model_forecast1(df_fits, reset_click):
+def update_table_model_forecast1(df_fits, loc, cty, reset_click):
     
     reset = False
     # Find which one has been triggered
@@ -866,6 +912,7 @@ def update_table_model_forecast1(df_fits, reset_click):
 @app.callback(
     Output('df2', 'children'),
     [Input("location-select1", "value"),
+     Input('county-select1', 'value'),
      Input("model-select1", "value"),
      Input("ICU beds1", "value"),
      Input("nonICU beds1", "value"),
@@ -893,7 +940,7 @@ def update_table_model_forecast1(df_fits, reset_click):
 )
 
 
-def update_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_admit, 
+def update_patient_census(loc, cty, model, icu_beds, nonicu_beds, per_loc, per_admit, 
     per_cc, LOS_cc, LOS_nc, per_vent, TimeLag, transfers, per_ICU_transfer, mortality, 
     GLOVE_SURGICAL, GLOVE_EXAM_NITRILE, GLOVE_EXAM_VINYL, MASK_FACE_PROC_ANTI_FOG, 
     MASK_PROC_FLUID_RESISTANT, GOWN_ISOLATION_XL_YELLOW, MASK_SURG_ANTI_FOG_FILM, 
@@ -910,7 +957,7 @@ def update_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_admit
             
     # Return to original hm(no colored annotation) by resetting
     
-    df2 = app_fxns.generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_admit, 
+    df2 = app_fxns.generate_patient_census(loc, cty, model, icu_beds, nonicu_beds, per_loc, per_admit, 
     per_cc, LOS_cc, LOS_nc, per_vent, TimeLag, transfers, per_ICU_transfer, mortality, 
     GLOVE_SURGICAL, GLOVE_EXAM_NITRILE, GLOVE_EXAM_VINYL, MASK_FACE_PROC_ANTI_FOG, 
     MASK_PROC_FLUID_RESISTANT, GOWN_ISOLATION_XL_YELLOW, MASK_SURG_ANTI_FOG_FILM, 
@@ -923,10 +970,12 @@ def update_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_admit
 @app.callback(
     Output("patient_census_plot1", "figure"),
     [Input('df2', 'children'),
+     Input("location-select1", "value"),
+     Input('county-select1', 'value'),
      Input("reset-btn1", "n_clicks")],
 )
 
-def update_plot_patient_census(df_census, reset_click):
+def update_plot_patient_census(df_census, loc, cty, reset_click):
     
     reset = False
     # Find which one has been triggered
@@ -944,9 +993,11 @@ def update_plot_patient_census(df_census, reset_click):
 @app.callback(
     [Output("patient_census_table_plot1", "figure"), Output('Patient_Census_Discharge_link', 'href')],
     [Input('df2', 'children'),
+     Input("location-select1", "value"),
+     Input('county-select1', 'value'),
      Input("reset-btn1", "n_clicks")],
 )
-def update_table_patient_census1(df_census, reset_click):
+def update_table_patient_census1(df_census, loc, cty, reset_click):
     
     reset = False
     # Find which one has been triggered
@@ -964,10 +1015,12 @@ def update_table_patient_census1(df_census, reset_click):
 @app.callback(
     Output("patient_discharge_plot1", "figure"),
     [Input('df2', 'children'),
+     Input("location-select1", "value"),
+     Input('county-select1', 'value'),
      Input("reset-btn1", "n_clicks")],
 )
 
-def update_plot_patient_discharge(df_census, reset_click):
+def update_plot_patient_discharge(df_census, loc, cty, reset_click):
     
     reset = False
     # Find which one has been triggered
@@ -989,10 +1042,12 @@ def update_plot_patient_discharge(df_census, reset_click):
 @app.callback(
     Output("ppe_plot1", "figure"),
     [Input('df2', 'children'),
+     Input("location-select1", "value"),
+     Input('county-select1', 'value'),
      Input("reset-btn1", "n_clicks")],
 )
 
-def update_plot_ppe(df, reset_click):
+def update_plot_ppe(df, loc, cty, reset_click):
     
     reset = False
     # Find which one has been triggered
@@ -1012,9 +1067,11 @@ def update_plot_ppe(df, reset_click):
 @app.callback(
     [Output("ppe_table_plot1", "figure"), Output('ppe_link', 'href')],
     [Input('df2', 'children'),
+     Input("location-select1", "value"),
+     Input('county-select1', 'value'),
      Input("reset-btn1", "n_clicks")],
 )
-def update_table_ppe(df, reset_click):
+def update_table_ppe(df, loc, cty, reset_click):
     
     reset = False
     # Find which one has been triggered

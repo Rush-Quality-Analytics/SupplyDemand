@@ -32,6 +32,7 @@ census_df = pd.DataFrame(columns = col_names2)
 seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
 statepops = pd.read_csv('DataUpdate/data/StatePops.csv')
 
+
 locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
 locs_df = locs_df[locs_df['Country/Region'] == 'US']
 locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
@@ -39,12 +40,34 @@ locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Nort
                                                  'United States Virgin Islands', 'Virgin Islands, U.S.',
                                                 'Wuhan Evacuee'])]
 
+locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+locs_df = locs_df[locs_df['Country/Region'] == 'US']
+locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
+                                                'Diamond Princess', 'Grand Princess', 'Recovered', 
+                                                 'United States Virgin Islands', 'Virgin Islands, U.S.',
+                                                'Wuhan Evacuee'])]
+
+counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
+counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
+                                                       'Out of AL', 'Out of IL',
+                                                       'Out of CO', 'Out of GA',
+                                                       'Out of HI', 'Out of LA',
+                                                       'Out of ME', 'Out of MI',
+                                                       'Out of OK', 'Out of PR',
+                                                       'Out of TN', 'Out of UT',
+                                                       ])]
+
 locs_df.drop(columns=['Unnamed: 0'], inplace=True)
+counties_df.drop(columns=['Unnamed: 0'], inplace=True)
 
 locations = list(set(locs_df['Province/State']))
 locations.sort()
 
-models = ['2 phase sine-logistic', 'SEIR-SD', '2 phase logistic', 'Logistic', 'Gaussian', 'Quadratic', 'Exponential']
+counties = list(set(counties_df['Admin2']))
+counties.append('Entire state or territory')
+
+models = ['Logistic', '2 phase sine-logistic', '2 phase logistic', 'SEIR-SD', 
+           'Gaussian', 'Quadratic', 'Exponential']
 day_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 
             'Friday', 'Saturday','Sunday']
 
@@ -299,7 +322,7 @@ def generate_control_card1():
     return html.Div(
         id="control-card1",
         children=[
-            html.P("Select a location"),
+            html.P("Select a state or territory"),
             dcc.Dropdown(
                 id="location-select1",
                 options=[{"label": i, "value": i} for i in locations],
@@ -309,6 +332,19 @@ def generate_control_card1():
                     'font-size': "100%",
                     }
             ),
+            
+            html.Br(),
+            html.P("Select a county or other area"),
+            dcc.Dropdown(
+                id="county-select1",
+                options=[{"label": i, "value": i} for i in counties],
+                value='Entire state or territory',
+                style={
+                    'width': '250px', 
+                    'font-size': "100%",
+                    }
+            ),
+            
             html.Br(),
             html.P("Select a model"),
             dcc.Dropdown(
@@ -531,7 +567,7 @@ def generate_control_card1():
 
 
 
-def generate_model_forecasts(loc,  model, reset):
+def generate_model_forecasts(loc, county, model, reset):
     
     new_cases = []
     ForecastDays = 60
@@ -544,23 +580,72 @@ def generate_model_forecasts(loc,  model, reset):
 
     PopSize = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
     PopSize = PopSize[0]
+    
+    if county == 'Entire state or territory':
+        df_sub = locs_df[locs_df['Province/State'] == loc]
+        ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
+        ArrivalDate = ArrivalDate[0]
         
-    ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
-    ArrivalDate = ArrivalDate[0]
+        SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
         
-    SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
+        #print(loc, county)
+        #print(df_sub.shape)
+        #print(list(df_sub))
+        #print(df_sub.head(), '\n')
         
+    
+    else:
+        
+        try:
+            df_sub = counties_df[counties_df['Province/State'] == loc]
+            df_sub = df_sub[df_sub['Admin2'] == county]
+            df_sub = df_sub.filter(items=['date', 'Confirmed'], axis=1)
+            df_sub = df_sub.set_index('date').transpose()
+            df_sub = df_sub.reset_index(drop=True)
+            #df_sub.drop(['date'], axis=1, inplace=True)
+            
+            df_sub['Province/State'] = loc
+            df_sub['Country/Region'] = 'US'
+            df_sub['Lat'] = 0
+            df_sub['Long'] = 0
+            
+            col = df_sub.pop('Long')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Lat')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Country/Region')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Province/State')
+            df_sub.insert(0, col.name, col)
+            
+    
+            ArrivalDate = np.nan
+            SEIR_Fit = []
+            
+            #print(df_sub.columns)
+            #print(df_sub.head())
+            
+        except:
+            df_sub = locs_df[locs_df['Province/State'] == loc]
+            ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
+            ArrivalDate = ArrivalDate[0]
+            
+            SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
+            
+            #print(loc, county)
+            #print(df_sub.shape)
+            #print(list(df_sub))
+            #print(df_sub.head(), '\n')
+            
         
     # add 1 to number of forecast days for indexing purposes
     ForecastDays = int(ForecastDays+1)
-        
-        
-    # filter main dataframe to include only the chosen location
-    df_sub = locs_df[locs_df['Province/State'] == loc]
-        
+                
     # get column labels, will filter below to extract dates
     yi = list(df_sub)
-        
         
     obs_y_trunc = []
     fore_clrs =  ['purple',  'mediumorchid', 'plum', 'blue', 'deepskyblue', 
@@ -586,8 +671,16 @@ def generate_model_forecasts(loc,  model, reset):
         while obs_y_trunc[ii] == 0: ii+=1
         y = obs_y_trunc[ii:]
         dates = DATES[ii:]
-            
-    
+        
+        y = list(y)
+        if y != sorted(y):
+            for ii, val in enumerate(y):
+                if ii == 0: 
+                    continue
+                elif val < y[ii-1]:
+                    y[ii] = y[ii-1]
+                    
+        
         # declare x as a list of integers from 0 to len(y)
         x = list(range(len(y)))
 
@@ -640,14 +733,14 @@ def generate_model_forecasts(loc,  model, reset):
             
             
         if label == 'Current forecast':
-            for i, val in enumerate(forecasted_y):
-                if i > 0:
-                    if forecasted_y[i] - forecasted_y[i-1] > 0:
-                        new_cases.append(forecasted_y[i] - forecasted_y[i-1])
+            for ii, val in enumerate(forecasted_y):
+                if ii > 0:
+                    if forecasted_y[ii] - forecasted_y[ii-1] > 0:
+                        new_cases.append(forecasted_y[ii] - forecasted_y[ii-1])
                     else:
                         new_cases.append(0)
-                if i == 0:
-                    new_cases.append(forecasted_y[i])
+                if ii == 0:
+                    new_cases.append(forecasted_y[ii])
                         
                 
         # get dates from ArrivalDate to the current day
@@ -865,7 +958,7 @@ def generate_model_forecast_table(fits_df, reset):
 
 
         
-def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_admit, 
+def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, per_admit, 
     per_cc, LOS_cc, LOS_nc, per_vent, TimeLag, transfers, per_ICU_transfer, 
     mortality, GLOVE_SURGICAL, GLOVE_EXAM_NITRILE, GLOVE_EXAM_VINYL, 
     MASK_FACE_PROC_ANTI_FOG, MASK_PROC_FLUID_RESISTANT, GOWN_ISOLATION_XL_YELLOW, 
@@ -878,18 +971,70 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
     
     PopSize = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
     PopSize = PopSize[0]
+    
+
+    if county == 'Entire state or territory':
+        df_sub = locs_df[locs_df['Province/State'] == loc]
+        ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
+        ArrivalDate = ArrivalDate[0]
         
-    ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
-    ArrivalDate = ArrivalDate[0]
+        SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
         
-    SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
+        #print(loc, county)
+        #print(df_sub.shape)
+        #print(list(df_sub))
+        #print(df_sub.head(), '\n')
+        
+    
+    else:
+        
+        try:
+            df_sub = counties_df[counties_df['Province/State'] == loc]
+            df_sub = df_sub[df_sub['Admin2'] == county]
+            df_sub = df_sub.filter(items=['date', 'Confirmed'], axis=1)
+            df_sub = df_sub.set_index('date').transpose()
+            df_sub = df_sub.reset_index(drop=True)
+            #df_sub.drop(['date'], axis=1, inplace=True)
+            
+            df_sub['Province/State'] = loc
+            df_sub['Country/Region'] = 'US'
+            df_sub['Lat'] = 0
+            df_sub['Long'] = 0
+            
+            col = df_sub.pop('Long')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Lat')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Country/Region')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Province/State')
+            df_sub.insert(0, col.name, col)
+            
+    
+            ArrivalDate = np.nan
+            SEIR_Fit = []
+            
+            #print(df_sub.columns)
+            #print(df_sub.head())
+            
+        except:
+            df_sub = locs_df[locs_df['Province/State'] == loc]
+            ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
+            ArrivalDate = ArrivalDate[0]
+            
+            SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
+            
+            #print(loc, county)
+            #print(df_sub.shape)
+            #print(list(df_sub))
+            #print(df_sub.head(), '\n')
+            
       
     # add 1 to number of forecast days for indexing purposes
     ForecastDays = int(ForecastDays+1)
-        
-        
-    # filter main dataframe to include only the chosen location
-    df_sub = locs_df[locs_df['Province/State'] == loc]
         
     # get column labels, will filter below to extract dates
     yi = list(df_sub)
@@ -902,8 +1047,15 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
     while obs_y_trunc[ii] == 0: ii+=1
     y = obs_y_trunc[ii:]
     dates = DATES[ii:]
-            
-    
+        
+    y = list(y)
+    if y != sorted(y):
+        for ii, val in enumerate(y):
+            if ii == 0: 
+                continue
+            elif val < y[ii-1]:
+                y[ii] = y[ii-1]
+                    
     # declare x as a list of integers from 0 to len(y)
     x = list(range(len(y)))
 
