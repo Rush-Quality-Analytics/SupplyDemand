@@ -201,8 +201,8 @@ def get_sine_logistic(obs_x, obs_y, ForecastDays):
                                method='lm', maxfev=5000)
         
         # get predicted y values
-        if np.isinf(pcov[0][0]) == True:
-            check = 'check' + pcov[0][0]
+        #if np.isinf(pcov[0][0]) == True:
+        #    check = 'check' + pcov[0][0]
         
         pred_y = sine_logistic(np.float64(obs_x), *popt)
         # extend x values by number of ForecastDays
@@ -387,8 +387,8 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
         max_r2 = 0
         Fy = []
         Py = []
-        b_pt = 90
         for i in range(90, 210):
+            
             
             try:
                 obs_x1 = obs_x[0:i]
@@ -438,7 +438,6 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
                 #obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
                 if obs_pred_r2 > max_r2:
                     max_r2 = obs_pred_r2
-                    b_pt = i
                     Fy = list(forecasted_y)
                     Py = list(pred_y)
                     
@@ -473,7 +472,6 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
         max_r2 = 0
         Fy = []
         Py = []
-        b_pt = 90
         for i in range(90, 210):
         
             try:
@@ -484,7 +482,7 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
                 obs_y2 = obs_y[i:]
                 
                 
-                miny = max(obs_y1) * 0.7    
+                miny = max(obs_y1) 
                 obs_y2 = np.array(obs_y2) - miny
                 
                 minx = min(obs_x2)
@@ -523,7 +521,6 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
                 obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
                 if obs_pred_r2 > max_r2:
                     max_r2 = obs_pred_r2
-                    b_pt = i
                     Fy = list(forecasted_y)
                     Py = list(pred_y)
                     
