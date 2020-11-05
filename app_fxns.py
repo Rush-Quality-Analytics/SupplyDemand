@@ -17,45 +17,29 @@ import model_fxns as fxns
 testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
 testing_df = pd.read_pickle('DataUpdate/data/Testing_Dataframe.pkl')
 
-col_names1 =  ['obs_y', 'pred_y', 'forecasted_y', 'pred_dates', 'label', 
-               'forecast_dates',  'obs_pred_r2', 'model', 'focal_loc', 
-               'PopSize', 'ArrivalDate', 'pred_clr', 'fore_clr']
+col_names1 =  ['obs_y', 'pred_y', 'forecasted_y', 'pred_dates', 'label', 'forecast_dates',  
+               'obs_pred_r2', 'model', 'focal_loc', 'PopSize', 'ArrivalDate', 'pred_clr', 'fore_clr']
 fits_df = pd.DataFrame(columns = col_names1)
 
 
-col_names2 = ['Total cases', 'New cases', 'New visits', 'New admits',
-                  'All COVID', 'Non-ICU', 'ICU', 'Vent',
-                  'Discharged from ICU deceased', 'Discharged from ICU alive',
-                  'Discharged from non-ICU alive']
+col_names2 = ['Total cases', 'New cases', 'New visits', 'New admits', 'All COVID', 'Non-ICU', 
+              'ICU', 'Vent', 'Discharged from ICU deceased', 'Discharged from ICU alive', 'Discharged from non-ICU alive']
 census_df = pd.DataFrame(columns = col_names2)
 
 seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
 statepops = pd.read_csv('DataUpdate/data/StatePops.csv')
 
-
 locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
 locs_df = locs_df[locs_df['Country/Region'] == 'US']
 locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
-                                                'Diamond Princess', 'Grand Princess', 'Recovered', 
-                                                 'United States Virgin Islands', 'Virgin Islands, U.S.',
-                                                'Wuhan Evacuee'])]
-
-locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
-locs_df = locs_df[locs_df['Country/Region'] == 'US']
-locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
-                                                'Diamond Princess', 'Grand Princess', 'Recovered', 
-                                                 'United States Virgin Islands', 'Virgin Islands, U.S.',
-                                                'Wuhan Evacuee'])]
+                                                   'Diamond Princess', 'Grand Princess', 'Recovered', 
+                                                   'United States Virgin Islands', 'Virgin Islands, U.S.', 'Wuhan Evacuee'])]
 
 counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
 counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
-                                                       'Out of AL', 'Out of IL',
-                                                       'Out of CO', 'Out of GA',
-                                                       'Out of HI', 'Out of LA',
-                                                       'Out of ME', 'Out of MI',
-                                                       'Out of OK', 'Out of PR',
-                                                       'Out of TN', 'Out of UT',
-                                                       ])]
+                                'Out of AL', 'Out of IL','Out of CO', 'Out of GA',
+                                'Out of HI', 'Out of LA', 'Out of ME', 'Out of MI',
+                                'Out of OK', 'Out of PR', 'Out of TN', 'Out of UT',])]
 
 locs_df.drop(columns=['Unnamed: 0'], inplace=True)
 counties_df.drop(columns=['Unnamed: 0'], inplace=True)
@@ -66,10 +50,8 @@ locations.sort()
 counties = list(set(counties_df['Admin2']))
 counties.append('Entire state or territory')
 
-models = ['Logistic', '2 phase sine-logistic', '2 phase logistic', 'SEIR-SD', 
-           'Gaussian', 'Quadratic', 'Exponential']
-day_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 
-            'Friday', 'Saturday','Sunday']
+models = ['Logistic', '2 phase sine-logistic', '2 phase logistic', 'SEIR-SD', 'Gaussian', 'Quadratic', 'Exponential']
+day_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 
 
@@ -77,7 +59,6 @@ day_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday',
 
 def description_card1():
     """
-
     :return: A Div containing dashboard title & descriptions.
     """
     return html.Div(
@@ -99,7 +80,6 @@ def description_card1():
 
 def description_card2():
     """
-
     :return: A Div containing dashboard title & descriptions.
     """
     return html.Div(
@@ -659,12 +639,12 @@ def generate_model_forecasts(loc, county, model, reset):
             
         if j == 0:
             # get dates for today's predictions/forecast
-            DATES = yi[4:]
-            obs_y_trunc = df_sub.iloc[0,4:].values
+            DATES = yi[2:]
+            obs_y_trunc = df_sub.iloc[0,2:].values
         else:
             # get dates for previous days predictions/forecast
-            DATES = yi[4:j]
-            obs_y_trunc = df_sub.iloc[0,4:j].values
+            DATES = yi[2:j]
+            obs_y_trunc = df_sub.iloc[0,2:j].values
             
         
         ii = 0
@@ -1040,8 +1020,8 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     yi = list(df_sub)
         
     obs_y_trunc = []
-    DATES = yi[4:]
-    obs_y_trunc = df_sub.iloc[0,4:].values
+    DATES = yi[2:]
+    obs_y_trunc = df_sub.iloc[0, 2:].values
     
     ii = 0
     while obs_y_trunc[ii] == 0: ii+=1

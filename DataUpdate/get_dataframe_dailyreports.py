@@ -8,7 +8,7 @@ dates = []
 def dataframe():
     JH_DATA_URL = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/'
     df_main = pd.DataFrame(columns = ['Province/State', 'Country/Region', 'date',
-                                'Lat' , 'Long', 'Confirmed', 'Deaths', 'Recovered'])
+                                'Confirmed', 'Deaths', 'Recovered', 'Active'])
     
     
     today = pd.Timestamp('today')
@@ -35,7 +35,7 @@ def dataframe():
                 df = df[df['Country/Region'] == 'US']
                 df['date'] = date
                 df = df.filter(['Admin2', 'Province/State', 'Country/Region', 'date',
-                                'Lat' , 'Long', 'Confirmed', 'Deaths', 'Recovered'])
+                                'Confirmed', 'Deaths', 'Recovered', 'Active'])
                 
             except:
                 pass
@@ -45,10 +45,10 @@ def dataframe():
                 df = df[df['Country_Region'] == 'US']
                 df['date'] = date
                 df = df.filter(['Admin2', 'Province_State', 'Country_Region', 'date', 
-                                'Lat' , 'Long_', 'Confirmed', 'Deaths', 'Recovered'])
+                                'Confirmed', 'Deaths', 'Recovered', 'Active'])
                 
                 df.columns = ['Admin2', 'Province/State', 'Country/Region', 'date',
-                                'Lat' , 'Long', 'Confirmed', 'Deaths', 'Recovered']
+                                'Confirmed', 'Deaths', 'Recovered', 'Active']
             except:
                 pass
             
@@ -74,8 +74,7 @@ df_sums, df_main, dates = dataframe()
 
 
 
-
-col_names = ['Province/State', 'Country/Region', 'Lat', 'Long']
+col_names = ['Province/State', 'Country/Region']
 
 today = pd.Timestamp('today')
 today = '{:%m/%d/%Y}'.format(today)
@@ -96,10 +95,8 @@ provstates = list(set(df_sums['Province/State']))
 lofl = []
 for ps in provstates:
     st_df = df_main[df_main['Province/State'].str.contains(ps)]
-    lat = st_df['Lat'].iloc[-1]
-    long = st_df['Long'].iloc[-1]
-    
-    ps_ls = [ps, 'US', lat, long]
+
+    ps_ls = [ps, 'US']
     cases = df_sums[df_sums['Province/State'].str.contains(ps)]
     st_cases = cases['Confirmed'].tolist()
     st_dates = cases['date'].tolist()
