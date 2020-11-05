@@ -31,7 +31,7 @@ census_df = pd.DataFrame(columns = col_names2)
 
 seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
 statepops = pd.read_csv('DataUpdate/data/StatePops.csv')
-cty_pops_df = pd.read_pickle('DataUpdate/data/County_Pops.pkl')
+#cty_pops_df = pd.read_pickle('DataUpdate/data/County_Pops.pkl')
 
 
 locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
@@ -47,6 +47,10 @@ locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Nort
                                                 'Diamond Princess', 'Grand Princess', 'Recovered', 
                                                  'United States Virgin Islands', 'Virgin Islands, U.S.',
                                                 'Wuhan Evacuee'])]
+locs_df.drop(columns=['Unnamed: 0'], inplace=True)
+locations = list(set(locs_df['Province/State']))
+locations.sort()
+
 
 counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
 counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
@@ -57,15 +61,10 @@ counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-sta
                                                        'Out of OK', 'Out of PR',
                                                        'Out of TN', 'Out of UT',
                                                        ])]
-
-locs_df.drop(columns=['Unnamed: 0'], inplace=True)
 counties_df.drop(columns=['Unnamed: 0'], inplace=True)
-
-locations = list(set(locs_df['Province/State']))
-locations.sort()
-
 counties = list(set(counties_df['Admin2']))
 counties.append('Entire state or territory')
+counties_df = 0
 
 models = ['Logistic', '2 phase sine-logistic', '2 phase logistic', 'SEIR-SD', 
            'Gaussian', 'Quadratic', 'Exponential']
@@ -598,12 +597,27 @@ def generate_model_forecasts(loc, county, model, reset):
     else:
         
         try:
+            counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
+            counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
+                                                                   'Out of AL', 'Out of IL',
+                                                                   'Out of CO', 'Out of GA',
+                                                                   'Out of HI', 'Out of LA',
+                                                                   'Out of ME', 'Out of MI',
+                                                                   'Out of OK', 'Out of PR',
+                                                                   'Out of TN', 'Out of UT',
+                                                                   ])]
+            counties_df.drop(columns=['Unnamed: 0'], inplace=True)
+            #counties = list(set(counties_df['Admin2']))
+            #counties.append('Entire state or territory')
+
             df_sub = counties_df[counties_df['Province/State'] == loc]
             df_sub = df_sub[df_sub['Admin2'] == county]
             df_sub = df_sub.filter(items=['date', 'Confirmed'], axis=1)
             df_sub = df_sub.set_index('date').transpose()
             df_sub = df_sub.reset_index(drop=True)
             #df_sub.drop(['date'], axis=1, inplace=True)
+            
+            counties_df = 0
             
             df_sub['Province/State'] = loc
             df_sub['Country/Region'] = 'US'
@@ -990,7 +1004,24 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     else:
         
         try:
+            
+            counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
+            counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
+                                                                   'Out of AL', 'Out of IL',
+                                                                   'Out of CO', 'Out of GA',
+                                                                   'Out of HI', 'Out of LA',
+                                                                   'Out of ME', 'Out of MI',
+                                                                   'Out of OK', 'Out of PR',
+                                                                   'Out of TN', 'Out of UT',
+                                                                   ])]
+            counties_df.drop(columns=['Unnamed: 0'], inplace=True)
+            #counties = list(set(counties_df['Admin2']))
+            #counties.append('Entire state or territory')
+
+
             df_sub = counties_df[counties_df['Province/State'] == loc]
+            counties_df = 0
+            
             df_sub = df_sub[df_sub['Admin2'] == county]
             df_sub = df_sub.filter(items=['date', 'Confirmed'], axis=1)
             df_sub = df_sub.set_index('date').transpose()

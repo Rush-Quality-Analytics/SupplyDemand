@@ -351,8 +351,8 @@ def get_polynomial(obs_x, obs_y, ForecastDays, degree=2):
 
 
 def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations, SEIR_Fit=0):
-    global seirN
-    seirN = int(N)
+    #global seirN
+    #seirN = int(N)
     # A function to fit various models to observed COVID-19 cases data according to:
     # obs_x: observed x values
     # obs_y: observed y values
@@ -472,7 +472,7 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
         max_r2 = 0
         Fy = []
         Py = []
-        for i in range(100, 160):
+        for i in range(90, 130):
         
             try:
                 obs_x1 = obs_x[0:i]
