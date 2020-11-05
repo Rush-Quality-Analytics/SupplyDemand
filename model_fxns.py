@@ -95,9 +95,6 @@ def get_logistic(obs_x, obs_y, ForecastDays):
                                np.float64(obs_y), 
                                method='lm', maxfev=5000)
         
-        # get predicted y values
-        if np.isinf(pcov[0][0]) == True:
-            check = 'check' + pcov[0][0]
         
         pred_y = logistic(np.float64(obs_x), *popt)
         # extend x values by number of ForecastDays
@@ -300,6 +297,9 @@ def get_exponential(obs_x, obs_y, ForecastDays):
     
     # return the forecasted x-y values and predicted y values
     params = []
+    
+    obs_x = 0
+    obs_y = 0
     return forecasted_y, forecasted_x, pred_y, params
         
 
@@ -344,6 +344,8 @@ def get_polynomial(obs_x, obs_y, ForecastDays, degree=2):
         pass
     
     params = []
+    obs_x = 0
+    obs_y = 0
     # return the forecasted x-y values and predicted y values
     return forecasted_y, forecasted_x, pred_y, params
 
@@ -566,6 +568,9 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
         forecasted_y, forecasted_x, pred_y, params = get_seir_sd(obs_x, obs_y, ForecastDays, N, iterations, SEIR_Fit, day)
         obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
         
+    obs_y = 0
+    forecasted_y1, forecasted_x1, pred_y1, params1 = 0, 0, 0, 0
+    forecasted_y2, forecasted_x2, pred_y2, params2 = 0, 0, 0, 0
     
     return obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params
 
