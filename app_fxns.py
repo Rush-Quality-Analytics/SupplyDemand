@@ -31,6 +31,7 @@ census_df = pd.DataFrame(columns = col_names2)
 
 seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
 statepops = pd.read_csv('DataUpdate/data/StatePops.csv')
+cty_pops_df = pd.read_pickle('DataUpdate/data/County_Pops.pkl')
 
 
 locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 

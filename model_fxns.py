@@ -435,7 +435,7 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
                 forecasted_y = np.array(forecasted_y)
                 
                 obs_pred_r2 = obs_pred_rsquare(obs_y, pred_y)
-                #obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
+                
                 if obs_pred_r2 > max_r2:
                     max_r2 = obs_pred_r2
                     Fy = list(forecasted_y)
