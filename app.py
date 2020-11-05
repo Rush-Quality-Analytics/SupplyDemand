@@ -22,15 +22,6 @@ DATA_PATH = BASE_PATH.joinpath("data").resolve()
 models = ['Logistic', '2 phase sine-logistic', '2 phase logistic', 'SEIR-SD', 
            'Gaussian', 'Quadratic', 'Exponential']
 
-counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
-counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
-                                                       'Out of AL', 'Out of IL',
-                                                       'Out of CO', 'Out of GA',
-                                                       'Out of HI', 'Out of LA',
-                                                       'Out of ME', 'Out of MI',
-                                                       'Out of OK', 'Out of PR',
-                                                       'Out of TN', 'Out of UT',
-                                                       ])]
 
 ######################## DASH APP FUNCTIONS ##################################
 
@@ -829,8 +820,20 @@ def update_output16(available_options):
     )
 def update_output13(v1):
     
+    counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
+    counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
+                                                       'Out of AL', 'Out of IL',
+                                                       'Out of CO', 'Out of GA',
+                                                       'Out of HI', 'Out of LA',
+                                                       'Out of ME', 'Out of MI',
+                                                       'Out of OK', 'Out of PR',
+                                                       'Out of TN', 'Out of UT',
+                                                       ])]
+
     tdf = counties_df[counties_df['Province/State'] == v1]
+    counties_df = 0
     cts = sorted(list(set(tdf['Admin2'].values.tolist())))
+    tdf = 0
     l = 'Entire state or territory'
     cts.insert(0, l)
     return [{"label": i, "value": i} for i in cts]
