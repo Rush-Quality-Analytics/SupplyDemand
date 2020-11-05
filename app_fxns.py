@@ -14,22 +14,6 @@ import model_fxns as fxns
 
 
 
-testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
-testing_df = pd.read_pickle('DataUpdate/data/Testing_Dataframe.pkl')
-
-col_names1 =  ['obs_y', 'pred_y', 'forecasted_y', 'pred_dates', 'label', 
-               'forecast_dates',  'obs_pred_r2', 'model', 'focal_loc', 
-               'PopSize', 'ArrivalDate', 'pred_clr', 'fore_clr']
-fits_df = pd.DataFrame(columns = col_names1)
-
-
-col_names2 = ['Total cases', 'New cases', 'New visits', 'New admits',
-                  'All COVID', 'Non-ICU', 'ICU', 'Vent',
-                  'Discharged from ICU deceased', 'Discharged from ICU alive',
-                  'Discharged from non-ICU alive']
-census_df = pd.DataFrame(columns = col_names2)
-
-seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
 statepops = pd.read_csv('DataUpdate/data/StatePops.csv')
 
 locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
@@ -40,11 +24,26 @@ locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Nort
                                                 'Wuhan Evacuee'])]
 
 locs_df.drop(columns=['Unnamed: 0'], inplace=True)
-
 locations = list(set(locs_df['Province/State']))
 locations.sort()
+locs_df = 0
 
-models = ['2 phase sine-logistic', 'SEIR-SD', '2 phase logistic', 'Logistic', 'Gaussian', 'Quadratic', 'Exponential']
+counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
+counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
+                                                       'Out of AL', 'Out of IL',
+                                                       'Out of CO', 'Out of GA',
+                                                       'Out of HI', 'Out of LA',
+                                                       'Out of ME', 'Out of MI',
+                                                       'Out of OK', 'Out of PR',
+                                                       'Out of TN', 'Out of UT',
+                                                       ])]
+counties_df.drop(columns=['Unnamed: 0'], inplace=True)
+counties = list(set(counties_df['Admin2']))
+counties.append('Entire state or territory')
+counties_df = 0
+
+models = ['Logistic', '2 phase sine-logistic', '2 phase logistic', 'SEIR-SD', 
+           'Gaussian', 'Quadratic', 'Exponential']
 day_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 
             'Friday', 'Saturday','Sunday']
 
@@ -299,7 +298,7 @@ def generate_control_card1():
     return html.Div(
         id="control-card1",
         children=[
-            html.P("Select a location"),
+            html.P("Select a state or territory"),
             dcc.Dropdown(
                 id="location-select1",
                 options=[{"label": i, "value": i} for i in locations],
@@ -309,6 +308,19 @@ def generate_control_card1():
                     'font-size': "100%",
                     }
             ),
+            
+            html.Br(),
+            html.P("Select a county or other area"),
+            dcc.Dropdown(
+                id="county-select1",
+                options=[{"label": i, "value": i} for i in counties],
+                value='Entire state or territory',
+                style={
+                    'width': '250px', 
+                    'font-size': "100%",
+                    }
+            ),
+            
             html.Br(),
             html.P("Select a model"),
             dcc.Dropdown(
@@ -531,7 +543,7 @@ def generate_control_card1():
 
 
 
-def generate_model_forecasts(loc,  model, reset):
+def generate_model_forecasts(loc, county, model, reset):
     
     new_cases = []
     ForecastDays = 60
@@ -544,23 +556,114 @@ def generate_model_forecasts(loc,  model, reset):
 
     PopSize = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
     PopSize = PopSize[0]
+    
+    if county == 'Entire state or territory':
         
-    ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
-    ArrivalDate = ArrivalDate[0]
+        locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+        locs_df = locs_df[locs_df['Country/Region'] == 'US']
+        locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
+                                                        'Diamond Princess', 'Grand Princess', 'Recovered', 
+                                                         'United States Virgin Islands', 'Virgin Islands, U.S.',
+                                                        'Wuhan Evacuee'])]
         
-    SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
+        locs_df.drop(columns=['Unnamed: 0'], inplace=True)
+
+
+        df_sub = locs_df[locs_df['Province/State'] == loc]
+        locs_df = 0
+        ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
+        ArrivalDate = ArrivalDate[0]
         
+        seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
+        SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
+        seir_fits_df = 0
+
+        #print(loc, county)
+        #print(df_sub.shape)
+        #print(list(df_sub))
+        #print(df_sub.head(), '\n')
+        
+    
+    else:
+        
+        try:
+            counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
+            counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
+                                                                   'Out of AL', 'Out of IL',
+                                                                   'Out of CO', 'Out of GA',
+                                                                   'Out of HI', 'Out of LA',
+                                                                   'Out of ME', 'Out of MI',
+                                                                   'Out of OK', 'Out of PR',
+                                                                   'Out of TN', 'Out of UT',
+                                                                   ])]
+            counties_df.drop(columns=['Unnamed: 0'], inplace=True)
+            #counties = list(set(counties_df['Admin2']))
+            #counties.append('Entire state or territory')
+
+            df_sub = counties_df[counties_df['Province/State'] == loc]
+            df_sub = df_sub[df_sub['Admin2'] == county]
+            df_sub = df_sub.filter(items=['date', 'Confirmed'], axis=1)
+            df_sub = df_sub.set_index('date').transpose()
+            df_sub = df_sub.reset_index(drop=True)
+            #df_sub.drop(['date'], axis=1, inplace=True)
+            
+            counties_df = 0
+            
+            df_sub['Province/State'] = loc
+            df_sub['Country/Region'] = 'US'
+            df_sub['Lat'] = 0
+            df_sub['Long'] = 0
+            
+            col = df_sub.pop('Long')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Lat')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Country/Region')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Province/State')
+            df_sub.insert(0, col.name, col)
+            
+    
+            ArrivalDate = np.nan
+            SEIR_Fit = []
+            
+            #print(df_sub.columns)
+            #print(df_sub.head())
+            
+        except:
+            
+            locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+            locs_df = locs_df[locs_df['Country/Region'] == 'US']
+            locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
+                                                            'Diamond Princess', 'Grand Princess', 'Recovered', 
+                                                             'United States Virgin Islands', 'Virgin Islands, U.S.',
+                                                            'Wuhan Evacuee'])]
+            
+            locs_df.drop(columns=['Unnamed: 0'], inplace=True)
+
+            df_sub = locs_df[locs_df['Province/State'] == loc]
+            ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
+            ArrivalDate = ArrivalDate[0]
+            locs_df = 0
+            
+            seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
+            SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
+            seir_fits_df = 0
+
+            #print(loc, county)
+            #print(df_sub.shape)
+            #print(list(df_sub))
+            #print(df_sub.head(), '\n')
+            
         
     # add 1 to number of forecast days for indexing purposes
     ForecastDays = int(ForecastDays+1)
-        
-        
-    # filter main dataframe to include only the chosen location
-    df_sub = locs_df[locs_df['Province/State'] == loc]
-        
+                
     # get column labels, will filter below to extract dates
     yi = list(df_sub)
-        
         
     obs_y_trunc = []
     fore_clrs =  ['purple',  'mediumorchid', 'plum', 'blue', 'deepskyblue', 
@@ -586,8 +689,16 @@ def generate_model_forecasts(loc,  model, reset):
         while obs_y_trunc[ii] == 0: ii+=1
         y = obs_y_trunc[ii:]
         dates = DATES[ii:]
-            
-    
+        
+        y = list(y)
+        if y != sorted(y):
+            for ii, val in enumerate(y):
+                if ii == 0: 
+                    continue
+                elif val < y[ii-1]:
+                    y[ii] = y[ii-1]
+                    
+        
         # declare x as a list of integers from 0 to len(y)
         x = list(range(len(y)))
 
@@ -640,14 +751,14 @@ def generate_model_forecasts(loc,  model, reset):
             
             
         if label == 'Current forecast':
-            for i, val in enumerate(forecasted_y):
-                if i > 0:
-                    if forecasted_y[i] - forecasted_y[i-1] > 0:
-                        new_cases.append(forecasted_y[i] - forecasted_y[i-1])
+            for ii, val in enumerate(forecasted_y):
+                if ii > 0:
+                    if forecasted_y[ii] - forecasted_y[ii-1] > 0:
+                        new_cases.append(forecasted_y[ii] - forecasted_y[ii-1])
                     else:
                         new_cases.append(0)
-                if i == 0:
-                    new_cases.append(forecasted_y[i])
+                if ii == 0:
+                    new_cases.append(forecasted_y[ii])
                         
                 
         # get dates from ArrivalDate to the current day
@@ -661,6 +772,15 @@ def generate_model_forecasts(loc,  model, reset):
             
         fits_df.loc[len(fits_df)] = output_list
 
+
+    dates = 0
+    df_sub = 0
+    output_list = 0
+    fdates = 0
+    pred_y = 0
+    forecasted_y = 0
+    output_list = 0
+    
     fits_df = fits_df.to_json()
     return fits_df
 
@@ -779,6 +899,14 @@ def generate_model_forecast_plot(fits_df, reset):
                     ),
                     ),
         )
+    
+    dates = 0
+    sub_df = 0
+    fits_df = 0
+    fdates = 0
+    pred_y = 0
+    forecasted_y = 0
+    
     return figure
 
 
@@ -853,10 +981,13 @@ def generate_model_forecast_table(fits_df, reset):
     df_table['9 days ago'] = np.round(col11, 0)
     df_table['10 days ago'] = np.round(col12, 0)
     
-    
-    
     csv_string = df_table.to_csv(index=False, encoding='utf-8')
     csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
+    
+    col0, col1, col1, col3, col4, col5, col6, col7, col8 = 0, 0, 0, 0, 0, 0, 0, 0, 0
+    col9, col10, col11, col12 = 0, 0, 0, 0
+    df_table = 0
+    fits_df = 0
     
     return csv_string
     
@@ -865,7 +996,7 @@ def generate_model_forecast_table(fits_df, reset):
 
 
         
-def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_admit, 
+def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, per_admit, 
     per_cc, LOS_cc, LOS_nc, per_vent, TimeLag, transfers, per_ICU_transfer, 
     mortality, GLOVE_SURGICAL, GLOVE_EXAM_NITRILE, GLOVE_EXAM_VINYL, 
     MASK_FACE_PROC_ANTI_FOG, MASK_PROC_FLUID_RESISTANT, GOWN_ISOLATION_XL_YELLOW, 
@@ -878,18 +1009,111 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
     
     PopSize = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
     PopSize = PopSize[0]
+    
+
+    if county == 'Entire state or territory':
+        locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+        locs_df = locs_df[locs_df['Country/Region'] == 'US']
+        locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
+                                                        'Diamond Princess', 'Grand Princess', 'Recovered', 
+                                                         'United States Virgin Islands', 'Virgin Islands, U.S.',
+                                                        'Wuhan Evacuee'])]
         
-    ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
-    ArrivalDate = ArrivalDate[0]
+        locs_df.drop(columns=['Unnamed: 0'], inplace=True)
+
+        df_sub = locs_df[locs_df['Province/State'] == loc]
+        ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
+        ArrivalDate = ArrivalDate[0]
+        locs_df = 0
         
-    SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
+        seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
+        SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
+        seir_fits_df = 0
+
+        #print(loc, county)
+        #print(df_sub.shape)
+        #print(list(df_sub))
+        #print(df_sub.head(), '\n')
+        
+    
+    else:
+        
+        try:
+            
+            counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
+            counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
+                                                                   'Out of AL', 'Out of IL',
+                                                                   'Out of CO', 'Out of GA',
+                                                                   'Out of HI', 'Out of LA',
+                                                                   'Out of ME', 'Out of MI',
+                                                                   'Out of OK', 'Out of PR',
+                                                                   'Out of TN', 'Out of UT',
+                                                                   ])]
+            counties_df.drop(columns=['Unnamed: 0'], inplace=True)
+            #counties = list(set(counties_df['Admin2']))
+            #counties.append('Entire state or territory')
+
+
+            df_sub = counties_df[counties_df['Province/State'] == loc]
+            counties_df = 0
+            
+            df_sub = df_sub[df_sub['Admin2'] == county]
+            df_sub = df_sub.filter(items=['date', 'Confirmed'], axis=1)
+            df_sub = df_sub.set_index('date').transpose()
+            df_sub = df_sub.reset_index(drop=True)
+            #df_sub.drop(['date'], axis=1, inplace=True)
+            
+            df_sub['Province/State'] = loc
+            df_sub['Country/Region'] = 'US'
+            df_sub['Lat'] = 0
+            df_sub['Long'] = 0
+            
+            col = df_sub.pop('Long')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Lat')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Country/Region')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Province/State')
+            df_sub.insert(0, col.name, col)
+            
+    
+            ArrivalDate = np.nan
+            SEIR_Fit = []
+            
+            #print(df_sub.columns)
+            #print(df_sub.head())
+            
+        except:
+            locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+            locs_df = locs_df[locs_df['Country/Region'] == 'US']
+            locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
+                                                            'Diamond Princess', 'Grand Princess', 'Recovered', 
+                                                             'United States Virgin Islands', 'Virgin Islands, U.S.',
+                                                            'Wuhan Evacuee'])]
+            
+            locs_df.drop(columns=['Unnamed: 0'], inplace=True)
+
+            df_sub = locs_df[locs_df['Province/State'] == loc]
+            ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
+            ArrivalDate = ArrivalDate[0]
+            locs_df = 0
+            
+            seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
+            SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
+            seir_fits_df = 0
+
+            #print(loc, county)
+            #print(df_sub.shape)
+            #print(list(df_sub))
+            #print(df_sub.head(), '\n')
+            
       
     # add 1 to number of forecast days for indexing purposes
     ForecastDays = int(ForecastDays+1)
-        
-        
-    # filter main dataframe to include only the chosen location
-    df_sub = locs_df[locs_df['Province/State'] == loc]
         
     # get column labels, will filter below to extract dates
     yi = list(df_sub)
@@ -902,8 +1126,15 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
     while obs_y_trunc[ii] == 0: ii+=1
     y = obs_y_trunc[ii:]
     dates = DATES[ii:]
-            
-    
+        
+    y = list(y)
+    if y != sorted(y):
+        for ii, val in enumerate(y):
+            if ii == 0: 
+                continue
+            elif val < y[ii-1]:
+                y[ii] = y[ii-1]
+                    
     # declare x as a list of integers from 0 to len(y)
     x = list(range(len(y)))
 
@@ -1148,6 +1379,46 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
     
     census_df = census_df.to_json()
     
+    dates = 0
+    df_sub = 0
+    fdates = 0
+    forecasted_y = 0
+    ppe_ls = 0
+    col_labels = 0
+    cells = 0
+    ppe_df = 0
+    glove_surgical = 0
+    glove_nitrile = 0
+    glove_vinyl = 0
+    face_mask = 0
+    procedure_mask = 0
+    isolation_gown = 0
+    surgical_mask = 0
+    face_shield = 0
+    respirator = 0
+    PUI_COVID = 0
+    new_visits_your_hospital = 0
+    PUI_COVID = 0
+    cell = 0
+    total_nc = 0
+    total_cc = 0
+    discharged_dead_cc = 0
+    discharged_alive_cc = 0
+    discharged_alive_nc = 0
+    ar = 0
+    ts_lag = 0
+    row_labels = 0
+    n_cc = 0
+    n_nc = 0
+    x_vars = 0
+    p_nc = 0
+    p_cc = 0    
+    LOScc = 0
+    LOSnc = 0
+    lag_pop = 0
+    new_cases_lag = 0
+    lol = 0
+    
     return census_df
 
 
@@ -1238,6 +1509,9 @@ def generate_plot_patient_census(census_df, reset):
             plot_bgcolor="rgb(245, 247, 249)",
         ),
     )
+    
+    dates = 0
+    census_df = 0
     
     return figure
 
@@ -1330,6 +1604,9 @@ def generate_plot_discharge_census(census_df, reset):
         ),
     )
     
+    dates = 0
+    census_df = 0
+    
     return figure
 
 
@@ -1377,7 +1654,7 @@ def generate_patient_census_table(census_df, reset):
             plot_bgcolor="rgb(245, 247, 249)",
         ),)
     
-    
+    df_table = 0
     
     return figure, csv_string
 
@@ -1463,6 +1740,9 @@ def generate_plot_ppe(df, reset):
         ),
     )
     
+    ppe_df = 0
+    dates = 0
+    
     return figure
 
 
@@ -1511,7 +1791,7 @@ def generate_ppe_table(df, reset):
             plot_bgcolor="rgb(245, 247, 249)",
         ),)
     
-    
+    df_table = 0
     
     return figure, csv_string
 
@@ -1523,6 +1803,7 @@ def generate_ppe_table(df, reset):
 
 
 def map1(reset):
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     
     fig = go.Figure(data=go.Choropleth(
     locations = testing_df_mrd['state'], # Spatial coordinates
@@ -1542,11 +1823,13 @@ def map1(reset):
             paper_bgcolor="rgb(245, 247, 249)",
             plot_bgcolor="rgb(245, 247, 249)")
     
+    testing_df_mrd = 0
+    
     return fig
 
 
 def map2(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     fig = go.Figure(data=go.Choropleth(
     locations=testing_df_mrd['state'], # Spatial coordinates
     z = testing_df_mrd['Positives per capita'].astype(float), # Data to be color-coded
@@ -1565,11 +1848,12 @@ def map2(reset):
             paper_bgcolor="rgb(245, 247, 249)",
             plot_bgcolor="rgb(245, 247, 249)")
 
+    testing_df_mrd = 0
     return fig
 
 
 def map3(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     fig = go.Figure(data=go.Choropleth(
     locations=testing_df_mrd['state'], # Spatial coordinates
     z = testing_df_mrd['Percent positive'].astype(float), # Data to be color-coded
@@ -1588,11 +1872,13 @@ def map3(reset):
             paper_bgcolor="rgb(245, 247, 249)",
             plot_bgcolor="rgb(245, 247, 249)")
     
+    testing_df_mrd = 0
     return fig
 
 
 def map4(reset):
-    
+    testing_df = pd.read_pickle('DataUpdate/data/Testing_Dataframe.pkl')
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     fig = go.Figure(data=go.Choropleth(
     locations=testing_df_mrd['state'], # Spatial coordinates
     z = testing_df['DeltaTestingRate'].astype(float), # Data to be color-coded
@@ -1611,13 +1897,15 @@ def map4(reset):
             paper_bgcolor="rgb(245, 247, 249)",
             plot_bgcolor="rgb(245, 247, 249)")
     
+    testing_df_mrd = 0
+    testing_df = 0
     return fig
 
 
 
 
 def map5(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     fig = go.Figure(data=go.Choropleth(
     locations = testing_df_mrd['state'], # Spatial coordinates
     z = testing_df_mrd['hospitalizedCurrently'].astype(float), # Data to be color-coded
@@ -1636,14 +1924,14 @@ def map5(reset):
             paper_bgcolor="rgb(245, 247, 249)",
             plot_bgcolor="rgb(245, 247, 249)")
     
+    testing_df_mrd = 0
     return fig
 
 
 
 
 def map6(reset):
-    
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     fig = go.Figure(data=go.Choropleth(
     locations=testing_df_mrd['state'], # Spatial coordinates
     z = testing_df_mrd['inIcuCurrently'].astype(float), # Data to be color-coded
@@ -1662,13 +1950,14 @@ def map6(reset):
             paper_bgcolor="rgb(245, 247, 249)",
             plot_bgcolor="rgb(245, 247, 249)")
     
+    testing_df_mrd = 0
     return fig
 
 
 
 
 def generate_delta_testing_plot(reset):
-    
+    testing_df = pd.read_pickle('DataUpdate/data/Testing_Dataframe.pkl')
     fig = px.line(testing_df, x="date", y="Testing_Rate", color="state",
               line_group="state", hover_name="state",
               labels={'Testing_Rate': 'Testing rate'})
@@ -1685,11 +1974,12 @@ def generate_delta_testing_plot(reset):
                       paper_bgcolor="rgb(245, 247, 249)",
                       plot_bgcolor="rgb(245, 247, 249)",)
     
+    testing_df = 0
     return fig
 
 
 def generate_PopSize_vs_Tested(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['log_PopSize'], 
                                                                    testing_df_mrd['log_People_Tested'])
     
@@ -1721,11 +2011,12 @@ def generate_PopSize_vs_Tested(reset):
                       paper_bgcolor="rgb(245, 247, 249)",
                       plot_bgcolor="rgb(245, 247, 249)",)
     
+    testing_df_mrd = 0
     return fig
 
 
 def generate_Negative_vs_Tested(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['log_People_Tested'], testing_df_mrd['log_negative'])
     
     pred_y = slope * testing_df_mrd['log_People_Tested'] + intercept
@@ -1753,13 +2044,13 @@ def generate_Negative_vs_Tested(reset):
                       paper_bgcolor="rgb(245, 247, 249)",
                       plot_bgcolor="rgb(245, 247, 249)",)
     
-    
+    testing_df_mrd = 0
     return fig
 
     
 
 def generate_Positive_vs_Tested(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['log_People_Tested'], testing_df_mrd['log_positive'])
     
     pred_y = slope * testing_df_mrd['log_People_Tested'] + intercept
@@ -1789,13 +2080,13 @@ def generate_Positive_vs_Tested(reset):
                       paper_bgcolor="rgb(245, 247, 249)",
                       plot_bgcolor="rgb(245, 247, 249)",)
     
-    
+    testing_df_mrd = 0
     return fig
 
 
 
 def generate_ICU_vs_Hospitalized(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     df_sub = testing_df_mrd.filter(items=['inIcuCurrently', 'onVentilatorCurrently', 'hospitalizedCurrently',
                                 '%Poor', '%Black', 'sqrt_PopSize', 'PopSize', 'state', 
                                 'total', 'death', 'color'])
@@ -1832,12 +2123,14 @@ def generate_ICU_vs_Hospitalized(reset):
                       paper_bgcolor="rgb(245, 247, 249)",
                       plot_bgcolor="rgb(245, 247, 249)",)
     
+    df_sub = 0
+    testing_df_mrd = 0
     return fig
 
 
 
 def generate_ventilator_vs_ICU(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     df_sub = testing_df_mrd.filter(items=['inIcuCurrently', 'onVentilatorCurrently',
                                 '%Poor', '%Black', 'sqrt_PopSize', 'PopSize', 'state', 
                                 'total', 'death', 'color'])
@@ -1875,4 +2168,6 @@ def generate_ventilator_vs_ICU(reset):
                       paper_bgcolor="rgb(245, 247, 249)",
                       plot_bgcolor="rgb(245, 247, 249)",)
 
+    df_sub = 0
+    testing_df_mrd = 0
     return fig

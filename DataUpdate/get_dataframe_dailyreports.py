@@ -34,7 +34,7 @@ def dataframe():
             try:
                 df = df[df['Country/Region'] == 'US']
                 df['date'] = date
-                df = df.filter(['Province/State', 'Country/Region', 'date',
+                df = df.filter(['Admin2', 'Province/State', 'Country/Region', 'date',
                                 'Lat' , 'Long', 'Confirmed', 'Deaths', 'Recovered'])
                 
             except:
@@ -44,10 +44,10 @@ def dataframe():
             try:
                 df = df[df['Country_Region'] == 'US']
                 df['date'] = date
-                df = df.filter(['Province_State', 'Country_Region', 'date', 
+                df = df.filter(['Admin2', 'Province_State', 'Country_Region', 'date', 
                                 'Lat' , 'Long_', 'Confirmed', 'Deaths', 'Recovered'])
                 
-                df.columns = ['Province/State', 'Country/Region', 'date',
+                df.columns = ['Admin2', 'Province/State', 'Country/Region', 'date',
                                 'Lat' , 'Long', 'Confirmed', 'Deaths', 'Recovered']
             except:
                 pass
@@ -64,6 +64,7 @@ def dataframe():
     except:
         pass
 
+    df_sums = df_main.drop(['Admin2'], axis=1)
     df_sums = df_main.groupby(['Province/State','date'])['Confirmed'].sum().reset_index()
     
     return df_sums, df_main, dates
@@ -72,9 +73,6 @@ def dataframe():
 df_sums, df_main, dates = dataframe()
 
 
-#print(list(df_sums))
-#print(df_sums.shape)
-#print(len(dates))
 
 
 col_names = ['Province/State', 'Country/Region', 'Lat', 'Long']
@@ -126,5 +124,9 @@ sum_col = np.array(df.iloc[:, c:].T)[0]
 if sum(sum_col) == 0:
     df = df.drop(df.columns[c], axis=1)
 
+#df.loc[df['Province/State'] == 'Illinois', '10/31/20'] = df.loc[df['Province/State'] == 'Illinois', '10/30/20'] + 7899
+#df.loc[df['Province/State'] == 'Illinois', '11/01/20'] = df.loc[df['Province/State'] == 'Illinois', '10/31/20'] + 6980
 
 df.to_csv('data/COVID-CASES-DF.txt', sep='\t')
+df_main = df_main[~df_main['Admin2'].isin(['', None, np.nan])]
+df_main.to_csv('data/COVID-CASES-Counties-DF.txt', sep='\t')
