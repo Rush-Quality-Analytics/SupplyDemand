@@ -14,9 +14,6 @@ import model_fxns as fxns
 
 
 
-testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
-testing_df = pd.read_pickle('DataUpdate/data/Testing_Dataframe.pkl')
-
 col_names1 =  ['obs_y', 'pred_y', 'forecasted_y', 'pred_dates', 'label', 
                'forecast_dates',  'obs_pred_r2', 'model', 'focal_loc', 
                'PopSize', 'ArrivalDate', 'pred_clr', 'fore_clr']
@@ -30,8 +27,6 @@ col_names2 = ['Total cases', 'New cases', 'New visits', 'New admits',
 census_df = pd.DataFrame(columns = col_names2)
 
 statepops = pd.read_csv('DataUpdate/data/StatePops.csv')
-#cty_pops_df = pd.read_pickle('DataUpdate/data/County_Pops.pkl')
-
 
 locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
 locs_df = locs_df[locs_df['Country/Region'] == 'US']
@@ -789,6 +784,15 @@ def generate_model_forecasts(loc, county, model, reset):
             
         fits_df.loc[len(fits_df)] = output_list
 
+
+    dates = 0
+    df_sub = 0
+    output_list = 0
+    fdates = 0
+    pred_y = 0
+    forecasted_y = 0
+    output_list = 0
+    
     fits_df = fits_df.to_json()
     return fits_df
 
@@ -907,6 +911,14 @@ def generate_model_forecast_plot(fits_df, reset):
                     ),
                     ),
         )
+    
+    dates = 0
+    sub_df = 0
+    fits_df = 0
+    fdates = 0
+    pred_y = 0
+    forecasted_y = 0
+    
     return figure
 
 
@@ -981,10 +993,13 @@ def generate_model_forecast_table(fits_df, reset):
     df_table['9 days ago'] = np.round(col11, 0)
     df_table['10 days ago'] = np.round(col12, 0)
     
-    
-    
     csv_string = df_table.to_csv(index=False, encoding='utf-8')
     csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
+    
+    col0, col1, col1, col3, col4, col5, col6, col7, col8 = 0, 0, 0, 0, 0, 0, 0, 0, 0
+    col9, col10, col11, col12 = 0, 0, 0, 0
+    df_table = 0
+    fits_df = 0
     
     return csv_string
     
@@ -1376,6 +1391,46 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     
     census_df = census_df.to_json()
     
+    dates = 0
+    df_sub = 0
+    fdates = 0
+    forecasted_y = 0
+    ppe_ls = 0
+    col_labels = 0
+    cells = 0
+    ppe_df = 0
+    glove_surgical = 0
+    glove_nitrile = 0
+    glove_vinyl = 0
+    face_mask = 0
+    procedure_mask = 0
+    isolation_gown = 0
+    surgical_mask = 0
+    face_shield = 0
+    respirator = 0
+    PUI_COVID = 0
+    new_visits_your_hospital = 0
+    PUI_COVID = 0
+    cell = 0
+    total_nc = 0
+    total_cc = 0
+    discharged_dead_cc = 0
+    discharged_alive_cc = 0
+    discharged_alive_nc = 0
+    ar = 0
+    ts_lag = 0
+    row_labels = 0
+    n_cc = 0
+    n_nc = 0
+    x_vars = 0
+    p_nc = 0
+    p_cc = 0    
+    LOScc = 0
+    LOSnc = 0
+    lag_pop = 0
+    new_cases_lag = 0
+    lol = 0
+    
     return census_df
 
 
@@ -1466,6 +1521,9 @@ def generate_plot_patient_census(census_df, reset):
             plot_bgcolor="rgb(245, 247, 249)",
         ),
     )
+    
+    dates = 0
+    census_df = 0
     
     return figure
 
@@ -1558,6 +1616,9 @@ def generate_plot_discharge_census(census_df, reset):
         ),
     )
     
+    dates = 0
+    census_df = 0
+    
     return figure
 
 
@@ -1605,7 +1666,7 @@ def generate_patient_census_table(census_df, reset):
             plot_bgcolor="rgb(245, 247, 249)",
         ),)
     
-    
+    df_table = 0
     
     return figure, csv_string
 
@@ -1691,6 +1752,9 @@ def generate_plot_ppe(df, reset):
         ),
     )
     
+    ppe_df = 0
+    dates = 0
+    
     return figure
 
 
@@ -1739,7 +1803,7 @@ def generate_ppe_table(df, reset):
             plot_bgcolor="rgb(245, 247, 249)",
         ),)
     
-    
+    df_table = 0
     
     return figure, csv_string
 
@@ -1751,6 +1815,7 @@ def generate_ppe_table(df, reset):
 
 
 def map1(reset):
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     
     fig = go.Figure(data=go.Choropleth(
     locations = testing_df_mrd['state'], # Spatial coordinates
@@ -1770,11 +1835,13 @@ def map1(reset):
             paper_bgcolor="rgb(245, 247, 249)",
             plot_bgcolor="rgb(245, 247, 249)")
     
+    testing_df_mrd = 0
+    
     return fig
 
 
 def map2(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     fig = go.Figure(data=go.Choropleth(
     locations=testing_df_mrd['state'], # Spatial coordinates
     z = testing_df_mrd['Positives per capita'].astype(float), # Data to be color-coded
@@ -1793,11 +1860,12 @@ def map2(reset):
             paper_bgcolor="rgb(245, 247, 249)",
             plot_bgcolor="rgb(245, 247, 249)")
 
+    testing_df_mrd = 0
     return fig
 
 
 def map3(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     fig = go.Figure(data=go.Choropleth(
     locations=testing_df_mrd['state'], # Spatial coordinates
     z = testing_df_mrd['Percent positive'].astype(float), # Data to be color-coded
@@ -1816,11 +1884,13 @@ def map3(reset):
             paper_bgcolor="rgb(245, 247, 249)",
             plot_bgcolor="rgb(245, 247, 249)")
     
+    testing_df_mrd = 0
     return fig
 
 
 def map4(reset):
-    
+    testing_df = pd.read_pickle('DataUpdate/data/Testing_Dataframe.pkl')
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     fig = go.Figure(data=go.Choropleth(
     locations=testing_df_mrd['state'], # Spatial coordinates
     z = testing_df['DeltaTestingRate'].astype(float), # Data to be color-coded
@@ -1839,13 +1909,15 @@ def map4(reset):
             paper_bgcolor="rgb(245, 247, 249)",
             plot_bgcolor="rgb(245, 247, 249)")
     
+    testing_df_mrd = 0
+    testing_df = 0
     return fig
 
 
 
 
 def map5(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     fig = go.Figure(data=go.Choropleth(
     locations = testing_df_mrd['state'], # Spatial coordinates
     z = testing_df_mrd['hospitalizedCurrently'].astype(float), # Data to be color-coded
@@ -1864,14 +1936,14 @@ def map5(reset):
             paper_bgcolor="rgb(245, 247, 249)",
             plot_bgcolor="rgb(245, 247, 249)")
     
+    testing_df_mrd = 0
     return fig
 
 
 
 
 def map6(reset):
-    
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     fig = go.Figure(data=go.Choropleth(
     locations=testing_df_mrd['state'], # Spatial coordinates
     z = testing_df_mrd['inIcuCurrently'].astype(float), # Data to be color-coded
@@ -1890,13 +1962,14 @@ def map6(reset):
             paper_bgcolor="rgb(245, 247, 249)",
             plot_bgcolor="rgb(245, 247, 249)")
     
+    testing_df_mrd = 0
     return fig
 
 
 
 
 def generate_delta_testing_plot(reset):
-    
+    testing_df = pd.read_pickle('DataUpdate/data/Testing_Dataframe.pkl')
     fig = px.line(testing_df, x="date", y="Testing_Rate", color="state",
               line_group="state", hover_name="state",
               labels={'Testing_Rate': 'Testing rate'})
@@ -1913,11 +1986,12 @@ def generate_delta_testing_plot(reset):
                       paper_bgcolor="rgb(245, 247, 249)",
                       plot_bgcolor="rgb(245, 247, 249)",)
     
+    testing_df = 0
     return fig
 
 
 def generate_PopSize_vs_Tested(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['log_PopSize'], 
                                                                    testing_df_mrd['log_People_Tested'])
     
@@ -1949,11 +2023,12 @@ def generate_PopSize_vs_Tested(reset):
                       paper_bgcolor="rgb(245, 247, 249)",
                       plot_bgcolor="rgb(245, 247, 249)",)
     
+    testing_df_mrd = 0
     return fig
 
 
 def generate_Negative_vs_Tested(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['log_People_Tested'], testing_df_mrd['log_negative'])
     
     pred_y = slope * testing_df_mrd['log_People_Tested'] + intercept
@@ -1981,13 +2056,13 @@ def generate_Negative_vs_Tested(reset):
                       paper_bgcolor="rgb(245, 247, 249)",
                       plot_bgcolor="rgb(245, 247, 249)",)
     
-    
+    testing_df_mrd = 0
     return fig
 
     
 
 def generate_Positive_vs_Tested(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['log_People_Tested'], testing_df_mrd['log_positive'])
     
     pred_y = slope * testing_df_mrd['log_People_Tested'] + intercept
@@ -2017,13 +2092,13 @@ def generate_Positive_vs_Tested(reset):
                       paper_bgcolor="rgb(245, 247, 249)",
                       plot_bgcolor="rgb(245, 247, 249)",)
     
-    
+    testing_df_mrd = 0
     return fig
 
 
 
 def generate_ICU_vs_Hospitalized(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     df_sub = testing_df_mrd.filter(items=['inIcuCurrently', 'onVentilatorCurrently', 'hospitalizedCurrently',
                                 '%Poor', '%Black', 'sqrt_PopSize', 'PopSize', 'state', 
                                 'total', 'death', 'color'])
@@ -2060,12 +2135,14 @@ def generate_ICU_vs_Hospitalized(reset):
                       paper_bgcolor="rgb(245, 247, 249)",
                       plot_bgcolor="rgb(245, 247, 249)",)
     
+    df_sub = 0
+    testing_df_mrd = 0
     return fig
 
 
 
 def generate_ventilator_vs_ICU(reset):
-    
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
     df_sub = testing_df_mrd.filter(items=['inIcuCurrently', 'onVentilatorCurrently',
                                 '%Poor', '%Black', 'sqrt_PopSize', 'PopSize', 'state', 
                                 'total', 'death', 'color'])
@@ -2103,4 +2180,6 @@ def generate_ventilator_vs_ICU(reset):
                       paper_bgcolor="rgb(245, 247, 249)",
                       plot_bgcolor="rgb(245, 247, 249)",)
 
+    df_sub = 0
+    testing_df_mrd = 0
     return fig
