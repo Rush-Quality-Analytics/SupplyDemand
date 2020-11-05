@@ -14,18 +14,6 @@ import model_fxns as fxns
 
 
 
-#col_names1 =  ['obs_y', 'pred_y', 'forecasted_y', 'pred_dates', 'label', 
-#               'forecast_dates',  'obs_pred_r2', 'model', 'focal_loc', 
-#               'PopSize', 'ArrivalDate', 'pred_clr', 'fore_clr']
-#fits_df = pd.DataFrame(columns = col_names1)
-
-
-#col_names2 = ['Total cases', 'New cases', 'New visits', 'New admits',
-#                  'All COVID', 'Non-ICU', 'ICU', 'Vent',
-#                  'Discharged from ICU deceased', 'Discharged from ICU alive',
-#                  'Discharged from non-ICU alive']
-#census_df = pd.DataFrame(columns = col_names2)
-
 statepops = pd.read_csv('DataUpdate/data/StatePops.csv')
 
 locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
