@@ -29,7 +29,6 @@ col_names2 = ['Total cases', 'New cases', 'New visits', 'New admits',
                   'Discharged from non-ICU alive']
 census_df = pd.DataFrame(columns = col_names2)
 
-seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
 statepops = pd.read_csv('DataUpdate/data/StatePops.csv')
 #cty_pops_df = pd.read_pickle('DataUpdate/data/County_Pops.pkl')
 
@@ -592,8 +591,10 @@ def generate_model_forecasts(loc, county, model, reset):
         ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
         ArrivalDate = ArrivalDate[0]
         
+        seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
         SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
-        
+        seir_fits_df = 0
+
         #print(loc, county)
         #print(df_sub.shape)
         #print(list(df_sub))
@@ -665,8 +666,10 @@ def generate_model_forecasts(loc, county, model, reset):
             ArrivalDate = ArrivalDate[0]
             locs_df = 0
             
+            seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
             SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
-            
+            seir_fits_df = 0
+
             #print(loc, county)
             #print(df_sub.shape)
             #print(list(df_sub))
@@ -1020,8 +1023,10 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
         ArrivalDate = ArrivalDate[0]
         locs_df = 0
         
+        seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
         SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
-        
+        seir_fits_df = 0
+
         #print(loc, county)
         #print(df_sub.shape)
         #print(list(df_sub))
@@ -1094,8 +1099,10 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
             ArrivalDate = ArrivalDate[0]
             locs_df = 0
             
+            seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
             SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
-            
+            seir_fits_df = 0
+
             #print(loc, county)
             #print(df_sub.shape)
             #print(list(df_sub))
