@@ -829,7 +829,8 @@ def update_output13(v1):
                                                        'Out of OK', 'Out of PR',
                                                        'Out of TN', 'Out of UT',
                                                        ])]
-
+    counties_df.drop(columns=['Unnamed: 0'], inplace=True)
+    
     tdf = counties_df[counties_df['Province/State'] == v1]
     counties_df = 0
     cts = sorted(list(set(tdf['Admin2'].values.tolist())))

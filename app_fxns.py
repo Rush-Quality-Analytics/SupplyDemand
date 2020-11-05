@@ -41,16 +41,10 @@ locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Nort
                                                  'United States Virgin Islands', 'Virgin Islands, U.S.',
                                                 'Wuhan Evacuee'])]
 
-locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
-locs_df = locs_df[locs_df['Country/Region'] == 'US']
-locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
-                                                'Diamond Princess', 'Grand Princess', 'Recovered', 
-                                                 'United States Virgin Islands', 'Virgin Islands, U.S.',
-                                                'Wuhan Evacuee'])]
 locs_df.drop(columns=['Unnamed: 0'], inplace=True)
 locations = list(set(locs_df['Province/State']))
 locations.sort()
-
+locs_df = 0
 
 counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
 counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
@@ -582,7 +576,19 @@ def generate_model_forecasts(loc, county, model, reset):
     PopSize = PopSize[0]
     
     if county == 'Entire state or territory':
+        
+        locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+        locs_df = locs_df[locs_df['Country/Region'] == 'US']
+        locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
+                                                        'Diamond Princess', 'Grand Princess', 'Recovered', 
+                                                         'United States Virgin Islands', 'Virgin Islands, U.S.',
+                                                        'Wuhan Evacuee'])]
+        
+        locs_df.drop(columns=['Unnamed: 0'], inplace=True)
+
+
         df_sub = locs_df[locs_df['Province/State'] == loc]
+        locs_df = 0
         ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
         ArrivalDate = ArrivalDate[0]
         
@@ -644,9 +650,20 @@ def generate_model_forecasts(loc, county, model, reset):
             #print(df_sub.head())
             
         except:
+            
+            locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+            locs_df = locs_df[locs_df['Country/Region'] == 'US']
+            locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
+                                                            'Diamond Princess', 'Grand Princess', 'Recovered', 
+                                                             'United States Virgin Islands', 'Virgin Islands, U.S.',
+                                                            'Wuhan Evacuee'])]
+            
+            locs_df.drop(columns=['Unnamed: 0'], inplace=True)
+
             df_sub = locs_df[locs_df['Province/State'] == loc]
             ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
             ArrivalDate = ArrivalDate[0]
+            locs_df = 0
             
             SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
             
@@ -989,9 +1006,19 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     
 
     if county == 'Entire state or territory':
+        locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+        locs_df = locs_df[locs_df['Country/Region'] == 'US']
+        locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
+                                                        'Diamond Princess', 'Grand Princess', 'Recovered', 
+                                                         'United States Virgin Islands', 'Virgin Islands, U.S.',
+                                                        'Wuhan Evacuee'])]
+        
+        locs_df.drop(columns=['Unnamed: 0'], inplace=True)
+
         df_sub = locs_df[locs_df['Province/State'] == loc]
         ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
         ArrivalDate = ArrivalDate[0]
+        locs_df = 0
         
         SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
         
@@ -1053,9 +1080,19 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
             #print(df_sub.head())
             
         except:
+            locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+            locs_df = locs_df[locs_df['Country/Region'] == 'US']
+            locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
+                                                            'Diamond Princess', 'Grand Princess', 'Recovered', 
+                                                             'United States Virgin Islands', 'Virgin Islands, U.S.',
+                                                            'Wuhan Evacuee'])]
+            
+            locs_df.drop(columns=['Unnamed: 0'], inplace=True)
+
             df_sub = locs_df[locs_df['Province/State'] == loc]
             ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
             ArrivalDate = ArrivalDate[0]
+            locs_df = 0
             
             SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
             
