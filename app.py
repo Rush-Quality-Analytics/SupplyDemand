@@ -119,6 +119,34 @@ app.layout = html.Div([
                 html.Br(),
                 
                 html.Div(
+                        id="Table4",
+                        children=[dcc.Loading(
+                            id="loading-7",
+                            type="default",
+                            fullscreen=False,
+                            children=[
+                                html.Div(
+                                    id="new_cases1",
+                                    children=[
+                                        html.B("New and Active Cases"),
+                                        html.Hr(),
+                                        dcc.Graph(id="new_cases_plot1"),
+                                    ],
+                                    style={'border-radius': '15px',
+                                           'box-shadow': '1px 1px 1px grey',
+                                           'background-color': '#f0f0f0',
+                                           'padding': '10px',
+                                           'margin-bottom': '10px',
+                                           'fontSize':16
+                                            },
+                                ),
+                            ],
+                        ),],),
+                
+                html.Br(),
+                html.Br(),
+                
+                html.Div(
                         id="Table1",
                         children=[dcc.Loading(
                             id="loading-2",
@@ -992,6 +1020,32 @@ def update_plot_patient_census(df_census, loc, cty, reset_click):
 
     # Return to original hm(no colored annotation) by resetting
     return app_fxns.generate_plot_patient_census(df_census, reset)
+
+
+
+@app.callback(
+    Output("new_cases_plot1", "figure"),
+    [Input('df2', 'children'),
+     Input("location-select1", "value"),
+     Input('county-select1', 'value'),
+     Input("reset-btn1", "n_clicks")],
+)
+
+def update_plot_new_cases(df_census, loc, cty, reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    return app_fxns.generate_plot_new_cases(df_census, loc, cty, reset)
+
+
 
 
 @app.callback(

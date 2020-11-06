@@ -49,7 +49,8 @@ def get_gaussian(obs_x, obs_y, ForecastDays):
     try:
         # attempt to fit the logistic model to the observed data
         # popt: optimized model parameter values
-        popt, pcov = curve_fit(gaussian3, obs_x, obs_y)
+        popt, pcov = curve_fit(gaussian3, obs_x, obs_y,
+                               method='lm', maxfev=20000)
         # get predicted y values
         pred_y = gaussian3(obs_x, *popt)
         # extend x values by number of ForecastDays
@@ -57,24 +58,32 @@ def get_gaussian(obs_x, obs_y, ForecastDays):
         # get corresponding forecasted y values, i.e., extend the predictions
         forecasted_y = gaussian3(forecasted_x, *popt)
         
+        if max(forecasted_y) > 100*max(obs_y) or max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
+                g = 1 + []    
+        
         
     except:
         try:
             
             # attempt to fit the logistic model to the observed data
             # popt: optimized model parameter values
-            popt, pcov = curve_fit(gaussian2, obs_x, obs_y)
+            popt, pcov = curve_fit(gaussian2, obs_x, obs_y,
+                                   method='lm', maxfev=20000)
             # get predicted y values
             pred_y = gaussian2(obs_x, *popt)
             # extend x values by number of ForecastDays
             forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
             # get corresponding forecasted y values, i.e., extend the predictions
             forecasted_y = gaussian2(forecasted_x, *popt)
+            
+            if max(forecasted_y) > 100*max(obs_y) or max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
+                g = 1 + []
         
         except:
             # attempt to fit the logistic model to the observed data
             # popt: optimized model parameter values
-            popt, pcov = curve_fit(gaussian1, obs_x, obs_y)
+            popt, pcov = curve_fit(gaussian1, obs_x, obs_y,
+                                   method='lm', maxfev=20000)
             # get predicted y values
             pred_y = gaussian1(obs_x, *popt)
             # extend x values by number of ForecastDays
@@ -84,13 +93,8 @@ def get_gaussian(obs_x, obs_y, ForecastDays):
     
     # return the forecasted x-y values and predicted y values
     params = []
-    fy = []
-    for i, val in enumerate(forecasted_y):
-        if val <= 0:
-            fy.append(10*max(pred_y))
+    
             
-        else:
-            fy.append(val)
     return forecasted_y, forecasted_x, pred_y, params
 
 
@@ -114,9 +118,9 @@ def get_logistic(obs_x, obs_y, ForecastDays):
         # A general logistic function
         # x is observed data
         # a, b, c are optimized by scipy optimize curve fit
-        return a / (d + np.exp(-c * x + b)) + a1 / (d1 + np.exp(-c1 * x + b1)) +  a2 / (d2 + np.exp(-c2 * x + b2))
+        return a / (d + np.exp(-c * x + b)) + a1 / (d1 + np.exp(-c1 * x + b1)) +  a2 / (d2 + np.exp(-c2 * x + b2)) #+  a3 / (d3 + np.exp(-c3 * x + b3))
         
-
+    
     # obs_x: observed x values
     # obs_y: observd y values
     # ForecastDays: number of days ahead to extend prediction
@@ -146,8 +150,9 @@ def get_logistic(obs_x, obs_y, ForecastDays):
         forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
         # get corresponding forecasted y values, i.e., extend the predictions
         forecasted_y = logistic3(np.float64(forecasted_x), *popt)
-            
-                            
+        
+        if max(forecasted_y) > 100*max(obs_y) or max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
+            g = 1 + []               
         
     except:
         
@@ -166,6 +171,8 @@ def get_logistic(obs_x, obs_y, ForecastDays):
             # get corresponding forecasted y values, i.e., extend the predictions
             forecasted_y = logistic2(np.float64(forecasted_x), *popt)
             
+            if max(forecasted_y) > 100*max(obs_y) or max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
+                g = 1 + []    
                 
         except:
             
@@ -184,25 +191,8 @@ def get_logistic(obs_x, obs_y, ForecastDays):
             forecasted_y = logistic1(np.float64(forecasted_x), *popt)
     
     params = []
-    fy = []
-    for i, val in enumerate(forecasted_y):
-        if val <= 0:
-            fy.append(10*max(pred_y))
-            
-        else:
-            fy.append(val)
     
-    # prevent use of negative y values and
-    # trailing zero-valued y values
-    #for i, val in enumerate(fy):
-    #    if val < 1:
-    #        try:
-    #            obs_y[i] = obs_y[i-1]
-    #        except:
-    #            pass
-                    
-    fy = np.array(fy)
-    return fy, forecasted_x, pred_y, params
+    return forecasted_y, forecasted_x, pred_y, params
 
 
 
@@ -340,10 +330,6 @@ def fit_curve(obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations
     
     elif model == 'Exponential':
         forecasted_y, forecasted_x, pred_y, params = get_exponential(obs_x, obs_y, ForecastDays)
-        obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
-    
-    elif model == '3rd degree polynomial':
-        forecasted_y, forecasted_x, pred_y, params = get_polynomial(obs_x, obs_y, ForecastDays, 3)
         obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
     
     elif model == 'Quadratic':

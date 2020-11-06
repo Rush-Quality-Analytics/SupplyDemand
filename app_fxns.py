@@ -869,7 +869,7 @@ def generate_model_forecast_plot(fits_df, reset):
             
             yaxis=dict(
                 title=dict(
-                    text="<b>Cumulative cases</b>",
+                    text="<b>Cumulative COVID-19 cases</b>",
                     font=dict(
                         family='"Open Sans", "HelveticaNeue", "Helvetica Neue",'
                         " Helvetica, Arial, sans-serif",
@@ -1146,7 +1146,8 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     iterations = 2
     obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = fxns.fit_curve(x, y, 
                             model, ForecastDays, PopSize, ArrivalDate, 0, iterations, SEIR_Fit)
-            
+    SEIR_Fit = 0
+    
     # convert y values to numpy array
     y = np.array(y)
 
@@ -1184,16 +1185,26 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
             else:
                 new_cases.append(0)
         if i == 0:
-            new_cases.append(forecasted_y[i])
-                        
+            new_cases.append(0)
+            
+    new_obs = []
+    for i, val in enumerate(y):
+        if i > 0:
+            if y[i] - y[i-1] > 0:
+                new_obs.append(y[i] - y[i-1])
+            else:
+                new_obs.append(0)
+        if i == 0:
+            new_obs.append(0)
+
                 
     # get dates from ArrivalDate to the current day
     dates = pd.date_range(start=first_date, end=latest_date)
     dates = dates.strftime('%m/%d')
             
     # declare column labels
-    col_labels = ['date', 'Total cases', 'New cases', 'New visits', 'New admits',
-                  'All COVID', 'Non-ICU', 'ICU', 'Vent',
+    col_labels = ['date', 'Total cases', 'Active cases', 'New cases (Forecasted)', 'New cases (Observed)', 'New visits', 
+                  'New admits', 'All COVID', 'Non-ICU', 'ICU', 'Vent',
                   'Discharged from ICU deceased', 'Discharged from ICU alive',
                   'Discharged from non-ICU alive']
     
@@ -1233,19 +1244,14 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     # row labels are the dates
     row_labels = fdates.tolist()  
 
-    # Declare pandas dataframe to hold data for download
-    #census_df = pd.DataFrame(columns = ['date'] + col_labels)
-    
     #### Construct arrays for critical care and non-critical care patients
-    # use lognormal cdf
-    
+
+    # Use lognormal cdf to parameterize patient turnover
     sigma = 0.5
     n_cc = np.log(LOS_cc) - (sigma**2)/2
     n_nc = np.log(LOS_nc) - (sigma**2)/2
     
     x_vars = np.array(list(range(1, len(fdates)+1)))
-    #y = (1/(x_vars * (2 * pi * sigma**2)**0.5)) * np.exp((-1/(2*sigma**2)) * (np.log(x_vars) - LOS_cc)**2)
-
     
     p_nc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_nc)/(2**0.5*sigma))
     p_cc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_cc)/(2**0.5*sigma))
@@ -1262,6 +1268,17 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     discharged_dead_cc = []
     discharged_alive_cc = []
     discharged_alive_nc = []
+    total_active = []
+    
+    ## Use lognormal to parameterize turnover of active cases
+    sigma = 0.1
+    n_active = np.log(14) - (sigma**2)/2
+    p_active = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_active)/(2**0.5*sigma))
+    
+    # Initiate lists to hold number of active covid cases
+    Active = np.zeros(len(fdates))
+    Active[0] = new_cases[0]
+    
     
     # Roll up patient carry-over into lists of total critical care and total
     # non-critical patients expected
@@ -1272,10 +1289,12 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
         
         discharged_cc = LOScc * p_cc
         discharged_nc = LOSnc * p_nc
+        inactive = Active * p_active
         
         d1 = np.sum(0.01 * mortality * discharged_cc)
         d2 = np.sum((1 - 0.01 * mortality) * discharged_cc)
         d3 = np.sum(discharged_nc)
+        #a1 = np.sum(inactive)
         
         discharged_dead_cc.append(d1)
         discharged_alive_cc.append(d2)
@@ -1283,17 +1302,26 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
         
         LOScc = LOScc - discharged_cc
         LOSnc = LOSnc - discharged_nc
+        Active = Active - inactive
             
         LOScc = np.roll(LOScc, shift=1)
         LOSnc = np.roll(LOSnc, shift=1)
+        Active = np.roll(Active, shift=1)
             
         LOScc[0] = ts_lag[i] * (0.01 * per_cc) * (0.01 * per_admit) * (0.01 * per_loc) + ((0.01 * per_ICU_transfer) * tr)
         LOSnc[0] = ts_lag[i] * (1 - (0.01 * per_cc)) * (0.01 * per_admit) * (0.01 * per_loc) + ((1 - 0.01 * per_ICU_transfer) * tr)
-        
+        Active[0] = new_cases[i]
         
         total_nc.append(np.sum(LOSnc))
         total_cc.append(np.sum(LOScc))
+        total_active.append(np.sum(Active))
         
+    
+    for i, val in enumerate(forecasted_y):
+        try:
+            new_obs[i]
+        except:
+            new_obs.append(np.nan)
     
     cells = []
     for i in range(len(row_labels)):
@@ -1309,7 +1337,9 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
         
         cell = [row_labels[i],
                 int(np.round(forecasted_y[i])), 
+                int(np.round(total_active[i])),
                 int(np.round(new)), 
+                new_obs[i],
                 int(np.round(val * (per_loc * 0.01))),
                 int(np.round((0.01 * per_admit) * val * (per_loc * 0.01))),
                 int(np.round(total_nc[i] + total_cc[i])), 
@@ -1318,7 +1348,8 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
                 int(np.round(total_cc[i]*(0.01*per_vent))),
                 int(discharged_dead_cc[i]),
                 int(discharged_alive_cc[i]),
-                int(discharged_alive_nc[i])]
+                int(discharged_alive_nc[i]),
+                ]
         
         cells.append(cell)
         
@@ -1419,6 +1450,8 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     lag_pop = 0
     new_cases_lag = 0
     lol = 0
+    total_active = 0
+    Active = 0
     
     return census_df
 
@@ -1442,33 +1475,52 @@ def generate_plot_patient_census(census_df, reset):
     labels = labels[1:]
     fig_data = []
     
-    clrs = ['purple',  'mediumorchid', 'blue', 'dodgerblue', 'deepskyblue',
+    clrs = ['', 'black', '#737373', 'black', 'purple',  'mediumorchid', 'blue', 'dodgerblue', 'deepskyblue',
             'green', 'limegreen', 'gold', 'orange', 'red', 'darkred']
     
     for i, label in enumerate(labels):
         
+        if label in ['Active cases', 'New cases (Forecasted)', 'New cases (Observed)']:
+            continue
+        else:
+            lo = True
+            
         if label in ['date', 'Discharged from ICU deceased', 
                      'Discharged from ICU alive',
                      'Discharged from non-ICU alive',
-                     'Total cases', 'New cases']:
-            #, 'Total cases', 'New cases', 'New visits']:
+                     'Total cases']:
+            
             continue
         
         dates = census_df['date'].tolist()
         clr = clrs[i]
         obs_y = census_df[label].tolist()
 
-        
-        fig_data.append(
-            go.Scatter(
-                x=dates,
-                y=obs_y,
-                mode="lines",
-                name=label,
-                opacity=0.75,
-                line=dict(color=clr, width=2)
+        if label != 'New cases (Observed)':
+            fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=obs_y,
+                    mode="lines",
+                    name=label,
+                    visible=lo,
+                    opacity=0.75,
+                    line=dict(color=clr, width=2)
+                )
             )
-        )
+        else:
+            fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=obs_y,
+                    mode="markers",
+                    name=label,
+                    visible=lo,
+                    opacity=0.75,
+                    marker=dict(size=10,
+                                color='DarkSlateGrey'),
+                )
+            )
         
     
     figure = go.Figure(
@@ -1518,6 +1570,146 @@ def generate_plot_patient_census(census_df, reset):
 
 
 
+def generate_plot_new_cases(census_df, loc, cty, reset):
+    
+    cty_pops = pd.read_pickle('DataUpdate/data/County_Pops.pkl')
+    
+    try:
+        pop_size = cty_pops[(cty_pops['State'] == loc) & (cty_pops['County'] == cty)]['Population size'].iloc[0]
+
+    except:
+        pop_size = 0
+        
+    cty_pops = 0
+        
+    census_df = pd.read_json(census_df)
+    
+    nogo = ['GLOVE SURGICAL', 'GLOVE EXAM NITRILE', 
+            'GLOVE EXAM VINYL', 'MASK FACE PROCEDURE ANTI FOG',
+            'MASK PROCEDURE FLUID RESISTANT', 'GOWN ISOLATION XLARGE YELLOW', 
+            'MASK SURGICAL ANTI FOG W/FILM', 'SHIELD FACE FULL ANTI FOG',
+            'RESPIRATOR PARTICULATE FILTER REG',
+            'Total cases', 'New visits', 'New admits', 'All COVID', 
+            'Non-ICU', 'ICU', 'Vent', 'Discharged from ICU deceased', 
+            'Discharged from ICU alive', 'Discharged from non-ICU alive']
+                  
+    census_df.drop(nogo, axis=1, inplace=True)
+    
+    labels = list(census_df)
+    
+    labels = labels[1:]
+    fig_data = []
+    
+    clrs = ['#cc0000', '#2e5cb8', '#2e5cb8', 'purple',  'mediumorchid', 'blue', 'dodgerblue', 'deepskyblue',
+            'green', 'limegreen', 'gold', 'orange', 'red', 'darkred']
+    
+    for i, label in enumerate(labels):
+        
+        #if label in ['Active cases', 'New cases (Forecasted)', 'New cases (Observed)']:
+        #    lo = 'legendonly'
+        #else:
+        #    lo = True
+            
+        if label in ['date']:
+            continue
+        
+        label2 = str(label)
+        if label2 == 'Active cases':
+            label2 = 'Active cases (Forecasted)'
+            
+        dates = census_df['date'].tolist()
+        clr = clrs[i]
+        obs_y = census_df[label].tolist()
+
+        if label != 'New cases (Observed)':
+            fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=obs_y,
+                    mode="lines",
+                    name=label2,
+                    #visible=lo,
+                    opacity=0.95,
+                    line=dict(color=clr, width=2)
+                )
+            )
+        else:
+            fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=obs_y,
+                    mode="markers",
+                    name=label2,
+                    #visible=lo,
+                    opacity=0.65,
+                    marker=dict(size=10,
+                                color=clr),
+                )
+            )
+        
+    if pop_size > 0:
+        p_active = 100 * census_df['Active cases']/pop_size
+        fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=p_active,
+                    mode="lines",
+                    name='% active cases per capita',
+                    #visible=lo,
+                    opacity=0.75,
+                    marker=dict(size=10,
+                                color='red'),
+                )
+            )
+        
+    
+    figure = go.Figure(
+        data=fig_data,
+        layout=go.Layout(
+            xaxis=dict(
+                title=dict(
+                    text="<b>Date</b>",
+                    font=dict(
+                        family='"Open Sans", "HelveticaNeue", "Helvetica Neue",'
+                        " Helvetica, Arial, sans-serif",
+                        size=18,
+                    ),
+                ),
+                rangemode="tozero",
+                zeroline=True,
+                showticklabels=True,
+            ),
+            
+            yaxis=dict(
+                title=dict(
+                    text="<b>COVID-19 cases</b>",
+                    font=dict(
+                        family='"Open Sans", "HelveticaNeue", "Helvetica Neue",'
+                        " Helvetica, Arial, sans-serif",
+                        size=18,
+                        
+                    ),
+                ),
+                rangemode="tozero",
+                zeroline=True,
+                showticklabels=True,
+            ),
+            
+            margin=dict(l=60, r=30, b=10, t=40),
+            showlegend=True,
+            height=400,
+            paper_bgcolor="rgb(245, 247, 249)",
+            plot_bgcolor="rgb(245, 247, 249)",
+        ),
+    )
+    
+    dates = 0
+    census_df = 0
+    
+    return figure
+
+
+
 
 
 
@@ -1529,7 +1721,9 @@ def generate_plot_discharge_census(census_df, reset):
             'GLOVE EXAM VINYL', 'MASK FACE PROCEDURE ANTI FOG',
             'MASK PROCEDURE FLUID RESISTANT', 'GOWN ISOLATION XLARGE YELLOW', 
             'MASK SURGICAL ANTI FOG W/FILM', 'SHIELD FACE FULL ANTI FOG',
-            'RESPIRATOR PARTICULATE FILTER REG']
+            'RESPIRATOR PARTICULATE FILTER REG',
+            'Total cases', 'New cases (Forecasted)', 'New cases (Observed)',
+            'New visits', 'Active cases']
     
     census_df.drop(nogo, axis=1, inplace=True)
     
@@ -1542,8 +1736,7 @@ def generate_plot_discharge_census(census_df, reset):
             'green', 'limegreen', 'gold', 'orange', 'red', 'darkred']
     
     for i, label in enumerate(labels):
-        
-        if label in ['date']:#, 'Total cases', 'New cases', 'New visits']:
+        if label in ['date']:
             continue
         if label in ['Discharged from ICU deceased', 'Discharged from ICU alive', 
                      'Discharged from non-ICU alive']:
@@ -1619,7 +1812,9 @@ def generate_patient_census_table(census_df, reset):
             'GLOVE EXAM VINYL', 'MASK FACE PROCEDURE ANTI FOG',
             'MASK PROCEDURE FLUID RESISTANT', 'GOWN ISOLATION XLARGE YELLOW', 
             'MASK SURGICAL ANTI FOG W/FILM', 'SHIELD FACE FULL ANTI FOG',
-            'RESPIRATOR PARTICULATE FILTER REG']
+            'RESPIRATOR PARTICULATE FILTER REG', 'Total cases', 
+            'New cases (Forecasted)', 'New cases (Observed)',
+            'Active cases']
     
     df_table.drop(nogo, axis=1, inplace=True)
     
@@ -1636,11 +1831,13 @@ def generate_patient_census_table(census_df, reset):
                 fill_color='lavender',
                 align='left', 
                 height=30),
-        cells=dict(values=[df_table['date'], df_table['Total cases'],
-                       df_table['New cases'], df_table['New visits'],
+        cells=dict(values=[df_table['date'], #df_table['Total cases'],
+                       #df_table['New cases'], df_table['Active cases'],
+                       df_table['New visits'],
                        df_table['New admits'], df_table['All COVID'],
                        df_table['Non-ICU'], df_table['ICU'],
-                       df_table['Vent'], df_table['Discharged from ICU deceased'],
+                       df_table['Vent'], 
+                       df_table['Discharged from ICU deceased'],
                        df_table['Discharged from ICU alive'], 
                        df_table['Discharged from non-ICU alive']],
                        fill_color="rgb(245, 247, 249)",
@@ -1665,7 +1862,7 @@ def generate_plot_ppe(df, reset):
     
     ppe_df = pd.read_json(df)
     
-    nogo = ['Total cases', 'New cases', 'New visits', 'New admits',
+    nogo = ['Total cases', 'New cases (Forecasted)', 'New cases (Observed)', 'New visits', 'New admits', 'Active cases',
                   'All COVID', 'Non-ICU', 'ICU', 'Vent',
                   'Discharged from ICU deceased', 'Discharged from ICU alive',
                   'Discharged from non-ICU alive']
@@ -1751,7 +1948,7 @@ def generate_plot_ppe(df, reset):
 def generate_ppe_table(df, reset):
     df_table = pd.read_json(df)
     
-    nogo = ['Total cases', 'New cases', 'New visits', 'New admits',
+    nogo = ['Total cases', 'New cases (Forecasted)', 'New cases (Observed)', 'New visits', 'New admits',
                   'All COVID', 'Non-ICU', 'ICU', 'Vent',
                   'Discharged from ICU deceased', 'Discharged from ICU alive',
                   'Discharged from non-ICU alive']
