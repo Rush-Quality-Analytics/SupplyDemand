@@ -17,56 +17,6 @@ def obs_pred_rsquare(obs, pred):
 ################ Simple growth-based statistical models
 
 
-def get_history(obs_x, obs_y, ForecastDays):
-    
-    def most_likely(y0, n1, n2):
-        
-        wts = 1/(0.001+np.abs(y0 - ls))
-        exp_y = np.average(n2, weights=wts)
-        
-    
-    n1 = []
-    for i, val in enumerate(obs_y):
-        if i > 0:
-            if obs_y[i] - obs_y[i-1] > 0:
-                n1.append(obs_y[i] - obs_y[i-1])
-            else:
-                n1.append(0)
-        if i == 0:
-            n1.append(0)
-        
-    n2 = []
-    l = len(n1) - 1 
-    for i, val in enumerate(n1):
-        if i != l:
-           n2.append(n1[i+1])
-            
-    n1 = n1[:-1]
-    
-    n1 = np.array(n1)
-    n2 = np.array(n2)
-        
-    pred_y = []
-    forecasted_y = []
-    forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
-    
-    for i, val in enumerated(forecasted_x):
-        if i == 0:
-            forecasted_y.append(obs_y)
-        else:
-            
-    
-        
-    return forecasted_y, forecasted_x, pred_y, params
-            
-            
-    
-    
-        
-
-
-
-
 def get_gaussian(obs_x, obs_y, ForecastDays):
     
     def gaussian1(x, n, s, m):  
@@ -108,7 +58,7 @@ def get_gaussian(obs_x, obs_y, ForecastDays):
         # get corresponding forecasted y values, i.e., extend the predictions
         forecasted_y = gaussian3(forecasted_x, *popt)
         
-        if max(forecasted_y) > 100*max(obs_y) or max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
+        if max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
                 g = 1 + []    
         
         
@@ -126,7 +76,7 @@ def get_gaussian(obs_x, obs_y, ForecastDays):
             # get corresponding forecasted y values, i.e., extend the predictions
             forecasted_y = gaussian2(forecasted_x, *popt)
             
-            if max(forecasted_y) > 100*max(obs_y) or max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
+            if max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
                 g = 1 + []
         
         except:
@@ -164,11 +114,11 @@ def get_logistic(obs_x, obs_y, ForecastDays):
         # a, b, c are optimized by scipy optimize curve fit
         return a / (d + np.exp(-c * x + b)) + a1 / (d1 + np.exp(-c1 * x + b1))
     
-    def logistic3(x, a, b, c, d, a1, b1, c1, d1, a2, b2, c2, d2):
+    def logistic3(x, a, b, c, d, a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3):
         # A general logistic function
         # x is observed data
         # a, b, c are optimized by scipy optimize curve fit
-        return a / (d + np.exp(-c * x + b)) + a1 / (d1 + np.exp(-c1 * x + b1)) +  a2 / (d2 + np.exp(-c2 * x + b2)) #+  a3 / (d3 + np.exp(-c3 * x + b3))
+        return a / (d + np.exp(-c * x + b))   +   a1 / (d1 + np.exp(-c1 * x + b1))   +   a2 / (d2 + np.exp(-c2 * x + b2))   +    a3 / (d3 + np.exp(-c3 * x + b3))
         
     
     # obs_x: observed x values
@@ -192,7 +142,7 @@ def get_logistic(obs_x, obs_y, ForecastDays):
         popt, pcov = curve_fit(logistic3, 
                                np.float64(obs_x), 
                                np.float64(obs_y), 
-                               method='lm', maxfev=20000)
+                               method='lm', maxfev=40000)
         
         
         pred_y = logistic3(np.float64(obs_x), *popt)
@@ -201,7 +151,7 @@ def get_logistic(obs_x, obs_y, ForecastDays):
         # get corresponding forecasted y values, i.e., extend the predictions
         forecasted_y = logistic3(np.float64(forecasted_x), *popt)
         
-        if max(forecasted_y) > 100*max(obs_y) or max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
+        if max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
             g = 1 + []               
         
     except:
@@ -212,7 +162,7 @@ def get_logistic(obs_x, obs_y, ForecastDays):
             popt, pcov = curve_fit(logistic2, 
                                    np.float64(obs_x), 
                                    np.float64(obs_y), 
-                                   method='lm', maxfev=20000)
+                                   method='lm', maxfev=40000)
             
             
             pred_y = logistic2(np.float64(obs_x), *popt)
@@ -221,7 +171,7 @@ def get_logistic(obs_x, obs_y, ForecastDays):
             # get corresponding forecasted y values, i.e., extend the predictions
             forecasted_y = logistic2(np.float64(forecasted_x), *popt)
             
-            if max(forecasted_y) > 100*max(obs_y) or max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
+            if max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
                 g = 1 + []    
                 
         except:
@@ -231,7 +181,7 @@ def get_logistic(obs_x, obs_y, ForecastDays):
             popt, pcov = curve_fit(logistic1, 
                                    np.float64(obs_x), 
                                    np.float64(obs_y), 
-                                   method='lm', maxfev=20000)
+                                   method='lm', maxfev=40000)
             
             
             pred_y = logistic1(np.float64(obs_x), *popt)
@@ -242,7 +192,16 @@ def get_logistic(obs_x, obs_y, ForecastDays):
     
     params = []
     
-    return forecasted_y, forecasted_x, pred_y, params
+    fy = []
+    for i, val in enumerate(forecasted_y):
+        if val > 10*max(pred_y):
+            fy.append(10*max(pred_y))
+            
+        else:
+            fy.append(val)
+        
+    
+    return fy, forecasted_x, pred_y, params
 
 
 
@@ -286,7 +245,17 @@ def get_exponential(obs_x, obs_y, ForecastDays):
     
     obs_x = 0
     obs_y = 0
-    return forecasted_y, forecasted_x, pred_y, params
+    
+    fy = []
+    for i, val in enumerate(forecasted_y):
+        if val > 10*max(pred_y):
+            fy.append(10*max(pred_y))
+            
+        else:
+            fy.append(val)
+            
+            
+    return fy, forecasted_x, pred_y, params
         
 
 
@@ -332,8 +301,17 @@ def get_polynomial(obs_x, obs_y, ForecastDays, degree=2):
     params = []
     obs_x = 0
     obs_y = 0
+    
+    fy = []
+    for i, val in enumerate(forecasted_y):
+        if val > 10*max(pred_y):
+            fy.append(10*max(pred_y))
+            
+        else:
+            fy.append(val)
+            
     # return the forecasted x-y values and predicted y values
-    return forecasted_y, forecasted_x, pred_y, params
+    return fy, forecasted_x, pred_y, params
 
 
 
