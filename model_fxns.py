@@ -17,6 +17,56 @@ def obs_pred_rsquare(obs, pred):
 ################ Simple growth-based statistical models
 
 
+def get_history(obs_x, obs_y, ForecastDays):
+    
+    def most_likely(y0, n1, n2):
+        
+        wts = 1/(0.001+np.abs(y0 - ls))
+        exp_y = np.average(n2, weights=wts)
+        
+    
+    n1 = []
+    for i, val in enumerate(obs_y):
+        if i > 0:
+            if obs_y[i] - obs_y[i-1] > 0:
+                n1.append(obs_y[i] - obs_y[i-1])
+            else:
+                n1.append(0)
+        if i == 0:
+            n1.append(0)
+        
+    n2 = []
+    l = len(n1) - 1 
+    for i, val in enumerate(n1):
+        if i != l:
+           n2.append(n1[i+1])
+            
+    n1 = n1[:-1]
+    
+    n1 = np.array(n1)
+    n2 = np.array(n2)
+        
+    pred_y = []
+    forecasted_y = []
+    forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+    
+    for i, val in enumerated(forecasted_x):
+        if i == 0:
+            forecasted_y.append(obs_y)
+        else:
+            
+    
+        
+    return forecasted_y, forecasted_x, pred_y, params
+            
+            
+    
+    
+        
+
+
+
+
 def get_gaussian(obs_x, obs_y, ForecastDays):
     
     def gaussian1(x, n, s, m):  
