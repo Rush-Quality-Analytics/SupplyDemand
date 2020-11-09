@@ -151,8 +151,11 @@ def get_logistic(obs_x, obs_y, ForecastDays):
         # get corresponding forecasted y values, i.e., extend the predictions
         forecasted_y = logistic3(np.float64(forecasted_x), *popt)
         
-        if max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
-            g = 1 + []               
+        #if max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
+        #    g = 1 + []               
+        
+        
+        
         
     except:
         
@@ -171,8 +174,8 @@ def get_logistic(obs_x, obs_y, ForecastDays):
             # get corresponding forecasted y values, i.e., extend the predictions
             forecasted_y = logistic2(np.float64(forecasted_x), *popt)
             
-            if max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
-                g = 1 + []    
+            #if max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
+            #    g = 1 + []    
                 
         except:
             
@@ -192,16 +195,18 @@ def get_logistic(obs_x, obs_y, ForecastDays):
     
     params = []
     
-    fy = []
     for i, val in enumerate(forecasted_y):
-        if val > 10*max(pred_y):
-            fy.append(10*max(pred_y))
+        if val > 5*max(pred_y):
+            forecasted_y[i] = 5*max(pred_y)
             
-        else:
-            fy.append(val)
+        elif i > 0 and val <= 0 and forecasted_y[i-1] > 0:
+            forecasted_y[i] = max(pred_y)
+            
+        if i > 0 and forecasted_y[i] < forecasted_y[i-1]:
+            forecasted_y[i] = forecasted_y[i-1]
         
     
-    return fy, forecasted_x, pred_y, params
+    return forecasted_y, forecasted_x, pred_y, params
 
 
 
@@ -248,8 +253,8 @@ def get_exponential(obs_x, obs_y, ForecastDays):
     
     fy = []
     for i, val in enumerate(forecasted_y):
-        if val > 10*max(pred_y):
-            fy.append(10*max(pred_y))
+        if val > 5*max(pred_y):
+            fy.append(5*max(pred_y))
             
         else:
             fy.append(val)
@@ -304,8 +309,8 @@ def get_polynomial(obs_x, obs_y, ForecastDays, degree=2):
     
     fy = []
     for i, val in enumerate(forecasted_y):
-        if val > 10*max(pred_y):
-            fy.append(10*max(pred_y))
+        if val > 5*max(pred_y):
+            fy.append(5*max(pred_y))
             
         else:
             fy.append(val)
