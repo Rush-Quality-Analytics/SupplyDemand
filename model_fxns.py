@@ -114,11 +114,11 @@ def get_logistic(obs_x, obs_y, ForecastDays):
         # a, b, c are optimized by scipy optimize curve fit
         return a / (d + np.exp(-c * x + b)) + a1 / (d1 + np.exp(-c1 * x + b1))
     
-    def logistic3(x, a, b, c, d, a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3):
+    def logistic3(x, a, b, c, d, a1, b1, c1, d1, a2, b2, c2, d2): #, a3, b3, c3, d3):
         # A general logistic function
         # x is observed data
         # a, b, c are optimized by scipy optimize curve fit
-        return a / (d + np.exp(-c * x + b))   +   a1 / (d1 + np.exp(-c1 * x + b1))   +   a2 / (d2 + np.exp(-c2 * x + b2))   +    a3 / (d3 + np.exp(-c3 * x + b3))
+        return a / (d + np.exp(-c * x + b))   +   a1 / (d1 + np.exp(-c1 * x + b1))   +   a2 / (d2 + np.exp(-c2 * x + b2))  # +    a3 / (d3 + np.exp(-c3 * x + b3))
         
     
     # obs_x: observed x values
