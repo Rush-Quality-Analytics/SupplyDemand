@@ -42,8 +42,7 @@ counties = list(set(counties_df['Admin2']))
 counties.append('Entire state or territory')
 counties_df = 0
 
-models = ['Logistic (multi-phase)', 'SEIR-SD', #'2 phase sine-logistic', '2 phase logistic',
-           'Gaussian (multi-phase)', 'Quadratic', 'Exponential']
+models = ['Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Quadratic', 'Exponential']
 
 day_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 
             'Friday', 'Saturday','Sunday']
@@ -104,15 +103,25 @@ def description_card3():
     return html.Div(
         id="description-card3",
         children=[
+            html.H5("Important Updates", style={
+            'textAlign': 'left',
+            }),
+            dcc.Markdown("-------"),
+            dcc.Markdown("We have added two new models. These are the logistic (multiphase) and Gaussian (multiphase)." +
+                         " We have removed the 2-phase logistic and 2-phase sine logistic because the new models offer a faster" +
+                         " and more elegant solution. We also removed the SEIR-SD model because its poor performance did not justify" +
+                         " the computational resources to maintain it. We have also added functionality to forecast active cases." +
+                         " and to allow users to select county level data."),
+            
+            html.Br(),
             html.H5("Instructions for using the COVID Calculator", style={
             'textAlign': 'left',
             }),
             dcc.Markdown("-------"),
             dcc.Markdown("**MODEL FORECASTS**"),
             dcc.Markdown("**1. Select a State and a Model to fit.**" +
-                         " Choose from 7 models to obtain forecasts for COVID-19 cases across US states and select terroritories." + 
-                         " See the [preprint](https://www.medrxiv.org/content/10.1101/2020.04.20.20073031v2) or Details box below for an explanation of each model." + 
-                         " Some models run very quickly (exponential, logistic, quadratic, gaussian, SEIR-SD)." + 
+                         " Choose from 4 models to obtain forecasts for COVID-19 cases across US states and select terroritories." + 
+                         " Some models run very quickly (exponential, logistic, quadratic, gaussian)." + 
                          " Other models take several seconds to run (2-phase sine-logistic, 2-phase logistic)."
                          ),
                          
@@ -160,7 +169,7 @@ def description_card3():
                          ),
             
             html.Br(),
-            dcc.Markdown("**See the Details box below or our [preprint](https://www.medrxiv.org/content/10.1101/2020.04.20.20073031v2) for deeper insights.**"),
+            dcc.Markdown("**See the Details box below or our [publication](https://academic.oup.com/jamiaopen/advance-article/doi/10.1093/jamiaopen/ooaa045/5907917) for deeper insights.**"),
             html.Br(),
         ],
     )
@@ -201,68 +210,25 @@ def description_card4():
                          "eventually fail as COVID-19 cases saturate."
                          ),
             html.Br(),
-            dcc.Markdown("**Logistic:** " +  
+            dcc.Markdown("**Logistic (Multiphase):** " +  
                          "Exponential growth within a population cannot continue *ad infinitum*. Instead, growth must slow as an upper limit " +
                          "is approached or as natural limitations to disease spread (e.g., immunity, contact among hosts) are encountered. " +
                          "The logistic model captures this slowing and eventual saturation, resulting in a sigmoidal or s-shaped growth curve. " +
                          "In addition to exponential and quadratic growth, early COVID-19 studies have implicated logistic growth in the spread " + 
                          "of the disease. The logistic model takes a relatively simple functional form, " +
-                         "N_t=α/(1+e^(-rt) ), where α is the upper limit of N and r is the intrinsic rate of increase. Our application uses " +
-                         "numerical optimization of α and r to find the best fit logistic function and hence, predicted values for N. "
+                         "N_t=α/(1+e^(-rt) ), where α is the upper limit of N and r is the intrinsic rate of increase. Our application extends " +
+                         "the logistic model to take multiple phases of logistic growth and uses numerical optimization to find the best fit parameters. "
                          ),
             html.Br(),
-            dcc.Markdown("**Gaussian:** " +  
+            dcc.Markdown("**Gaussian (Multiphase):** " +  
                          "The Gaussian (i.e., normal) distribution can provide a relatively simple and close approximation to complex epidemiological " +
                          "models. This symmetrical curve has two parameters, mean = μ, standard deviation = σ, and belongs to the family of exponential " +
                          "distributions. When used to model spread of disease, Gaussian curves are symmetrical around a climax day with the change " +
                          "in the rate of growth determining the standard deviation about the curve. Gaussian models have previously been successful " +
-                         "in approximating the spread of COVID-19 in Germany. Our application uses numerical optimization of μ and σ and the " +
-                         "cumulative distribution function of the Gaussian model to find the best fit cumulative Gaussian function and hence, " +
-                         "predicted values for N."
-                         ),
-            html.Br(),
-            dcc.Markdown("**SEIR-SD:** " +  
-                         "To date, COVID-19 studies have used a variety of epidemiological models to characterize the spread of the disease within " +
-                         "populations. The modeling in several of these studies has been based on refinements to the classic SEIR model. In this model, " +
-                         "a contagious disease drives changes in the fraction of susceptible persons (S), the fraction of persons exposed but not yet " +
-                         "exhibiting infection (E), the fraction of infectious persons (I), and the fraction of persons recovered (R), where S + E + I + R = 1. "+
-                         "These SEIR subpopulations are modeled as compartments in a set of ordinary differential equations:"
-                         ),
-            dcc.Markdown("dS/dt = βSI , dE/dt = βSI-αE , dI/dt = αE-γI , dR/dt = γI"),
-            dcc.Markdown("In these equations, α is the inverse of the incubation period, and γ is the inverse of the average infectious period, and β is " +
-                         "the average number of contacts of infected persons with susceptible persons per unit time. Our application imputes the initial " +
-                         "value of β from a well-known simplifying relationship between γ and the basic reproductive number (R0), i.e., β = γ R0 [20-22]." +
-                         "We allowed β to decrease in proportion to I. We assumed that people will, on average, reduce their contact with others when the " + 
-                         "populace is aware that an increasing percent of their population is infected. This approach allows an inherent degree of social " +
-                         "distancing to emerge as a frequency-dependent phenomenon. We also simulated an explicit effect of social distancing (λ) to capture " +
-                         "the overall strength of response to public health policies. These effects were included as time-iterative modifications to β." +
-                         "We also modified the classic SEIR model to account for initial time lags in COVID-19 testing. Specifically, and particularly " +
-                         "in the US, widespread testing for COVID-19 may have artificially dampened the apparent number of positive cases within the first "+
-                         "month of the first reported infection. We accounted for this effect by modifying the apparent size of I while allowing the actual "+
-                         "size of I to grow according to the SEIR-SD dynamic. " +
-                         "This modification models testing as low-to-nonexistent during the initial weeks of outbreak, and then accelerates afterwards. " +
-                         "Our application performs a pseudo-optimization on the SEIR-SD model parameters and a likely date of initial " +
-                         "infection, as opposed to using the first reported occurrence. Our implementation of the SEIR-SD model is based on an unbiased " +
-                         "search of multivariate parameter space within ranges of parameter values derived from population sizes for US states and territories "+
-                         "and the increasing corpus of COVID-19 literature. Our application performs 200,000 iterations and chooses the set of parameters "+
-                         "that maximize the explained variation in observed data. This implementation avoids the computational challenges of applying "+
-                         "numerical optimizers to complex simulation models and avoids the problems that these optimizers can have in becoming trapped "+
-                         "in local minima."
-                         ),
-            html.Br(),
-            dcc.Markdown("**Resurgence model: 2-phase logistic:** " +  
-                         "This model assumes that growth occurs in two primary logistic phases. That is, that growth increases exponentially and saturates "+
-                         ", but then increases exponentially once more and then saturates again. Our implementation finds the optimal breakpoint between the 2 "+
-                         "phases by iterating across the time series of observed growth."
-                         ),
-            html.Br(),
-            dcc.Markdown("**Resurgence model: 2-phase sine-logistic:** " +  
-                         "This model assumes that growth occurs as in the 2-phase logistic model but that growth is also characterized by periodic fluctuation, "+
-                         "as in a sine-wave, hence, sine-logistic. Our implementation of the 2 phase sine-logistic model finds the optimal breakpoint between the 2 "+
-                         "primary phases of growth by iterating across the time series of observed growth."
+                         "in approximating the spread of COVID-19 in Germany. Our application extends the Gaussian model to take multiple phases of " +
+                         "guassian growth and uses numerical optimization to find the best fit parameters. "
                          ),
                         
-            dcc.Markdown("**See our [preprint](https://www.medrxiv.org/content/10.1101/2020.04.20.20073031v2) for deeper insights.**"),
             
             html.Br(),
             html.Br(),
@@ -575,15 +541,6 @@ def generate_model_forecasts(loc, county, model, reset):
         ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
         ArrivalDate = ArrivalDate[0]
         
-        seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
-        SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
-        seir_fits_df = 0
-
-        #print(loc, county)
-        #print(df_sub.shape)
-        #print(list(df_sub))
-        #print(df_sub.head(), '\n')
-        
     
     else:
         
@@ -629,10 +586,7 @@ def generate_model_forecasts(loc, county, model, reset):
             
     
             ArrivalDate = np.nan
-            SEIR_Fit = []
             
-            #print(df_sub.columns)
-            #print(df_sub.head())
             
         except:
             
@@ -649,15 +603,6 @@ def generate_model_forecasts(loc, county, model, reset):
             ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
             ArrivalDate = ArrivalDate[0]
             locs_df = 0
-            
-            seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
-            SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
-            seir_fits_df = 0
-
-            #print(loc, county)
-            #print(df_sub.shape)
-            #print(list(df_sub))
-            #print(df_sub.head(), '\n')
             
         
     # add 1 to number of forecast days for indexing purposes
@@ -709,7 +654,7 @@ def generate_model_forecasts(loc, county, model, reset):
         #    forecasted x and y values
         iterations = 2
         obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = fxns.fit_curve(x, y, 
-                            model, ForecastDays, PopSize, ArrivalDate, j, iterations, SEIR_Fit)
+                            model, ForecastDays, PopSize, ArrivalDate, j, iterations)
             
         # convert y values to numpy array
         y = np.array(y)
@@ -1027,15 +972,6 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
         ArrivalDate = ArrivalDate[0]
         locs_df = 0
         
-        seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
-        SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
-        seir_fits_df = 0
-
-        #print(loc, county)
-        #print(df_sub.shape)
-        #print(list(df_sub))
-        #print(df_sub.head(), '\n')
-        
     
     else:
         
@@ -1083,10 +1019,7 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
             
     
             ArrivalDate = np.nan
-            SEIR_Fit = []
             
-            #print(df_sub.columns)
-            #print(df_sub.head())
             
         except:
             locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
@@ -1102,15 +1035,6 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
             ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
             ArrivalDate = ArrivalDate[0]
             locs_df = 0
-            
-            seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
-            SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
-            seir_fits_df = 0
-
-            #print(loc, county)
-            #print(df_sub.shape)
-            #print(list(df_sub))
-            #print(df_sub.head(), '\n')
             
       
     # add 1 to number of forecast days for indexing purposes
@@ -1145,8 +1069,7 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     #    forecasted x and y values
     iterations = 2
     obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = fxns.fit_curve(x, y, 
-                            model, ForecastDays, PopSize, ArrivalDate, 0, iterations, SEIR_Fit)
-    SEIR_Fit = 0
+                            model, ForecastDays, PopSize, ArrivalDate, 0, iterations)
     
     # convert y values to numpy array
     y = np.array(y)

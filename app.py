@@ -19,8 +19,7 @@ app.config.suppress_callback_exceptions = True
 BASE_PATH = pathlib.Path(__file__).parent.resolve()
 DATA_PATH = BASE_PATH.joinpath("data").resolve()
 
-models = ['Logistic (multi-phase)', 'SEIR-SD', #'2 phase sine-logistic', '2 phase logistic',
-           'Gaussian (multi-phase)', 'Quadratic', 'Exponential']
+models = ['Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Quadratic', 'Exponential']
 
 
 ######################## DASH APP FUNCTIONS ##################################
@@ -878,15 +877,7 @@ def update_output13(v1):
      ],
     )
 def update_output14(loc1, loc2):
-    
-    if loc2 == 'Entire state or territory':
-        m = ['Logistic (multi-phase)', 'SEIR-SD', #'2 phase sine-logistic', '2 phase logistic',
-           'Gaussian (multi-phase)', 'Quadratic', 'Exponential']
-    else:
-        m = ['Logistic (multi-phase)', #'2 phase sine-logistic', '2 phase logistic',
-           'Gaussian (multi-phase)', 'Quadratic', 'Exponential']
-
-    return [{"label": i, "value": i} for i in m]
+    return [{"label": i, "value": i} for i in models]
 
 
 
