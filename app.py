@@ -298,9 +298,7 @@ app.layout = html.Div([
         ],
         ),
         
-        
         dcc.Tab(label='Trends in Testing', children=[
-            
         
         # Banner
         html.Div(
@@ -474,12 +472,12 @@ app.layout = html.Div([
 
         ]),
         
-        dcc.Tab(label='Instructions, Details, & Contact Information', children=[
-        
+            
+        dcc.Tab(label='Instructions & Details', children=[
         
         # Banner
         html.Div(
-            id="banner4",
+            id="banner5",
             className="banner",
             children=[html.Img(src=app.get_asset_url("RUSH_full_color.jpg"), 
                                style={'textAlign': 'left'}),
@@ -813,6 +811,12 @@ def update_output2_22(value):
     return 'RESP PART FILTER REG: {}'.format(value)
 
 
+@app.callback(
+    dash.dependencies.Output('incidence rate-container', 'children'),
+    [dash.dependencies.Input('inc_rate', 'value')])
+def update_output2_23(value):
+    return 'Incidence correction factor: {}'.format(value)
+
 
 
 @app.callback( # Select sub-category
@@ -827,6 +831,18 @@ def update_output15(available_options, v2):
 
 
 @app.callback( # Select sub-category
+    Output('county-select2', 'value'),
+    [
+     Input('county-select2', 'options'),
+     Input('location-select2', 'value'),
+     ],
+    )
+def update_output18(available_options, v2):
+    return available_options[0]['value']
+
+
+
+@app.callback( # Select sub-category
     Output('location-select1', 'value'),
     [
      Input('location-select1', 'options'),
@@ -834,6 +850,17 @@ def update_output15(available_options, v2):
      ],
     )
 def update_output16(available_options):
+    return available_options[0]['value']
+
+
+@app.callback( # Select sub-category
+    Output('location-select2', 'value'),
+    [
+     Input('location-select2', 'options'),
+     #Input('county-select1', 'value'),
+     ],
+    )
+def update_output19(available_options):
     return available_options[0]['value']
 
 
@@ -868,6 +895,36 @@ def update_output13(v1):
 
 
 
+@app.callback( # Update available sub_categories
+    Output('county-select2', 'options'),
+    [
+     Input('location-select2', 'value'),
+     #Input('county-select1', 'value'),
+     ],
+    )
+def update_output20(v1):
+    
+    counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
+    counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
+                                                       'Out of AL', 'Out of IL',
+                                                       'Out of CO', 'Out of GA',
+                                                       'Out of HI', 'Out of LA',
+                                                       'Out of ME', 'Out of MI',
+                                                       'Out of OK', 'Out of PR',
+                                                       'Out of TN', 'Out of UT',
+                                                       ])]
+    counties_df.drop(columns=['Unnamed: 0'], inplace=True)
+    
+    tdf = counties_df[counties_df['Province/State'] == v1]
+    counties_df = 0
+    cts = sorted(list(set(tdf['Admin2'].values.tolist())))
+    tdf = 0
+    l = 'Entire state or territory'
+    cts.insert(0, l)
+    return [{"label": i, "value": i} for i in cts]
+
+
+
 
 @app.callback( # Update available sub_categories
     Output('model-select1', 'options'),
@@ -877,6 +934,17 @@ def update_output13(v1):
      ],
     )
 def update_output14(loc1, loc2):
+    return [{"label": i, "value": i} for i in models]
+
+
+@app.callback( # Update available sub_categories
+    Output('model-select2', 'options'),
+    [
+     Input('location-select2', 'value'),
+     Input('county-select2', 'value'),
+     ],
+    )
+def update_output17(loc1, loc2):
     return [{"label": i, "value": i} for i in models]
 
 
@@ -1035,6 +1103,34 @@ def update_plot_new_cases(df_census, loc, cty, reset_click):
 
     # Return to original hm(no colored annotation) by resetting
     return app_fxns.generate_plot_new_cases(df_census, loc, cty, reset)
+
+
+
+
+@app.callback(
+    Output("employee_forecast_plot1", "figure"),
+    [Input('df2', 'children'),
+     Input("location-select2", "value"),
+     Input('county-select2', 'value'),
+     Input("employees", "value"),
+     Input("inc_rate", "value"),
+     Input("furlough", "value"),
+     Input("reset-btn1", "n_clicks")],
+)
+
+def update_plot_employee_forecast(df_census, loc, cty, employees, inc_rate, furlough, reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    return app_fxns.generate_plot_employee_forecast1(df_census, loc, cty, employees, inc_rate, furlough, reset)
 
 
 

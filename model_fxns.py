@@ -29,8 +29,6 @@ def get_gaussian(obs_x, obs_y, ForecastDays):
     def gaussian3(x, n, s, m, n1, s1, m1, n2, s2, m2):  
         return n**2 * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5))))
     
-
-
     # obs_x: observed x values
     # obs_y: observd y values
     # ForecastDays: number of days ahead to extend prediction
@@ -113,16 +111,10 @@ def get_logistic(obs_x, obs_y, ForecastDays):
         return a / (d + np.exp(-c * x + b))
     
     def logistic2(x, a, b, c, d, g, f, a1, b1, c1, d1):
-        # A general logistic function
-        # x is observed data
-        # a, b, c are optimized by scipy optimize curve fit
         return a / (d + np.exp(-c * x + b)) + a1 / (d1 + np.exp(-c1 * x + b1))
     
-    def logistic3(x, a, b, c, d, a1, b1, c1, d1,  a2, b2, c2, d2): #, a3, b3, c3, d3):
-        # A general logistic function
-        # x is observed data
-        # a, b, c are optimized by scipy optimize curve fit
-        return a / (d + np.exp(-c * x + b))   +   a1 / (d1 + np.exp(-c1 * x + b1))   +   a2 / (d2 + np.exp(-c2 * x + b2))  # +    a3 / (d3 + np.exp(-c3 * x + b3))
+    def logistic3(x, a, b, c, d, a1, b1, c1, d1,  a2, b2, c2, d2):
+        return a / (d + np.exp(-c * x + b))   +   a1 / (d1 + np.exp(-c1 * x + b1))   +   a2 / (d2 + np.exp(-c2 * x + b2))
         
     
     # obs_x: observed x values
@@ -155,11 +147,6 @@ def get_logistic(obs_x, obs_y, ForecastDays):
         # get corresponding forecasted y values, i.e., extend the predictions
         forecasted_y = logistic3(np.float64(forecasted_x), *popt)
         
-        #if max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
-        #    g = 1 + []               
-        
-        
-        
         
     except:
         
@@ -178,8 +165,6 @@ def get_logistic(obs_x, obs_y, ForecastDays):
             # get corresponding forecasted y values, i.e., extend the predictions
             forecasted_y = logistic2(np.float64(forecasted_x), *popt)
             
-            #if max(forecasted_y) != forecasted_y[-1] or min(forecasted_y) != forecasted_y[0]:
-            #    g = 1 + []    
                 
         except:
             

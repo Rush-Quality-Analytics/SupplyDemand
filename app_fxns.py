@@ -72,6 +72,26 @@ def description_card1():
     )
 
 
+def description_card1b():
+    """
+
+    :return: A Div containing dashboard title & descriptions.
+    """
+    return html.Div(
+        id="description-card1b",
+        children=[
+            html.H5("Center for Quality, Safety and Value Analytics", style={
+            'textAlign': 'left',
+            #'color': '#2F9314'
+        }),
+            html.Div(
+                id="intro1b",
+                children="Obtain forecasts for active COVID cases among your employees",
+            ),
+            html.Br(),
+        ],
+    )
+
 
 def description_card2():
     """
@@ -269,7 +289,7 @@ def generate_control_card1():
             dcc.Dropdown(
                 id="location-select1",
                 options=[{"label": i, "value": i} for i in locations],
-                value='Illinois',
+                value='Alabama',
                 style={
                     'width': '250px', 
                     'font-size': "100%",
@@ -503,10 +523,88 @@ def generate_control_card1():
 
 
 
-
-
-
-
+def generate_control_card2():
+    
+    """
+    :return: A Div containing controls for graphs.
+    """
+    return html.Div(
+        id="control-card2",
+        children=[
+            html.P("Select a state or territory"),
+            dcc.Dropdown(
+                id="location-select2",
+                options=[{"label": i, "value": i} for i in locations],
+                value='Alabama',
+                style={
+                    'width': '250px', 
+                    'font-size': "100%",
+                    }
+            ),
+            
+            html.Br(),
+            html.P("Select a county or other area"),
+            dcc.Dropdown(
+                id="county-select2",
+                options=[{"label": i, "value": i} for i in counties],
+                value='Entire state or territory',
+                style={
+                    'width': '250px', 
+                    'font-size': "100%",
+                    }
+            ),
+            
+            html.Br(),
+            html.P("Select a model"),
+            dcc.Dropdown(
+                id="model-select2",
+                options=[{"label": i, "value": i} for i in models],
+                value=models[0],
+            ),
+            
+            
+            html.Br(),
+            html.Hr(),
+            
+            html.Br(),
+            #html.H5("Employee variables"),
+            
+            html.P("No. of employees"),
+            #html.Div(id='employees'),
+            dcc.Input(
+                id="employees",
+                placeholder="Enter a number",
+                type='text',
+            ),
+            
+            html.P("Minimum Furlough (Days)"),
+            #html.Div(id='employees'),
+            dcc.Input(
+                id="furlough",
+                placeholder="Enter a number",
+                type='text',
+            ),
+            
+            html.Br(),
+            html.Br(),
+            html.Div(id='incidence rate-container'),
+            dcc.Slider(
+                id="inc_rate",
+                min=0,
+                max=2,
+                value=1,
+                step=0.1,
+                marks={
+                    0: '0x',
+                    0.5: '0.5x',
+                    1: '1x',
+                    1.5: '1.5x',
+                    2: '2x',
+                },
+                ),
+            
+        ],
+    )
 
 
 
@@ -1631,6 +1729,147 @@ def generate_plot_new_cases(census_df, loc, cty, reset):
     
     return figure
 
+
+
+
+
+def generate_plot_employee_forecast1(census_df, loc, cty, employees, inc_rate, furlough, reset):
+    
+    cty_pops = pd.read_pickle('DataUpdate/data/County_Pops.pkl')
+    
+    try:
+        pop_size = cty_pops[(cty_pops['State'] == loc) & (cty_pops['County'] == cty)]['Population size'].iloc[0]
+
+    except:
+        pop_size = 0
+        
+    cty_pops = 0
+        
+    census_df = pd.read_json(census_df)
+    
+    nogo = ['GLOVE SURGICAL', 'GLOVE EXAM NITRILE', 
+            'GLOVE EXAM VINYL', 'MASK FACE PROCEDURE ANTI FOG',
+            'MASK PROCEDURE FLUID RESISTANT', 'GOWN ISOLATION XLARGE YELLOW', 
+            'MASK SURGICAL ANTI FOG W/FILM', 'SHIELD FACE FULL ANTI FOG',
+            'RESPIRATOR PARTICULATE FILTER REG',
+            'Total cases', 'New visits', 'New admits', 'All COVID', 
+            'Non-ICU', 'ICU', 'Vent', 'Discharged from ICU deceased', 
+            'Discharged from ICU alive', 'Discharged from non-ICU alive']
+                  
+    census_df.drop(nogo, axis=1, inplace=True)
+    
+    labels = list(census_df)
+    
+    labels = labels[1:]
+    fig_data = []
+    
+    clrs = ['#cc0000', '#2e5cb8', '#2e5cb8', 'purple',  'mediumorchid', 'blue', 'dodgerblue', 'deepskyblue',
+            'green', 'limegreen', 'gold', 'orange', 'red', 'darkred']
+    
+    for i, label in enumerate(labels):
+        
+        #if label in ['Active cases', 'New cases (Forecasted)', 'New cases (Observed)']:
+        #    lo = 'legendonly'
+        #else:
+        #    lo = True
+            
+        if label in ['date']:
+            continue
+        
+        label2 = str(label)
+        if label2 == 'Active cases':
+            label2 = 'Active cases (Forecasted)'
+            
+        dates = census_df['date'].tolist()
+        clr = clrs[i]
+        obs_y = census_df[label].tolist()
+
+        if label != 'New cases (Observed)':
+            fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=obs_y,
+                    mode="lines",
+                    name=label2,
+                    #visible=lo,
+                    opacity=0.95,
+                    line=dict(color=clr, width=2)
+                )
+            )
+        else:
+            fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=obs_y,
+                    mode="markers",
+                    name=label2,
+                    #visible=lo,
+                    opacity=0.65,
+                    marker=dict(size=10,
+                                color=clr),
+                )
+            )
+        
+    if pop_size > 0:
+        p_active = 100 * census_df['Active cases']/pop_size
+        fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=p_active,
+                    mode="lines",
+                    name='% active cases per capita',
+                    #visible=lo,
+                    opacity=0.75,
+                    marker=dict(size=10,
+                                color='red'),
+                )
+            )
+        
+    
+    figure = go.Figure(
+        data=fig_data,
+        layout=go.Layout(
+            xaxis=dict(
+                title=dict(
+                    text="<b>Date</b>",
+                    font=dict(
+                        family='"Open Sans", "HelveticaNeue", "Helvetica Neue",'
+                        " Helvetica, Arial, sans-serif",
+                        size=18,
+                    ),
+                ),
+                rangemode="tozero",
+                zeroline=True,
+                showticklabels=True,
+            ),
+            
+            yaxis=dict(
+                title=dict(
+                    text="<b>COVID-19 cases</b>",
+                    font=dict(
+                        family='"Open Sans", "HelveticaNeue", "Helvetica Neue",'
+                        " Helvetica, Arial, sans-serif",
+                        size=18,
+                        
+                    ),
+                ),
+                rangemode="tozero",
+                zeroline=True,
+                showticklabels=True,
+            ),
+            
+            margin=dict(l=60, r=30, b=10, t=40),
+            showlegend=True,
+            height=400,
+            paper_bgcolor="rgb(245, 247, 249)",
+            plot_bgcolor="rgb(245, 247, 249)",
+        ),
+    )
+    
+    dates = 0
+    census_df = 0
+    
+    return figure
 
 
 
