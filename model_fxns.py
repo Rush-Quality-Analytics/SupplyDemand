@@ -109,7 +109,7 @@ def get_phase_wave(N, obs_x, obs_y, ForecastDays):
         return  a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))   +   a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1))   +   a2 / (d2 + np.exp(-c2 * (x + g2*np.sin(f2*x)) + b2))
     
     ct1 = 10
-    ct2 = 10
+    ct2 = 2
     # obs_x: observed x values
     # obs_y: observd y values
     # ForecastDays: number of days ahead to extend prediction
