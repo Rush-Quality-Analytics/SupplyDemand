@@ -12,7 +12,7 @@ import urllib
 
 import model_fxns as fxns
 
-
+pd.set_option('display.max_columns', None)
 
 statepops = pd.read_csv('DataUpdate/data/StatePops.csv')
 
@@ -24,8 +24,8 @@ locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Nort
                                                 'Wuhan Evacuee'])]
 
 locs_df.drop(columns=['Unnamed: 0'], inplace=True)
-locations = list(set(locs_df['Province/State']))
-locations.sort()
+locations = sorted(list(set(locs_df['Province/State'])))
+locations.insert(0, locations.pop(locations.index('Illinois')))
 locs_df = 0
 
 counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
@@ -42,7 +42,7 @@ counties = list(set(counties_df['Admin2']))
 counties.append('Entire state or territory')
 counties_df = 0
 
-models = ['Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Quadratic', 'Exponential']
+models = ['Phase Wave', 'Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Quadratic', 'Exponential']
 
 day_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 
             'Friday', 'Saturday','Sunday']
@@ -86,7 +86,7 @@ def description_card1b():
         }),
             html.Div(
                 id="intro1b",
-                children="Obtain forecasts for active COVID cases among your employees",
+                children="Obtain forecasts for active COVID cases among your employees. THIS TAB IS UNDER CURRENT DEVELOPMENT. ",
             ),
             html.Br(),
         ],
@@ -289,7 +289,7 @@ def generate_control_card1():
             dcc.Dropdown(
                 id="location-select1",
                 options=[{"label": i, "value": i} for i in locations],
-                value='Alabama',
+                value='Illinois',
                 style={
                     'width': '250px', 
                     'font-size': "100%",
@@ -535,7 +535,7 @@ def generate_control_card2():
             dcc.Dropdown(
                 id="location-select2",
                 options=[{"label": i, "value": i} for i in locations],
-                value='Alabama',
+                value='Illinois',
                 style={
                     'width': '250px', 
                     'font-size': "100%",
@@ -566,43 +566,61 @@ def generate_control_card2():
             html.Br(),
             html.Hr(),
             
-            html.Br(),
-            #html.H5("Employee variables"),
+            html.H5("Employee variables"),
             
             html.P("No. of employees"),
-            #html.Div(id='employees'),
             dcc.Input(
                 id="employees",
-                placeholder="Enter a number",
-                type='text',
+                placeholder=1000,
+                value=1000,
+                type='number',
             ),
             
-            html.P("Minimum Furlough (Days)"),
-            #html.Div(id='employees'),
+            html.Br(),
+            html.Br(),
+            html.P("No. of employees needed per covid patient"),
+            dcc.Input(
+                id="employees per patient or per bed",
+                placeholder=3,
+                value=3,
+                type='number',
+            ),
+            
+            html.Br(),
+            html.Br(),
+            html.P("Minimum furlough days after an employee tests positive"),
             dcc.Input(
                 id="furlough",
-                placeholder="Enter a number",
-                type='text',
+                placeholder=10,
+                value=10,
+                type='number',
             ),
             
             html.Br(),
             html.Br(),
-            html.Div(id='incidence rate-container'),
+            html.P('Relative positivity rate'),
             dcc.Slider(
                 id="inc_rate",
                 min=0,
-                max=2,
-                value=1,
-                step=0.1,
+                max=200,
+                value=100,
+                step=1,
                 marks={
-                    0: '0x',
-                    0.5: '0.5x',
-                    1: '1x',
-                    1.5: '1.5x',
-                    2: '2x',
+                    0: '0%',
+                    50: '50%',
+                    100: '100%',
+                    150: '150%',
+                    200: '200%',
                 },
                 ),
+            html.Div(id='incidence rate-container'),
             
+            html.Br(),
+            html.Br(),
+            html.Div(
+                id="reset-btn-outer2",
+                children=html.Button(id="reset-btn2", children="Reset Plots2", n_clicks=0),
+            ),
         ],
     )
 
@@ -619,17 +637,17 @@ def generate_model_forecasts(loc, county, model, reset):
         
     fits_df = pd.DataFrame(columns = col_names)
 
-    PopSize = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
-    PopSize = PopSize[0]
-    
+    PopSize = int()
     if county == 'Entire state or territory':
         
+        PopSize = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
+        PopSize = PopSize[0]
+    
         locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
         locs_df = locs_df[locs_df['Country/Region'] == 'US']
         locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
-                                                        'Diamond Princess', 'Grand Princess', 'Recovered', 
-                                                         'United States Virgin Islands', 'Virgin Islands, U.S.',
-                                                        'Wuhan Evacuee'])]
+                            'Diamond Princess', 'Grand Princess', 'Recovered', 'United States Virgin Islands', 
+                            'Virgin Islands, U.S.', 'Wuhan Evacuee'])]
         
         locs_df.drop(columns=['Unnamed: 0'], inplace=True)
 
@@ -638,7 +656,7 @@ def generate_model_forecasts(loc, county, model, reset):
         locs_df = 0
         ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
         ArrivalDate = ArrivalDate[0]
-        
+
     
     else:
         
@@ -663,6 +681,16 @@ def generate_model_forecasts(loc, county, model, reset):
             df_sub = df_sub.reset_index(drop=True)
             #df_sub.drop(['date'], axis=1, inplace=True)
             
+            cty_pops = pd.read_pickle('DataUpdate/data/County_Pops.pkl')
+    
+            try:
+                PopSize = cty_pops[(cty_pops['State'] == loc) & (cty_pops['County'] == county)]['Population size'].iloc[0]
+        
+            except:
+                PopSize = 0
+                
+            cty_pops = 0
+    
             counties_df = 0
             
             df_sub['Province/State'] = loc
@@ -681,13 +709,14 @@ def generate_model_forecasts(loc, county, model, reset):
             
             col = df_sub.pop('Province/State')
             df_sub.insert(0, col.name, col)
-            
-    
+
             ArrivalDate = np.nan
             
             
         except:
-            
+            PopSize = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
+            PopSize = PopSize[0]
+    
             locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
             locs_df = locs_df[locs_df['Country/Region'] == 'US']
             locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
@@ -1224,7 +1253,7 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     dates = dates.strftime('%m/%d')
             
     # declare column labels
-    col_labels = ['date', 'Total cases', 'Active cases', 'New cases (Forecasted)', 'New cases (Observed)', 'New visits', 
+    col_labels = ['date', 'Total cases', 'New visits', 
                   'New admits', 'All COVID', 'Non-ICU', 'ICU', 'Vent',
                   'Discharged from ICU deceased', 'Discharged from ICU alive',
                   'Discharged from non-ICU alive']
@@ -1289,17 +1318,6 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     discharged_dead_cc = []
     discharged_alive_cc = []
     discharged_alive_nc = []
-    total_active = []
-    
-    ## Use lognormal to parameterize turnover of active cases
-    sigma = 0.1
-    n_active = np.log(14) - (sigma**2)/2
-    p_active = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_active)/(2**0.5*sigma))
-    
-    # Initiate lists to hold number of active covid cases
-    Active = np.zeros(len(fdates))
-    Active[0] = new_cases[0]
-    
     
     # Roll up patient carry-over into lists of total critical care and total
     # non-critical patients expected
@@ -1310,7 +1328,6 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
         
         discharged_cc = LOScc * p_cc
         discharged_nc = LOSnc * p_nc
-        inactive = Active * p_active
         
         d1 = np.sum(0.01 * mortality * discharged_cc)
         d2 = np.sum((1 - 0.01 * mortality) * discharged_cc)
@@ -1323,44 +1340,24 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
         
         LOScc = LOScc - discharged_cc
         LOSnc = LOSnc - discharged_nc
-        Active = Active - inactive
             
         LOScc = np.roll(LOScc, shift=1)
         LOSnc = np.roll(LOSnc, shift=1)
-        Active = np.roll(Active, shift=1)
             
         LOScc[0] = ts_lag[i] * (0.01 * per_cc) * (0.01 * per_admit) * (0.01 * per_loc) + ((0.01 * per_ICU_transfer) * tr)
         LOSnc[0] = ts_lag[i] * (1 - (0.01 * per_cc)) * (0.01 * per_admit) * (0.01 * per_loc) + ((1 - 0.01 * per_ICU_transfer) * tr)
-        Active[0] = new_cases[i]
         
         total_nc.append(np.sum(LOSnc))
         total_cc.append(np.sum(LOScc))
-        total_active.append(np.sum(Active))
         
-    
-    for i, val in enumerate(forecasted_y):
-        try:
-            new_obs[i]
-        except:
-            new_obs.append(np.nan)
     
     cells = []
+    
     for i in range(len(row_labels)):
             
-        new = new_cases[i]
         val = ts_lag[i]
-            
-        # each cell is a row with 4 columns:
-        #     Total cases, 
-        #     new cases, 
-        #     time-lagged visits to your hospital,
-        #     time-lagged admits to your hospital
-        
         cell = [row_labels[i],
                 int(np.round(forecasted_y[i])), 
-                int(np.round(total_active[i])),
-                int(np.round(new)), 
-                new_obs[i],
                 int(np.round(val * (per_loc * 0.01))),
                 int(np.round((0.01 * per_admit) * val * (per_loc * 0.01))),
                 int(np.round(total_nc[i] + total_cc[i])), 
@@ -1376,7 +1373,6 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
         
     # Add the row to the dataframe
     census_df = pd.DataFrame.from_records(cells, columns=col_labels)    
-    
     
     #### Construct arrays for critical care and non-critical care patients
         
@@ -1471,10 +1467,116 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     lag_pop = 0
     new_cases_lag = 0
     lol = 0
+    
+    return census_df
+
+
+
+
+
+def generate_new_and_active_cases(df, loc, county, model, reset):
+    
+    df = pd.read_json(df)
+    df = df[df['label'] == 'Current forecast']
+    
+    #df['forecast_dates'] = df['forecast_dates'].dt.strftime('%m/%d')#.values.tolist()
+    fdates = df['forecast_dates'].iloc[0]
+    y = df['obs_y'].iloc[0]
+    forecasted_y = df['forecasted_y'].iloc[0]
+    
+    new_cases = []
+    ForecastDays = 60
+    
+    # add 1 to number of forecast days for indexing purposes
+    ForecastDays = int(ForecastDays+1)
+    
+    # designature plot label for legend
+    for i, val in enumerate(forecasted_y):
+        if i > 0:
+            if forecasted_y[i] - forecasted_y[i-1] > 0:
+                new_cases.append(forecasted_y[i] - forecasted_y[i-1])
+            else:
+                new_cases.append(0)
+        if i == 0:
+            new_cases.append(0)
+            
+    new_obs = []
+    for i, val in enumerate(y):
+        if i > 0:
+            if y[i] - y[i-1] > 0:
+                new_obs.append(y[i] - y[i-1])
+            else:
+                new_obs.append(0)
+        if i == 0:
+            new_obs.append(0)
+
+                
+    # declare column labels
+    col_labels = ['date', 'Active cases', 'New cases (Forecasted)', 'New cases (Observed)']
+    
+    # row labels are the dates
+    row_labels = fdates
+
+    #### Construct arrays for critical care and non-critical care patients
+    total_active = []
+    
+    ## Use lognormal to parameterize turnover of active cases
+    x_vars = np.array(list(range(1, len(fdates)+1)))
+    
+    sigma = 0.1
+    n_active = np.log(14) - (sigma**2)/2
+    p_active = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_active)/(2**0.5*sigma))
+    
+    # Initiate lists to hold number of active covid cases
+    Active = np.zeros(len(fdates))
+    Active[0] = new_cases[0]
+    
+    
+    # Roll up patient carry-over into lists of total critical care and total
+    # non-critical patients expected
+    
+    for i, day in enumerate(fdates):
+        
+        inactive = Active * p_active
+        #a1 = np.sum(inactive)
+        Active = Active - inactive
+        Active = np.roll(Active, shift=1)
+        Active[0] = new_cases[i]
+        total_active.append(np.sum(Active))
+        
+    for i, val in enumerate(forecasted_y):
+        try:
+            new_obs[i]
+        except:
+            new_obs.append(np.nan)
+    
+    cells = []
+    for i in range(len(row_labels)):
+            
+        new = new_cases[i]
+        cell = [row_labels[i], int(np.round(total_active[i])), int(np.round(new)), new_obs[i]]
+        cells.append(cell)
+        
+    # Add the row to the dataframe
+    df = pd.DataFrame.from_records(cells, columns=col_labels)    
+    
+    #### Construct arrays for critical care and non-critical care patients
+        
+    # Add the row to the dataframe
+    
+    df = df.to_json()
+    
+    fdates = 0
+    forecasted_y = 0
+    col_labels = 0
+    cells = 0
+    cell = 0
+    row_labels = 0
     total_active = 0
     Active = 0
     
-    return census_df
+    return df
+
 
 
 
@@ -1501,11 +1603,6 @@ def generate_plot_patient_census(census_df, reset):
     
     for i, label in enumerate(labels):
         
-        if label in ['Active cases', 'New cases (Forecasted)', 'New cases (Observed)']:
-            continue
-        else:
-            lo = True
-            
         if label in ['date', 'Discharged from ICU deceased', 
                      'Discharged from ICU alive',
                      'Discharged from non-ICU alive',
@@ -1524,7 +1621,7 @@ def generate_plot_patient_census(census_df, reset):
                     y=obs_y,
                     mode="lines",
                     name=label,
-                    visible=lo,
+                    #visible=lo,
                     opacity=0.75,
                     line=dict(color=clr, width=2)
                 )
@@ -1536,7 +1633,7 @@ def generate_plot_patient_census(census_df, reset):
                     y=obs_y,
                     mode="markers",
                     name=label,
-                    visible=lo,
+                    #visible=lo,
                     opacity=0.75,
                     marker=dict(size=10,
                                 color='DarkSlateGrey'),
@@ -1591,33 +1688,124 @@ def generate_plot_patient_census(census_df, reset):
 
 
 
-def generate_plot_new_cases(census_df, loc, cty, reset):
+def generate_plot_new_cases(df, loc, cty, reset):
     
-    cty_pops = pd.read_pickle('DataUpdate/data/County_Pops.pkl')
+    pop_size = int()
+    if cty == 'Entire state or territory':
+        
+        pop_size = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
+        pop_size = pop_size[0]
     
-    try:
-        pop_size = cty_pops[(cty_pops['State'] == loc) & (cty_pops['County'] == cty)]['Population size'].iloc[0]
-
-    except:
-        pop_size = 0
+    else:
+        cty_pops = pd.read_pickle('DataUpdate/data/County_Pops.pkl')
+        
+        try:
+            pop_size = cty_pops[(cty_pops['State'] == loc) & (cty_pops['County'] == cty)]['Population size'].iloc[0]
+    
+        except:
+            pop_size = 0
         
     cty_pops = 0
+     
+    df = pd.read_json(df)
+    df = df[df['label'] == 'Current forecast']
+    
+    #df['forecast_dates'] = df['forecast_dates'].dt.strftime('%m/%d')#.values.tolist()
+    fdates = df['forecast_dates'].iloc[0]
+    y = df['obs_y'].iloc[0]
+    forecasted_y = df['forecasted_y'].iloc[0]
+    
+    new_cases = []
+    ForecastDays = 60
+    
+    # add 1 to number of forecast days for indexing purposes
+    ForecastDays = int(ForecastDays+1)
+    
+    # designature plot label for legend
+    for i, val in enumerate(forecasted_y):
+        if i > 0:
+            if forecasted_y[i] - forecasted_y[i-1] > 0:
+                new_cases.append(forecasted_y[i] - forecasted_y[i-1])
+            else:
+                new_cases.append(0)
+        if i == 0:
+            new_cases.append(0)
+            
+    new_obs = []
+    for i, val in enumerate(y):
+        if i > 0:
+            if y[i] - y[i-1] > 0:
+                new_obs.append(y[i] - y[i-1])
+            else:
+                new_obs.append(0)
+        if i == 0:
+            new_obs.append(0)
+
+                
+    # declare column labels
+    col_labels = ['date', 'Active cases', 'New cases (Forecasted)', 'New cases (Observed)']
+    
+    # row labels are the dates
+    row_labels = fdates
+
+    #### Construct arrays for critical care and non-critical care patients
+    total_active = []
+    
+    ## Use lognormal to parameterize turnover of active cases
+    x_vars = np.array(list(range(1, len(fdates)+1)))
+    
+    sigma = 0.1
+    n_active = np.log(14) - (sigma**2)/2
+    p_active = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_active)/(2**0.5*sigma))
+    
+    # Initiate lists to hold number of active covid cases
+    Active = np.zeros(len(fdates))
+    Active[0] = new_cases[0]
+    
+    
+    # Roll up patient carry-over into lists of total critical care and total
+    # non-critical patients expected
+    
+    for i, day in enumerate(fdates):
         
-    census_df = pd.read_json(census_df)
+        inactive = Active * p_active
+        #a1 = np.sum(inactive)
+        Active = Active - inactive
+        Active = np.roll(Active, shift=1)
+        Active[0] = new_cases[i]
+        total_active.append(np.sum(Active))
+        
+    for i, val in enumerate(forecasted_y):
+        try:
+            new_obs[i]
+        except:
+            new_obs.append(np.nan)
     
-    nogo = ['GLOVE SURGICAL', 'GLOVE EXAM NITRILE', 
-            'GLOVE EXAM VINYL', 'MASK FACE PROCEDURE ANTI FOG',
-            'MASK PROCEDURE FLUID RESISTANT', 'GOWN ISOLATION XLARGE YELLOW', 
-            'MASK SURGICAL ANTI FOG W/FILM', 'SHIELD FACE FULL ANTI FOG',
-            'RESPIRATOR PARTICULATE FILTER REG',
-            'Total cases', 'New visits', 'New admits', 'All COVID', 
-            'Non-ICU', 'ICU', 'Vent', 'Discharged from ICU deceased', 
-            'Discharged from ICU alive', 'Discharged from non-ICU alive']
-                  
-    census_df.drop(nogo, axis=1, inplace=True)
+    cells = []
+    for i in range(len(row_labels)):
+            
+        new = new_cases[i]
+        cell = [row_labels[i], int(np.round(total_active[i])), int(np.round(new)), new_obs[i]]
+        cells.append(cell)
+        
+    # Add the row to the dataframe
+    df = pd.DataFrame.from_records(cells, columns=col_labels)    
     
-    labels = list(census_df)
+    #### Construct arrays for critical care and non-critical care patients
+        
+    # Add the row to the dataframe
     
+    fdates = 0
+    forecasted_y = 0
+    col_labels = 0
+    cells = 0
+    cell = 0
+    row_labels = 0
+    total_active = 0
+    Active = 0
+    
+    #df = pd.read_json(df)
+    labels = list(df)
     labels = labels[1:]
     fig_data = []
     
@@ -1625,7 +1813,6 @@ def generate_plot_new_cases(census_df, loc, cty, reset):
             'green', 'limegreen', 'gold', 'orange', 'red', 'darkred']
     
     for i, label in enumerate(labels):
-        
         #if label in ['Active cases', 'New cases (Forecasted)', 'New cases (Observed)']:
         #    lo = 'legendonly'
         #else:
@@ -1638,9 +1825,9 @@ def generate_plot_new_cases(census_df, loc, cty, reset):
         if label2 == 'Active cases':
             label2 = 'Active cases (Forecasted)'
             
-        dates = census_df['date'].tolist()
+        dates = df['date'].tolist()
         clr = clrs[i]
-        obs_y = census_df[label].tolist()
+        obs_y = df[label].tolist()
 
         if label != 'New cases (Observed)':
             fig_data.append(
@@ -1669,7 +1856,7 @@ def generate_plot_new_cases(census_df, loc, cty, reset):
             )
         
     if pop_size > 0:
-        p_active = 100 * census_df['Active cases']/pop_size
+        p_active = 100 * df['Active cases']/pop_size
         fig_data.append(
                 go.Scatter(
                     x=dates,
@@ -1725,7 +1912,7 @@ def generate_plot_new_cases(census_df, loc, cty, reset):
     )
     
     dates = 0
-    census_df = 0
+    df = 0
     
     return figure
 
@@ -1733,93 +1920,206 @@ def generate_plot_new_cases(census_df, loc, cty, reset):
 
 
 
-def generate_plot_employee_forecast1(census_df, loc, cty, employees, inc_rate, furlough, reset):
+def generate_plot_employee_forecast1(df, loc, cty, employees, inc_rate, furlough, reset):
     
-    cty_pops = pd.read_pickle('DataUpdate/data/County_Pops.pkl')
+    pop_size = int()
+    pop_size_e = int()
     
-    try:
-        pop_size = cty_pops[(cty_pops['State'] == loc) & (cty_pops['County'] == cty)]['Population size'].iloc[0]
-
-    except:
-        pop_size = 0
+    if cty == 'Entire state or territory':
+        
+        pop_size = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
+        pop_size = pop_size[0]
+    
+    
+    else:
+        cty_pops = pd.read_pickle('DataUpdate/data/County_Pops.pkl')
+        
+        try:
+            pop_size = cty_pops[(cty_pops['State'] == loc) & (cty_pops['County'] == cty)]['Population size'].iloc[0]
+    
+        except:
+            pop_size = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
+            pop_size = pop_size[0]
+    
+    if employees is None or employees == 'Enter a number':
+        pop_size_e = int(pop_size)
+    else:
+        pop_size_e = int(employees)
         
     cty_pops = 0
+     
+    df = pd.read_json(df)
+    df = df[df['label'] == 'Current forecast']
+    
+    #df['forecast_dates'] = df['forecast_dates'].dt.strftime('%m/%d')#.values.tolist()
+    fdates = df['forecast_dates'].iloc[0]
+    y = df['obs_y'].iloc[0]
+    forecasted_y = np.array(df['forecasted_y'].iloc[0])
+    
+    new_cases = []
+    new_cases_e = []
+    ForecastDays = 60
+    
+    # add 1 to number of forecast days for indexing purposes
+    ForecastDays = int(ForecastDays+1)
+    
+    # designature plot label for legend
+    for i, val in enumerate(forecasted_y):
+        if i > 0:
+            if forecasted_y[i] - forecasted_y[i-1] > 0:
+                new_cases.append(forecasted_y[i] - forecasted_y[i-1])
+            else:
+                new_cases.append(0)
+        if i == 0:
+            new_cases.append(0)
+    
+    inc_rate = inc_rate/100
+    new_cases_e = np.array(new_cases) * (pop_size_e/pop_size) * inc_rate
+             
+    
+    # declare column labels
+    col_labels = ['date', 'Active cases (gen pop)', 'Active employee cases', 'New employee cases']
+    
+    # row labels are the dates
+    row_labels = fdates
+
+    total_active = []
+    total_active_e = []
+    
+    ## Use lognormal to parameterize turnover of active cases
+    x_vars = np.array(list(range(1, len(fdates)+1)))
+    
+    # General population
+    sigma = 0.1
+    n_active = np.log(14) - (sigma**2)/2
+    p_active = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_active)/(2**0.5*sigma))
+    
+    # Initiate lists to hold number of active covid cases
+    Active = np.zeros(len(fdates))
+    Active[0] = new_cases[0]
+    
+    # Employees
+    sigma = 0.05
+    n_active_e = (np.log(furlough) + 0.1) - (sigma**2)/2 # for median we include (sigma**2)/2
+    p_active_e = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_active_e)/(2**0.5*sigma))
+    
+    # Initiate lists to hold number of active covid cases
+    Active_e = np.zeros(len(fdates))
+    Active_e[0] = new_cases_e[0]
+    
+    
+    
+    # Roll up patient carry-over into lists of total critical care and total
+    # non-critical patients expected
+    
+    for i, day in enumerate(fdates):
         
-    census_df = pd.read_json(census_df)
+        inactive = Active * p_active
+        #a1 = np.sum(inactive)
+        Active = Active - inactive
+        Active = np.roll(Active, shift=1)
+        Active[0] = new_cases[i]
+        total_active.append(np.sum(Active))
+        
+        inactive_e = Active_e * p_active_e
+        #a1 = np.sum(inactive)
+        Active_e = Active_e - inactive_e
+        Active_e = np.roll(Active_e, shift=1)
+        Active_e[0] = new_cases_e[i]
+        total_active_e.append(np.sum(Active_e))
+        
     
-    nogo = ['GLOVE SURGICAL', 'GLOVE EXAM NITRILE', 
-            'GLOVE EXAM VINYL', 'MASK FACE PROCEDURE ANTI FOG',
-            'MASK PROCEDURE FLUID RESISTANT', 'GOWN ISOLATION XLARGE YELLOW', 
-            'MASK SURGICAL ANTI FOG W/FILM', 'SHIELD FACE FULL ANTI FOG',
-            'RESPIRATOR PARTICULATE FILTER REG',
-            'Total cases', 'New visits', 'New admits', 'All COVID', 
-            'Non-ICU', 'ICU', 'Vent', 'Discharged from ICU deceased', 
-            'Discharged from ICU alive', 'Discharged from non-ICU alive']
-                  
-    census_df.drop(nogo, axis=1, inplace=True)
+    cells = []
+    for i in range(len(row_labels)):
+        cell = [row_labels[i], int(np.round(total_active[i])), int(np.round(total_active_e[i])), int(np.round(new_cases_e[i]))]
+        cells.append(cell)
+        
+    # Add the row to the dataframe
+    df = pd.DataFrame.from_records(cells, columns=col_labels)    
     
-    labels = list(census_df)
+    #### Construct arrays for critical care and non-critical care patients
+        
+    # Add the row to the dataframe
+    
+    fdates = 0
+    forecasted_y = 0
+    col_labels = 0
+    cells = 0
+    cell = 0
+    row_labels = 0
+    total_active = 0
+    Active = 0
+    total_active_e = 0
+    Active_e = 0
+    new_cases_e = 0
+    new_cases = 0
+    
+    #df = pd.read_json(df)
+    labels = list(df)
     
     labels = labels[1:]
     fig_data = []
     
-    clrs = ['#cc0000', '#2e5cb8', '#2e5cb8', 'purple',  'mediumorchid', 'blue', 'dodgerblue', 'deepskyblue',
+    clrs = ['#cc0000', '#2e5cb8', 'deepskyblue',  'mediumorchid', 'blue', 'dodgerblue', 'deepskyblue',
             'green', 'limegreen', 'gold', 'orange', 'red', 'darkred']
     
     for i, label in enumerate(labels):
+        if label in ['New cases (Observed)']: continue
         
-        #if label in ['Active cases', 'New cases (Forecasted)', 'New cases (Observed)']:
-        #    lo = 'legendonly'
-        #else:
-        #    lo = True
+        if label == 'Active cases (gen pop)':
+            lo = 'legendonly'
+        else:
+            lo = True
             
         if label in ['date']:
             continue
         
         label2 = str(label)
-        if label2 == 'Active cases':
-            label2 = 'Active cases (Forecasted)'
             
-        dates = census_df['date'].tolist()
+        dates = df['date'].tolist()
         clr = clrs[i]
-        obs_y = census_df[label].tolist()
+        obs_y = df[label].tolist()
 
-        if label != 'New cases (Observed)':
-            fig_data.append(
-                go.Scatter(
-                    x=dates,
-                    y=obs_y,
-                    mode="lines",
-                    name=label2,
-                    #visible=lo,
-                    opacity=0.95,
-                    line=dict(color=clr, width=2)
-                )
+        if label == ['Active employee cases']:
+            label = 'No. of employees with active COVID'
+            
+        fig_data.append(
+            go.Scatter(
+                x=dates,
+                y=obs_y,
+                mode="lines",
+                name=label2,
+                    visible=lo,
+                opacity=0.95,
+                line=dict(color=clr, width=2)
             )
-        else:
-            fig_data.append(
-                go.Scatter(
-                    x=dates,
-                    y=obs_y,
-                    mode="markers",
-                    name=label2,
-                    #visible=lo,
-                    opacity=0.65,
-                    marker=dict(size=10,
-                                color=clr),
-                )
-            )
+        )
         
     if pop_size > 0:
-        p_active = 100 * census_df['Active cases']/pop_size
+        p_active = 100 * df['Active cases (gen pop)']/pop_size
         fig_data.append(
                 go.Scatter(
                     x=dates,
                     y=p_active,
                     mode="lines",
                     name='% active cases per capita',
-                    #visible=lo,
-                    opacity=0.75,
+                    visible=lo,
+                    opacity=0.5,
+                    marker=dict(size=10,
+                                color='red'),
+                )
+            )
+        
+    if pop_size_e > 0:
+        p_active = 100 * df['Active employee cases']/pop_size_e
+        fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=p_active,
+                    mode="lines",
+                    name='% of employees furloughed',
+                    visible=lo,
+                    opacity=0.9,
                     marker=dict(size=10,
                                 color='red'),
                 )
@@ -1845,7 +2145,7 @@ def generate_plot_employee_forecast1(census_df, loc, cty, employees, inc_rate, f
             
             yaxis=dict(
                 title=dict(
-                    text="<b>COVID-19 cases</b>",
+                    text="<b>COVID-19 cases (# or %)</b>",
                     font=dict(
                         family='"Open Sans", "HelveticaNeue", "Helvetica Neue",'
                         " Helvetica, Arial, sans-serif",
@@ -1860,14 +2160,16 @@ def generate_plot_employee_forecast1(census_df, loc, cty, employees, inc_rate, f
             
             margin=dict(l=60, r=30, b=10, t=40),
             showlegend=True,
-            height=400,
+            height=500,
             paper_bgcolor="rgb(245, 247, 249)",
             plot_bgcolor="rgb(245, 247, 249)",
         ),
     )
     
     dates = 0
-    census_df = 0
+    df = 0
+    
+    
     
     return figure
 
@@ -1884,8 +2186,7 @@ def generate_plot_discharge_census(census_df, reset):
             'MASK PROCEDURE FLUID RESISTANT', 'GOWN ISOLATION XLARGE YELLOW', 
             'MASK SURGICAL ANTI FOG W/FILM', 'SHIELD FACE FULL ANTI FOG',
             'RESPIRATOR PARTICULATE FILTER REG',
-            'Total cases', 'New cases (Forecasted)', 'New cases (Observed)',
-            'New visits', 'Active cases']
+            'Total cases', 'New visits', ]
     
     census_df.drop(nogo, axis=1, inplace=True)
     
@@ -1975,8 +2276,7 @@ def generate_patient_census_table(census_df, reset):
             'MASK PROCEDURE FLUID RESISTANT', 'GOWN ISOLATION XLARGE YELLOW', 
             'MASK SURGICAL ANTI FOG W/FILM', 'SHIELD FACE FULL ANTI FOG',
             'RESPIRATOR PARTICULATE FILTER REG', 'Total cases', 
-            'New cases (Forecasted)', 'New cases (Observed)',
-            'Active cases']
+            ]
     
     df_table.drop(nogo, axis=1, inplace=True)
     
@@ -2024,7 +2324,7 @@ def generate_plot_ppe(df, reset):
     
     ppe_df = pd.read_json(df)
     
-    nogo = ['Total cases', 'New cases (Forecasted)', 'New cases (Observed)', 'New visits', 'New admits', 'Active cases',
+    nogo = ['Total cases', 'New visits', 'New admits',
                   'All COVID', 'Non-ICU', 'ICU', 'Vent',
                   'Discharged from ICU deceased', 'Discharged from ICU alive',
                   'Discharged from non-ICU alive']
@@ -2110,7 +2410,7 @@ def generate_plot_ppe(df, reset):
 def generate_ppe_table(df, reset):
     df_table = pd.read_json(df)
     
-    nogo = ['Total cases', 'New cases (Forecasted)', 'New cases (Observed)', 'New visits', 'New admits',
+    nogo = ['Total cases', 'New visits', 'New admits',
                   'All COVID', 'Non-ICU', 'ICU', 'Vent',
                   'Discharged from ICU deceased', 'Discharged from ICU alive',
                   'Discharged from non-ICU alive']
