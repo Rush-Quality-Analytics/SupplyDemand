@@ -5,7 +5,7 @@ import datetime # library for date-time functionality
 import numpy as np # numerical python
 from scipy import stats # scientific python statistical package
 from scipy.optimize import curve_fit # optimization for fitting curves
-#import timeit
+import timeit
 
 #### FUNCTIONS FOR MODELING THE SPREAD OF COVID-19 CASES
 
@@ -137,9 +137,9 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
         r2_opt = 0
         popt_opt = 0
         
-        #t1 = timeit.default_timer()
+        t1 = timeit.default_timer()
         for i in np.linspace(3, 5, 10).tolist():
-            #t2 = timeit.default_timer()
+            t2 = timeit.default_timer()
             
             o_y = np.array(obs_y)
             ct = 0
@@ -169,14 +169,15 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
                         o_y[-1] = o_y[-1] - ((o_y[-1] - o_y[-2]) * 0.5)
                     
                     else:
-                        r2 = obs_pred_rsquare(obs_y, pred_y)
+                        r2 = obs_pred_rsquare(obs_y[:-30], pred_y[:-30])
                         if r2 > r2_opt:
                             r2_opt = float(r2)
                             popt_opt = popt
                             
-                            #t1 = timeit.default_timer()
-                            #print('time:', t1 - t2)
-                            #if t1 - t2 > 
+                            t1 = timeit.default_timer()
+                            print(i, ct, 'time:', t1 - t2)
+                            if r2 > 0.99:
+                                break
             
                             
                 except:
