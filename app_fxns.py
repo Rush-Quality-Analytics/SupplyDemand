@@ -72,7 +72,7 @@ def description_card1():
         }),
             html.Div(
                 id="intro1",
-                children="Obtain forecasts for COVID-19 cases using a suite of models, and forecasts for your patient census, discharges, and PPE needs using customizable variables",
+                children="Obtain forecasts for COVID-19 cases using a suite of models, and forecasts for your patient census, discharges, and PPE needs using customizable variables.",
             ),
             html.Br(),
         ],
@@ -134,11 +134,14 @@ def description_card3():
             'textAlign': 'left',
             }),
             dcc.Markdown("-------"),
-            dcc.Markdown("We have added two new models. These are the logistic (multiphase) and Gaussian (multiphase)." +
-                         " We have removed the 2-phase logistic and 2-phase sine logistic because the new models offer a faster" +
-                         " and more elegant solution. We also removed the SEIR-SD model because its poor performance did not justify" +
-                         " the computational resources to maintain it. We have also added functionality to forecast active cases." +
-                         " and to allow users to select county level data."),
+            dcc.Markdown("1. We have added three new models. These are the Phase Wave, logistic (multiphase), and Gaussian (multiphase)."),
+            dcc.Markdown("2. We have removed the 2-phase logistic and 2-phase sine logistic because the new models offer a faster" +
+                         " and more elegant solution."),
+            dcc.Markdown("3. We also removed the SEIR-SD model because its poor performance did not justify the computational resources to maintain it."),
+            dcc.Markdown("4. We removed the \"Trends in Testing\" and \"Trends in Hospitalization\" tabs and moved them to a separate" +
+                         " that this app will link to."),
+            dcc.Markdown("5. We have also added functionality to forecast active cases."),
+            dcc.Markdown("6. We have added functionality to allow users to select county level data."),
             
             html.Br(),
             html.H5("Instructions for using the COVID Calculator", style={
@@ -271,12 +274,6 @@ def description_card4():
                          "Our application also uses dates of COVID-19 arrival in US states and territories based on data available from state and territory "+
                          "governmental agencies (e.g., Departments of Health)."
                          ),
-            html.Br(),
-            dcc.Markdown("**Hospitalization and Testing Data.** Tabs on Trends in Testing and Trends in Hospitalization use a combination of the "+
-                         "JHU CSSE daily reports data as well as data from The Atlantic's [COVID Tracking Project](https://covidtracking.com/). "+
-                         "Description of the COVID tracking project's data can be found [here](https://covidtracking.com/data/download)."
-                         ),
-
         ],
     )
 
