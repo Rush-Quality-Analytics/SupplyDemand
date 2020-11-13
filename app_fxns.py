@@ -53,10 +53,9 @@ day_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday',
 
 
 
-def worker(condition):
-    results = fxns.fit_curve(condition)
-    return results
-    
+
+
+
     
 
 def description_card1():
@@ -790,14 +789,12 @@ def generate_model_forecasts(loc, county, model, reset):
         
         condition = [x, y, model, ForecastDays, PopSize, ArrivalDate, j, iterations]
         conditions.append(condition)
-        
-    pool = Pool()
-
-    # Parallel map
-    results = pool.map(worker, conditions)
     
-    #pool.join()
-    #pool.close()    
+    pool = Pool()
+    results = pool.map(fxns.fit_curve, conditions)
+    pool.close() 
+    pool.join()
+    
     
     for i, j in enumerate(list(range(-10, 1))):
         pred_clr = pred_clrs[i]
@@ -829,8 +826,6 @@ def generate_model_forecasts(loc, county, model, reset):
         result = results[i]
         
         obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = result
-        
-        print(label, obs_pred_r2)
         
         # convert y values to numpy array
         y = np.array(y)
@@ -894,7 +889,6 @@ def generate_model_forecasts(loc, county, model, reset):
             
         fits_df.loc[len(fits_df)] = output_list
 
-    
     dates = 0
     df_sub = 0
     output_list = 0

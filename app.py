@@ -1555,4 +1555,4 @@ def update_generate_ventilator_vs_ICU_plot(reset_click):
 
 # Run the server
 if __name__ == "__main__":
-    app.run_server(host='127.0.0.1', port=8050, debug=True)
+    app.run_server(host='127.0.0.1', port=8050, debug=True, threaded=False, processes=11)
