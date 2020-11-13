@@ -136,7 +136,7 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
         
         r2_opt = 0
         popt_opt = 0
-        for i in np.linspace(3, 5, 10).tolist():
+        for i in [3]:
                 
             o_y = np.array(obs_y)
             ct = 0
@@ -316,7 +316,7 @@ def get_logistic(obs_x, obs_y, ForecastDays):
         done = 0
         r2_opt = 0
         popt_opt = 0
-        for i in np.linspace(3, 5, 10).tolist():
+        for i in [3]:
             
             o_y = np.array(obs_y)
             ct = 0
@@ -375,7 +375,7 @@ def get_logistic(obs_x, obs_y, ForecastDays):
             done = 0
             r2_opt = 0
             popt_opt = 0
-            for i in np.linspace(3, 5, 10).tolist():
+            for i in [3]:
                 
                 o_y = np.array(obs_y)
                 ct = 0
