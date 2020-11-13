@@ -9,6 +9,10 @@ import plotly.graph_objects as go
 import plotly.express as px
 from scipy import stats
 import urllib
+import sys
+
+import multiprocessing as mp
+from multiprocessing import Pool
 
 import model_fxns as fxns
 
@@ -49,7 +53,11 @@ day_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday',
 
 
 
-
+def worker(condition):
+    results = fxns.fit_curve(condition)
+    return results
+    
+    
 
 def description_card1():
     """
@@ -628,6 +636,7 @@ def generate_control_card2():
 
 def generate_model_forecasts(loc, county, model, reset):
     
+        
     new_cases = []
     ForecastDays = 60
     
@@ -743,10 +752,9 @@ def generate_model_forecasts(loc, county, model, reset):
                   'darkturquoise', 'green', 'limegreen', 'gold', 'orange', 'red']
     pred_clrs = ['0.0', '0.1', '0.2', '0.25', '0.3', '0.35', '0.4', '0.5',
                  '0.6', '0.7', '0.8']
-            
+    
+    conditions = []        
     for i, j in enumerate(list(range(-10, 1))):
-        pred_clr = pred_clrs[i]
-        fore_clr = fore_clrs[i]
             
         if j == 0:
             # get dates for today's predictions/forecast
@@ -774,15 +782,56 @@ def generate_model_forecasts(loc, county, model, reset):
         
         # declare x as a list of integers from 0 to len(y)
         x = list(range(len(y)))
-
+        iterations = 2
         # Call function to use chosen model to obtain:
         #    r-square for observed vs. predicted
         #    predicted y-values
         #    forecasted x and y values
-        iterations = 2
-        obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = fxns.fit_curve(x, y, 
-                            model, ForecastDays, PopSize, ArrivalDate, j, iterations)
+        
+        condition = [x, y, model, ForecastDays, PopSize, ArrivalDate, j, iterations]
+        conditions.append(condition)
+        
+    pool = Pool()
+
+    # Parallel map
+    results = pool.map(worker, conditions)
+    
+    #pool.join()
+    #pool.close()    
+    
+    for i, j in enumerate(list(range(-10, 1))):
+        pred_clr = pred_clrs[i]
+        fore_clr = fore_clrs[i]
+        
+        # designature plot label for legend
+        if j == 0:
+            label='Current forecast'
             
+        else:
+            label = str(-j)+' day old forecast'
+        
+        if j == 0:
+            # get dates for today's predictions/forecast
+            DATES = yi[4:]
+            obs_y_trunc = df_sub.iloc[0,4:].values
+        else:
+            # get dates for previous days predictions/forecast
+            DATES = yi[4:j]
+            obs_y_trunc = df_sub.iloc[0,4:j].values
+            
+        
+        ii = 0
+        while obs_y_trunc[ii] == 0: ii+=1
+        y = obs_y_trunc[ii:]
+        dates = DATES[ii:]
+        
+            
+        result = results[i]
+        
+        obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = result
+        
+        print(label, obs_pred_r2)
+        
         # convert y values to numpy array
         y = np.array(y)
 
@@ -845,7 +894,7 @@ def generate_model_forecasts(loc, county, model, reset):
             
         fits_df.loc[len(fits_df)] = output_list
 
-
+    
     dates = 0
     df_sub = 0
     output_list = 0
@@ -1195,8 +1244,10 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     #    predicted y-values
     #    forecasted x and y values
     iterations = 2
-    obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = fxns.fit_curve(x, y, 
-                            model, ForecastDays, PopSize, ArrivalDate, 0, iterations)
+    
+    condition = [x, y, model, ForecastDays, PopSize, ArrivalDate, 0, iterations]
+    result = fxns.fit_curve(condition)
+    obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = result
     
     # convert y values to numpy array
     y = np.array(y)
