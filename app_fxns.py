@@ -72,7 +72,7 @@ def description_card1():
         }),
             html.Div(
                 id="intro1",
-                children="Obtain forecasts for COVID-19 cases using a suite of models, and forecasts for your patient census, discharges, and PPE needs using customizable variables.",
+                children="Obtain forecasts for COVID-19 cases using a suite of models, and forecasts for your patient census, discharges, and PPE needs using customizable variables",
             ),
             html.Br(),
         ],
@@ -134,14 +134,11 @@ def description_card3():
             'textAlign': 'left',
             }),
             dcc.Markdown("-------"),
-            dcc.Markdown("1. We have added three new models. These are the Phase Wave, logistic (multiphase), and Gaussian (multiphase)."),
-            dcc.Markdown("2. We have removed the 2-phase logistic and 2-phase sine logistic because the new models offer a faster" +
-                         " and more elegant solution."),
-            dcc.Markdown("3. We also removed the SEIR-SD model because its poor performance did not justify the computational resources to maintain it."),
-            dcc.Markdown("4. We removed the \"Trends in Testing\" and \"Trends in Hospitalization\" tabs and moved them to a separate" +
-                         " that this app will link to."),
-            dcc.Markdown("5. We have also added functionality to forecast active cases."),
-            dcc.Markdown("6. We have added functionality to allow users to select county level data."),
+            dcc.Markdown("We have added two new models. These are the logistic (multiphase) and Gaussian (multiphase)." +
+                         " We have removed the 2-phase logistic and 2-phase sine logistic because the new models offer a faster" +
+                         " and more elegant solution. We also removed the SEIR-SD model because its poor performance did not justify" +
+                         " the computational resources to maintain it. We have also added functionality to forecast active cases." +
+                         " and to allow users to select county level data."),
             
             html.Br(),
             html.H5("Instructions for using the COVID Calculator", style={
@@ -274,6 +271,12 @@ def description_card4():
                          "Our application also uses dates of COVID-19 arrival in US states and territories based on data available from state and territory "+
                          "governmental agencies (e.g., Departments of Health)."
                          ),
+            html.Br(),
+            dcc.Markdown("**Hospitalization and Testing Data.** Tabs on Trends in Testing and Trends in Hospitalization use a combination of the "+
+                         "JHU CSSE daily reports data as well as data from The Atlantic's [COVID Tracking Project](https://covidtracking.com/). "+
+                         "Description of the COVID tracking project's data can be found [here](https://covidtracking.com/data/download)."
+                         ),
+
         ],
     )
 
@@ -2478,3 +2481,386 @@ def generate_ppe_table(df, reset):
 
 
 
+
+
+
+
+
+def map1(reset):
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
+    
+    fig = go.Figure(data=go.Choropleth(
+    locations = testing_df_mrd['state'], # Spatial coordinates
+    z = testing_df_mrd['Testing_Rate'].astype(float), # Data to be color-coded
+    locationmode = 'USA-states', # set of locations match entries in `locations`
+    colorscale = 'Plasma',
+    colorbar_title = "Testing Rate",
+    marker_line_color='grey',
+    text = testing_df_mrd['date'],
+    ))
+
+    fig.update_layout(
+        geo_scope='usa',
+        margin=dict(l=0, r=0, b=0, t=0),
+            showlegend=True,
+            height=400,
+            paper_bgcolor="rgb(245, 247, 249)",
+            plot_bgcolor="rgb(245, 247, 249)")
+    
+    testing_df_mrd = 0
+    
+    return fig
+
+
+def map2(reset):
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
+    fig = go.Figure(data=go.Choropleth(
+    locations=testing_df_mrd['state'], # Spatial coordinates
+    z = testing_df_mrd['Positives per capita'].astype(float), # Data to be color-coded
+    locationmode = 'USA-states', # set of locations match entries in `locations`
+    colorscale = 'Viridis',
+    colorbar_title = "Positives per capita",
+    marker_line_color='grey',
+    text = testing_df_mrd['date'],
+    ))
+
+    fig.update_layout(
+        geo_scope='usa',
+        margin=dict(l=0, r=0, b=0, t=0),
+            showlegend=True,
+            height=400,
+            paper_bgcolor="rgb(245, 247, 249)",
+            plot_bgcolor="rgb(245, 247, 249)")
+
+    testing_df_mrd = 0
+    return fig
+
+
+def map3(reset):
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
+    fig = go.Figure(data=go.Choropleth(
+    locations=testing_df_mrd['state'], # Spatial coordinates
+    z = testing_df_mrd['Percent positive'].astype(float), # Data to be color-coded
+    locationmode = 'USA-states', # set of locations match entries in `locations`
+    colorscale = 'Cividis',
+    colorbar_title = "Percent positive",
+    marker_line_color='grey',
+    text = testing_df_mrd['date'],
+    ))
+
+    fig.update_layout(
+        geo_scope='usa',
+        margin=dict(l=0, r=0, b=0, t=0),
+            showlegend=True,
+            height=400,
+            paper_bgcolor="rgb(245, 247, 249)",
+            plot_bgcolor="rgb(245, 247, 249)")
+    
+    testing_df_mrd = 0
+    return fig
+
+
+def map4(reset):
+    testing_df = pd.read_pickle('DataUpdate/data/Testing_Dataframe.pkl')
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
+    fig = go.Figure(data=go.Choropleth(
+    locations=testing_df_mrd['state'], # Spatial coordinates
+    z = testing_df['DeltaTestingRate'].astype(float), # Data to be color-coded
+    locationmode = 'USA-states', # set of locations match entries in `locations`
+    colorscale = 'haline',
+    colorbar_title = "Change in testing rate",
+    marker_line_color='grey',
+    text = testing_df_mrd['date'],
+    ))
+
+    fig.update_layout(
+        geo_scope='usa',
+        margin=dict(l=0, r=0, b=0, t=0),
+            showlegend=True,
+            height=400,
+            paper_bgcolor="rgb(245, 247, 249)",
+            plot_bgcolor="rgb(245, 247, 249)")
+    
+    testing_df_mrd = 0
+    testing_df = 0
+    return fig
+
+
+
+
+def map5(reset):
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
+    fig = go.Figure(data=go.Choropleth(
+    locations = testing_df_mrd['state'], # Spatial coordinates
+    z = testing_df_mrd['hospitalizedCurrently'].astype(float), # Data to be color-coded
+    locationmode = 'USA-states', # set of locations match entries in `locations`
+    colorscale = 'haline',
+    colorbar_title = "Hospitalized",
+    marker_line_color='grey',
+    text = testing_df_mrd['date'],
+    ))
+
+    fig.update_layout(
+        geo_scope='usa',
+        margin=dict(l=0, r=0, b=0, t=0),
+            showlegend=True,
+            height=400,
+            paper_bgcolor="rgb(245, 247, 249)",
+            plot_bgcolor="rgb(245, 247, 249)")
+    
+    testing_df_mrd = 0
+    return fig
+
+
+
+
+def map6(reset):
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
+    fig = go.Figure(data=go.Choropleth(
+    locations=testing_df_mrd['state'], # Spatial coordinates
+    z = testing_df_mrd['inIcuCurrently'].astype(float), # Data to be color-coded
+    locationmode = 'USA-states', # set of locations match entries in `locations`
+    colorscale = 'haline',
+    colorbar_title = "In ICU",
+    marker_line_color='grey',
+    text = testing_df_mrd['date'],
+    ))
+
+    fig.update_layout(
+        geo_scope='usa',
+        margin=dict(l=0, r=0, b=0, t=0),
+            showlegend=True,
+            height=400,
+            paper_bgcolor="rgb(245, 247, 249)",
+            plot_bgcolor="rgb(245, 247, 249)")
+    
+    testing_df_mrd = 0
+    return fig
+
+
+
+
+def generate_delta_testing_plot(reset):
+    testing_df = pd.read_pickle('DataUpdate/data/Testing_Dataframe.pkl')
+    fig = px.line(testing_df, x="date", y="Testing_Rate", color="state",
+              line_group="state", hover_name="state",
+              labels={'Testing_Rate': 'Testing rate'})
+
+    fig.update_xaxes(title_font=dict(size=14, family='Arial', color='black'))
+    fig.update_yaxes(title_font=dict(size=14, family='Arial', color='black'))
+
+    fig.update_layout(title_font=dict(size=14, 
+                      color='black', 
+                      family='Arial'),
+                      showlegend=True,
+                      margin=dict(l=10, r=40, b=80, t=20),
+                      #height=400,
+                      paper_bgcolor="rgb(245, 247, 249)",
+                      plot_bgcolor="rgb(245, 247, 249)",)
+    
+    testing_df = 0
+    return fig
+
+
+def generate_PopSize_vs_Tested(reset):
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
+    
+    testing_df_mrd['totalTestResults'] = np.log10(testing_df_mrd['totalTestResults'])
+    
+    slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['log_PopSize'], 
+                                                                   testing_df_mrd['totalTestResults'])
+    
+    pred_y = slope * testing_df_mrd['log_PopSize'] + intercept
+    
+    lab = 'Power law slope = ' + str(np.round(slope,2)) + ', r-square = ' + str(np.round(r_value**2,2))
+    
+    fig = go.Figure()
+    
+    fig = px.scatter(testing_df_mrd, x="log_PopSize", y="totalTestResults",
+                 color='%Poor',
+                 symbol='color',
+                 size='%Black', hover_data=['Province_State','Confirmed', 'Deaths'],
+                 labels={'log_PopSize': 'log(State population size)', 
+                         'totalTestResults': 'log(Number of tests conducted)'})
+    
+    fig.add_trace(go.Scatter(x=testing_df_mrd['log_PopSize'], y=pred_y,
+                    mode='lines',
+                    ))
+    
+    
+    fig.update_layout(title = lab,
+                      title_font=dict(size=14, 
+                      color='black', 
+                      family='Arial'),
+                      showlegend=False,
+                      margin=dict(l=10, r=10, b=80, t=20),
+                      #height=400,
+                      paper_bgcolor="rgb(245, 247, 249)",
+                      plot_bgcolor="rgb(245, 247, 249)",)
+    
+    testing_df_mrd = 0
+    return fig
+
+
+def generate_Negative_vs_Tested(reset):
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
+    
+    testing_df_mrd['totalTestResults'] = np.log10(testing_df_mrd['totalTestResults'])
+    
+    slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['totalTestResults'], testing_df_mrd['log_negative'])
+    
+    pred_y = slope * testing_df_mrd['totalTestResults'] + intercept
+    
+    lab = 'Power law slope = ' + str(np.round(slope,2)) + ', r-square = ' + str(np.round(r_value**2,2))
+    
+    fig = px.scatter(testing_df_mrd, y="log_negative", x="totalTestResults", color='%Poor',
+                 symbol='color',
+                 size='%Black', hover_data=['Province_State','Confirmed', 'Deaths'],
+                 labels={'log_negative': 'log(Negative tests)', 
+                        'totalTestResults': 'log(Number of tests conducted)'})
+    
+    fig.add_trace(go.Scatter(x=testing_df_mrd['totalTestResults'], y=pred_y,
+                    mode='lines',
+                    ))
+    
+    
+    fig.update_layout(title = lab,
+                      title_font=dict(size=14, 
+                      color='black', 
+                      family='Arial'),
+                      showlegend=False,
+                      margin=dict(l=10, r=40, b=80, t=20),
+                      #height=400,
+                      paper_bgcolor="rgb(245, 247, 249)",
+                      plot_bgcolor="rgb(245, 247, 249)",)
+    
+    testing_df_mrd = 0
+    return fig
+
+    
+
+def generate_Positive_vs_Tested(reset):
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
+    
+    testing_df_mrd['totalTestResults'] = np.log10(testing_df_mrd['totalTestResults'])
+    
+    slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['totalTestResults'], testing_df_mrd['log_positive'])
+    
+    pred_y = slope * testing_df_mrd['totalTestResults'] + intercept
+    
+    lab = 'Power law slope = ' + str(np.round(slope,2)) + ', r-square = ' + str(np.round(r_value**2,2))
+    
+    fig = px.scatter(testing_df_mrd, x="totalTestResults", y="log_positive",
+                     color='%Poor',
+                     symbol='color',
+                     #trendline="ols",
+                     size='%Black', hover_data=['state','total', 'death'],
+                     labels={'totalTestResults': 'log(Number of tests conducted}', 
+                             'log_positive': 'log(Positive tests)'}
+                    )
+    
+    fig.add_trace(go.Scatter(x=testing_df_mrd['totalTestResults'], y=pred_y,
+                    mode='lines',
+                    ))
+    
+    fig.update_layout(title = lab,
+                      title_font=dict(size=14, 
+                      color='black', 
+                      family='Arial'),
+                      showlegend=False,
+                      margin=dict(l=10, r=10, b=80, t=20),
+                      #height=400,
+                      paper_bgcolor="rgb(245, 247, 249)",
+                      plot_bgcolor="rgb(245, 247, 249)",)
+    
+    testing_df_mrd = 0
+    return fig
+
+
+
+def generate_ICU_vs_Hospitalized(reset):
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
+    df_sub = testing_df_mrd.filter(items=['inIcuCurrently', 'onVentilatorCurrently', 'hospitalizedCurrently',
+                                '%Poor', '%Black', 'sqrt_PopSize', 'PopSize', 'state', 
+                                'total', 'death', 'color'])
+    df_sub.dropna(inplace=True)
+
+    varx = df_sub['hospitalizedCurrently']
+    vary = df_sub['inIcuCurrently']
+    mask = ~np.isnan(varx) & ~np.isnan(vary)
+    slope, intercept, r_value, p_value, std_err = stats.linregress(varx[mask], vary[mask])
+
+    pred_y = slope * df_sub['hospitalizedCurrently'] + intercept
+    
+    lab = 'Slope = ' + str(np.round(slope,2)) + ', r-square = ' + str(np.round(r_value**2,2))
+    
+    fig = px.scatter(df_sub, x="hospitalizedCurrently", y="inIcuCurrently",
+                     color='%Poor',
+                     symbol='color',
+                     size='%Black', hover_data=['state','total', 'death'],
+                     labels={'hospitalizedCurrently': 'Number hospitalized', 
+                         'inIcuCurrently': 'Patients in ICU'}
+                    )
+    
+    fig.add_trace(go.Scatter(x=df_sub['hospitalizedCurrently'], y=pred_y,
+                    mode='lines',
+                    ))
+    
+    fig.update_layout(title = lab,
+                      title_font=dict(size=14, 
+                      color='black', 
+                      family='Arial'),
+                      showlegend=False,
+                      margin=dict(l=10, r=10, b=80, t=20),
+                      #height=400,
+                      paper_bgcolor="rgb(245, 247, 249)",
+                      plot_bgcolor="rgb(245, 247, 249)",)
+    
+    df_sub = 0
+    testing_df_mrd = 0
+    return fig
+
+
+
+def generate_ventilator_vs_ICU(reset):
+    testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
+    df_sub = testing_df_mrd.filter(items=['inIcuCurrently', 'onVentilatorCurrently',
+                                '%Poor', '%Black', 'sqrt_PopSize', 'PopSize', 'state', 
+                                'total', 'death', 'color'])
+    df_sub.dropna(inplace=True)
+
+    varx = df_sub['inIcuCurrently']
+    vary = df_sub['onVentilatorCurrently']
+    mask = ~np.isnan(varx) & ~np.isnan(vary)
+    slope, intercept, r_value, p_value, std_err = stats.linregress(varx[mask], vary[mask])
+
+    pred_y = slope * df_sub['inIcuCurrently'] + intercept
+    
+    lab = 'Slope = ' + str(np.round(slope,2)) + ', r-square = ' + str(np.round(r_value**2,2))
+    
+    fig = px.scatter(df_sub, x="inIcuCurrently", y="onVentilatorCurrently",
+                     color='%Poor',
+                     symbol='color',
+                     #trendline="ols",
+                     size='%Black', hover_data=['state','total', 'death'],
+                     labels={'onVentilatorCurrently': 'Patients on Ventilator', 
+                         'inIcuCurrently': 'Patients in ICU'}
+                    )
+    
+    fig.add_trace(go.Scatter(x=df_sub['inIcuCurrently'], y=pred_y,
+                    mode='lines',
+                    ))
+    
+    fig.update_layout(title = lab,
+                      title_font=dict(size=14, 
+                      color='black', 
+                      family='Arial'),
+                      showlegend=False,
+                      margin=dict(l=10, r=10, b=80, t=20),
+                      #height=400,
+                      paper_bgcolor="rgb(245, 247, 249)",
+                      plot_bgcolor="rgb(245, 247, 249)",)
+
+    df_sub = 0
+    testing_df_mrd = 0
+    return fig

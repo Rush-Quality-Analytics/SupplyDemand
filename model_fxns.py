@@ -5,7 +5,6 @@ import datetime # library for date-time functionality
 import numpy as np # numerical python
 from scipy import stats # scientific python statistical package
 from scipy.optimize import curve_fit # optimization for fitting curves
-import timeit
 
 #### FUNCTIONS FOR MODELING THE SPREAD OF COVID-19 CASES
 
@@ -134,15 +133,14 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
         obs_y = np.array(obs_y)
         forecasted_y = [np.inf]
             
+        
         r2_opt = 0
         popt_opt = 0
-        
-        t1 = timeit.default_timer()
         for i in np.linspace(3, 5, 10).tolist():
-            t2 = timeit.default_timer()
-            
+                
             o_y = np.array(obs_y)
             ct = 0
+            
             while max(forecasted_y) > i * max(obs_y):
                 ct += 1
                 if ct > 10:
@@ -164,32 +162,23 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
                     # get corresponding forecasted y values, i.e., extend the predictions
                     forecasted_y = phase_wave3(forecasted_x, *popt)
                     
-                    
                     if max(forecasted_y) > i * max(obs_y):
                         o_y[-1] = o_y[-1] - ((o_y[-1] - o_y[-2]) * 0.5)
-                    
                     else:
-                        r2 = obs_pred_rsquare(obs_y[:-30], pred_y[:-30])
+                        r2 = obs_pred_rsquare(obs_y, pred_y)
                         if r2 > r2_opt:
                             r2_opt = float(r2)
                             popt_opt = popt
-                            
-                            t1 = timeit.default_timer()
-                            print(i, ct, 'time:', t1 - t2)
-                            if r2 > 0.99:
-                                break
-            
+                        
                             
                 except:
-                    print(i, ct, "couldn't fit")
-                    #pass
-        
+                    continue
         
         if r2_opt > 0:
             pred_y = phase_wave3(obs_x, *popt_opt)
             forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
             forecasted_y = phase_wave3(forecasted_x, *popt_opt)
-
+                        
                 
     except:
         
@@ -200,9 +189,10 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
             obs_y = np.array(obs_y)
             forecasted_y = [np.inf]
                 
+            
             r2_opt = 0
             popt_opt = 0
-            for i in np.linspace(3, 5, 10).tolist():
+            for i in np.linspace(3, 4, 5).tolist():
                     
                 o_y = np.array(obs_y)
                 ct = 0
@@ -236,6 +226,7 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
                                 r2_opt = float(r2)
                                 popt_opt = popt
                                 
+                                
                     except:
                         continue
             
@@ -244,6 +235,7 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
                 forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
                 forecasted_y = phase_wave2(forecasted_x, *popt_opt)
                             
+            
                 
         except:
             
@@ -321,13 +313,15 @@ def get_logistic(obs_x, obs_y, ForecastDays):
         obs_y = np.array(obs_y)
         forecasted_y = [np.inf]
         
+        done = 0
         r2_opt = 0
         popt_opt = 0
         for i in np.linspace(3, 5, 10).tolist():
             
             o_y = np.array(obs_y)
             ct = 0
-            
+            if done == 1:
+                break
             while max(forecasted_y) > i * max(obs_y):
                 ct += 1
                 if ct > 10:
@@ -356,7 +350,7 @@ def get_logistic(obs_x, obs_y, ForecastDays):
                         if r2 > r2_opt:
                             r2_opt = float(r2)
                             popt_opt = popt
-                            
+                            #done = 1
                             
                 except:
                     continue
@@ -366,6 +360,8 @@ def get_logistic(obs_x, obs_y, ForecastDays):
             forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
             forecasted_y = logistic3(forecasted_x, *popt_opt)
                     
+        elif done == 0:
+            x = 1 + []
                 
     except:
         
@@ -376,13 +372,15 @@ def get_logistic(obs_x, obs_y, ForecastDays):
             obs_y = np.array(obs_y)
             forecasted_y = [np.inf]
             
+            done = 0
             r2_opt = 0
             popt_opt = 0
             for i in np.linspace(3, 5, 10).tolist():
                 
                 o_y = np.array(obs_y)
                 ct = 0
-                
+                if done == 1:
+                    break
                 while max(forecasted_y) > i * max(obs_y):
                     ct += 1
                     if ct > 10:
@@ -421,6 +419,8 @@ def get_logistic(obs_x, obs_y, ForecastDays):
                 forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
                 forecasted_y = logistic2(forecasted_x, *popt_opt)
                         
+            elif done == 0:
+                x = 1 + []
                 
                 
         except:
@@ -619,4 +619,3 @@ def fit_curve(condition):
     obs_y = 0
     
     return [obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params]
-
