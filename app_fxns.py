@@ -566,7 +566,7 @@ def generate_control_card2():
             dcc.Dropdown(
                 id="model-select2",
                 options=[{"label": i, "value": i} for i in models],
-                value=models[0],
+                value=models[3],
             ),
             
             
@@ -640,17 +640,13 @@ def generate_model_forecasts(loc, county, model, reset):
     ForecastDays = 60
     
     col_names =  ['obs_y', 'pred_y', 'forecasted_y', 'pred_dates', 'forecast_dates', 
-                  'label', 'obs_pred_r2', 'model', 'focal_loc', 'PopSize', 
-                  'ArrivalDate', 'pred_clr', 'fore_clr']
+                  'label', 'obs_pred_r2', 'model', 'focal_loc', 
+                  'pred_clr', 'fore_clr']
         
     fits_df = pd.DataFrame(columns = col_names)
 
-    PopSize = int()
     if county == 'Entire state or territory':
         
-        PopSize = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
-        PopSize = PopSize[0]
-    
         locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
         locs_df = locs_df[locs_df['Country/Region'] == 'US']
         locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
@@ -689,16 +685,6 @@ def generate_model_forecasts(loc, county, model, reset):
             df_sub = df_sub.reset_index(drop=True)
             #df_sub.drop(['date'], axis=1, inplace=True)
             
-            cty_pops = pd.read_pickle('DataUpdate/data/County_Pops.pkl')
-    
-            try:
-                PopSize = cty_pops[(cty_pops['State'] == loc) & (cty_pops['County'] == county)]['Population size'].iloc[0]
-        
-            except:
-                PopSize = 0
-                
-            cty_pops = 0
-    
             counties_df = 0
             
             df_sub['Province/State'] = loc
@@ -718,8 +704,6 @@ def generate_model_forecasts(loc, county, model, reset):
             col = df_sub.pop('Province/State')
             df_sub.insert(0, col.name, col)
 
-            ArrivalDate = np.nan
-            
             
         except:
             PopSize = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
@@ -735,8 +719,6 @@ def generate_model_forecasts(loc, county, model, reset):
             locs_df.drop(columns=['Unnamed: 0'], inplace=True)
 
             df_sub = locs_df[locs_df['Province/State'] == loc]
-            ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
-            ArrivalDate = ArrivalDate[0]
             locs_df = 0
             
         
@@ -757,18 +739,15 @@ def generate_model_forecasts(loc, county, model, reset):
             
         if j == 0:
             # get dates for today's predictions/forecast
-            DATES = yi[4:]
             obs_y_trunc = df_sub.iloc[0,4:].values
         else:
             # get dates for previous days predictions/forecast
-            DATES = yi[4:j]
             obs_y_trunc = df_sub.iloc[0,4:j].values
             
         
         ii = 0
         while obs_y_trunc[ii] == 0: ii+=1
         y = obs_y_trunc[ii:]
-        dates = DATES[ii:]
         
         y = list(y)
         if y != sorted(y):
@@ -787,7 +766,7 @@ def generate_model_forecasts(loc, county, model, reset):
         #    predicted y-values
         #    forecasted x and y values
         
-        condition = [x, y, model, ForecastDays, PopSize, ArrivalDate, j, iterations]
+        condition = [x, y, model, ForecastDays, j, iterations]
         conditions.append(condition)
     
     pool = Pool()
@@ -884,8 +863,8 @@ def generate_model_forecasts(loc, county, model, reset):
             
             
         output_list = [y.tolist(), pred_y.tolist(), forecasted_y.tolist(), dates, fdates,
-                       label, obs_pred_r2, model, loc, PopSize, 
-                       ArrivalDate, pred_clr, fore_clr]
+                       label, obs_pred_r2, model, loc, #PopSize, ArrivalDate, 
+                       pred_clr, fore_clr]
             
         fits_df.loc[len(fits_df)] = output_list
 
@@ -1239,7 +1218,7 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     #    forecasted x and y values
     iterations = 2
     
-    condition = [x, y, model, ForecastDays, PopSize, ArrivalDate, 0, iterations]
+    condition = [x, y, model, ForecastDays, 0, iterations]
     result = fxns.fit_curve(condition)
     obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = result
     
@@ -2685,8 +2664,11 @@ def generate_delta_testing_plot(reset):
 
 def generate_PopSize_vs_Tested(reset):
     testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
+    
+    testing_df_mrd['totalTestResults'] = np.log10(testing_df_mrd['totalTestResults'])
+    
     slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['log_PopSize'], 
-                                                                   testing_df_mrd['log_People_Tested'])
+                                                                   testing_df_mrd['totalTestResults'])
     
     pred_y = slope * testing_df_mrd['log_PopSize'] + intercept
     
@@ -2694,12 +2676,12 @@ def generate_PopSize_vs_Tested(reset):
     
     fig = go.Figure()
     
-    fig = px.scatter(testing_df_mrd, x="log_PopSize", y="log_People_Tested",
+    fig = px.scatter(testing_df_mrd, x="log_PopSize", y="totalTestResults",
                  color='%Poor',
                  symbol='color',
                  size='%Black', hover_data=['Province_State','Confirmed', 'Deaths'],
                  labels={'log_PopSize': 'log(State population size)', 
-                         'log_People_Tested': 'log(Number of tests conducted)'})
+                         'totalTestResults': 'log(Number of tests conducted)'})
     
     fig.add_trace(go.Scatter(x=testing_df_mrd['log_PopSize'], y=pred_y,
                     mode='lines',
@@ -2722,19 +2704,22 @@ def generate_PopSize_vs_Tested(reset):
 
 def generate_Negative_vs_Tested(reset):
     testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
-    slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['log_People_Tested'], testing_df_mrd['log_negative'])
     
-    pred_y = slope * testing_df_mrd['log_People_Tested'] + intercept
+    testing_df_mrd['totalTestResults'] = np.log10(testing_df_mrd['totalTestResults'])
+    
+    slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['totalTestResults'], testing_df_mrd['log_negative'])
+    
+    pred_y = slope * testing_df_mrd['totalTestResults'] + intercept
     
     lab = 'Power law slope = ' + str(np.round(slope,2)) + ', r-square = ' + str(np.round(r_value**2,2))
     
-    fig = px.scatter(testing_df_mrd, y="log_negative", x="log_People_Tested", color='%Poor',
+    fig = px.scatter(testing_df_mrd, y="log_negative", x="totalTestResults", color='%Poor',
                  symbol='color',
                  size='%Black', hover_data=['Province_State','Confirmed', 'Deaths'],
                  labels={'log_negative': 'log(Negative tests)', 
-                        'log_People_Tested': 'log(Number of tests conducted)'})
+                        'totalTestResults': 'log(Number of tests conducted)'})
     
-    fig.add_trace(go.Scatter(x=testing_df_mrd['log_People_Tested'], y=pred_y,
+    fig.add_trace(go.Scatter(x=testing_df_mrd['totalTestResults'], y=pred_y,
                     mode='lines',
                     ))
     
@@ -2756,22 +2741,25 @@ def generate_Negative_vs_Tested(reset):
 
 def generate_Positive_vs_Tested(reset):
     testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
-    slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['log_People_Tested'], testing_df_mrd['log_positive'])
     
-    pred_y = slope * testing_df_mrd['log_People_Tested'] + intercept
+    testing_df_mrd['totalTestResults'] = np.log10(testing_df_mrd['totalTestResults'])
+    
+    slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['totalTestResults'], testing_df_mrd['log_positive'])
+    
+    pred_y = slope * testing_df_mrd['totalTestResults'] + intercept
     
     lab = 'Power law slope = ' + str(np.round(slope,2)) + ', r-square = ' + str(np.round(r_value**2,2))
     
-    fig = px.scatter(testing_df_mrd, x="log_People_Tested", y="log_positive",
+    fig = px.scatter(testing_df_mrd, x="totalTestResults", y="log_positive",
                      color='%Poor',
                      symbol='color',
                      #trendline="ols",
                      size='%Black', hover_data=['state','total', 'death'],
-                     labels={'log_People_Tested': 'log(Number of tests conducted}', 
+                     labels={'totalTestResults': 'log(Number of tests conducted}', 
                              'log_positive': 'log(Positive tests)'}
                     )
     
-    fig.add_trace(go.Scatter(x=testing_df_mrd['log_People_Tested'], y=pred_y,
+    fig.add_trace(go.Scatter(x=testing_df_mrd['totalTestResults'], y=pred_y,
                     mode='lines',
                     ))
     

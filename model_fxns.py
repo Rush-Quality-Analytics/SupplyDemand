@@ -17,7 +17,7 @@ def obs_pred_rsquare(obs, pred):
 ################ Simple growth-based statistical models
 
 
-def get_gaussian(N, obs_x, obs_y, ForecastDays):
+def get_gaussian(obs_x, obs_y, ForecastDays):
     
     def gaussian1(x, n, s, m):  
         #return n**2 * (1/(s*((2*pi)**0.5))) * np.exp(-0.5 * ((x - m)/s)**2)
@@ -100,7 +100,7 @@ def get_gaussian(N, obs_x, obs_y, ForecastDays):
 
 
 
-def get_phase_wave(N, obs_x, obs_y, ForecastDays):
+def get_phase_wave(obs_x, obs_y, ForecastDays):
     
     def phase_wave1(x,  a, b, c, d, f, g):
         return  a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))
@@ -283,7 +283,7 @@ def get_phase_wave(N, obs_x, obs_y, ForecastDays):
 
 
 
-def get_logistic(N, obs_x, obs_y, ForecastDays):
+def get_logistic(obs_x, obs_y, ForecastDays):
     
     
     def logistic1(x, a, b, c, d):
@@ -472,7 +472,7 @@ def get_logistic(N, obs_x, obs_y, ForecastDays):
 
 
 
-def get_exponential(N, obs_x, obs_y, ForecastDays):
+def get_exponential(obs_x, obs_y, ForecastDays):
     # obs_x: observed x values
     # obs_y: observd y values
     # ForecastDays: number of days ahead to extend prediction
@@ -524,7 +524,7 @@ def get_exponential(N, obs_x, obs_y, ForecastDays):
         
 
 
-def get_polynomial(N, obs_x, obs_y, ForecastDays, degree=2):
+def get_polynomial(obs_x, obs_y, ForecastDays, degree=2):
     # obs_x: observed x values
     # obs_y: observd y values
     # ForecastDays: number of days ahead to extend prediction
@@ -583,7 +583,7 @@ def get_polynomial(N, obs_x, obs_y, ForecastDays, degree=2):
 
 def fit_curve(condition):
     
-    obs_x, obs_y, model, ForecastDays, N, ArrivalDate, day, iterations = condition
+    obs_x, obs_y, model, ForecastDays, day, iterations = condition
     # A function to fit various models to observed COVID-19 cases data according to:
     # obs_x: observed x values
     # obs_y: observed y values
@@ -603,23 +603,23 @@ def fit_curve(condition):
     # value for the chosen model
     
     if model == 'Phase Wave':
-        forecasted_y, forecasted_x, pred_y, params = get_phase_wave(N, obs_x, obs_y, ForecastDays)
+        forecasted_y, forecasted_x, pred_y, params = get_phase_wave(obs_x, obs_y, ForecastDays)
         obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
         
     elif model == 'Logistic (multi-phase)':
-        forecasted_y, forecasted_x, pred_y, params = get_logistic(N, obs_x, obs_y, ForecastDays)
+        forecasted_y, forecasted_x, pred_y, params = get_logistic(obs_x, obs_y, ForecastDays)
         obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
         
     elif model == 'Gaussian (multi-phase)':
-        forecasted_y, forecasted_x, pred_y, params = get_gaussian(N, obs_x, obs_y, ForecastDays)
+        forecasted_y, forecasted_x, pred_y, params = get_gaussian(obs_x, obs_y, ForecastDays)
         obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
     
     elif model == 'Exponential':
-        forecasted_y, forecasted_x, pred_y, params = get_exponential(N, obs_x, obs_y, ForecastDays)
+        forecasted_y, forecasted_x, pred_y, params = get_exponential(obs_x, obs_y, ForecastDays)
         obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
     
     elif model == 'Quadratic':
-        forecasted_y, forecasted_x, pred_y, params = get_polynomial(N, obs_x, obs_y, ForecastDays)
+        forecasted_y, forecasted_x, pred_y, params = get_polynomial(obs_x, obs_y, ForecastDays)
         obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
         
     obs_y = 0
