@@ -19,8 +19,7 @@ app.config.suppress_callback_exceptions = True
 BASE_PATH = pathlib.Path(__file__).parent.resolve()
 DATA_PATH = BASE_PATH.joinpath("data").resolve()
 
-models = ['Logistic', '2 phase sine-logistic', '2 phase logistic', 'SEIR-SD', 
-           'Gaussian', 'Quadratic', 'Exponential']
+models = ['Phase Wave', 'Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Quadratic', 'Exponential']
 
 
 ######################## DASH APP FUNCTIONS ##################################
@@ -36,8 +35,14 @@ app.layout = html.Div([
             id='df1', 
             style={'display': 'none'}
         ),
+        
         html.Div(
             id='df2',
+            style={'display': 'none'}
+        ),
+
+        html.Div(
+            id='df3',
             style={'display': 'none'}
         ),
         
@@ -96,7 +101,8 @@ app.layout = html.Div([
                                 html.Div(
                                     id="model_forecasts1",
                                     children=[
-                                        html.B("Model Forecasts. A ceiling is imposed on extreme exponential behavior."),
+                                        html.B("Model Forecasts. Exponential and Quadratic models run quickly." +
+                                               " Other models are more intensive and may take several seconds."),
                                         html.Hr(),
                                         dcc.Graph(id="model_forecasts_plot1"),
                                     ],
@@ -115,6 +121,34 @@ app.layout = html.Div([
                 html.A('Download CSV', id='model_forecast_link', download="model_forecast_data.csv",
                        href="",
                        target="_blank"),
+                html.Br(),
+                html.Br(),
+                
+                html.Div(
+                        id="Table4",
+                        children=[dcc.Loading(
+                            id="loading-7",
+                            type="default",
+                            fullscreen=False,
+                            children=[
+                                html.Div(
+                                    id="new_cases1",
+                                    children=[
+                                        html.B("New and Active Cases"),
+                                        html.Hr(),
+                                        dcc.Graph(id="new_cases_plot1"),
+                                    ],
+                                    style={'border-radius': '15px',
+                                           'box-shadow': '1px 1px 1px grey',
+                                           'background-color': '#f0f0f0',
+                                           'padding': '10px',
+                                           'margin-bottom': '10px',
+                                           'fontSize':16
+                                            },
+                                ),
+                            ],
+                        ),],),
+                
                 html.Br(),
                 html.Br(),
                 
@@ -271,9 +305,75 @@ app.layout = html.Div([
         ],
         ),
         
+        dcc.Tab(label='Employee Forecasts', children=[
+            
+        # Banner
+        html.Div(
+            id="banner4",
+            className="banner",
+            children=[html.Img(src=app.get_asset_url("RUSH_full_color.jpg"), 
+                               style={'textAlign': 'left'}),
+                      html.Img(src=app.get_asset_url("plotly_logo.png"), 
+                               style={'textAlign': 'right'})],
+            ),
+            
+            # Left column
+            html.Div(
+                id="left-column1b",
+                className="three columns",
+                children=[app_fxns.description_card1b(), app_fxns.generate_control_card2()]
+                + [
+                    html.Div(
+                        ["initial child"], id="output-clientside1b", 
+                        style={"display": "none"}
+                    )
+                ],
+                style={
+                    'border-radius': '15px',
+                    'box-shadow': '1px 1px 1px grey',
+                    'background-color': '#f0f0f0',
+                    'padding': '10px',
+                    'margin-bottom': '10px',
+                    #'fontSize':16
+                },
+            ),
+            
+            # Right column
+        html.Div(
+            id="right-column1b",
+            className="nine columns",
+            children=[html.Div(
+                        id="Table4b",
+                        children=[dcc.Loading(
+                            id="loading-7b",
+                            type="default",
+                            fullscreen=False,
+                            children=[
+                                html.Div(
+                                    id="employee_cases1",
+                                    children=[
+                                        html.B("Forecasts of new and active cases among employees"),
+                                        html.Hr(),
+                                        dcc.Graph(id="employee_forecast_plot1"),
+                                    ],
+                                    style={'border-radius': '15px',
+                                           'box-shadow': '1px 1px 1px grey',
+                                           'background-color': '#f0f0f0',
+                                           'padding': '10px',
+                                           'margin-bottom': '10px',
+                                           'fontSize':16
+                                            },
+                                ),
+                            ],
+                        ),],),
+                ],
+                ),
+                
+        ]),    
+        
+        
         
         dcc.Tab(label='Trends in Testing', children=[
-            
         
         # Banner
         html.Div(
@@ -447,12 +547,12 @@ app.layout = html.Div([
 
         ]),
         
-        dcc.Tab(label='Instructions, Details, & Contact Information', children=[
-        
+            
+        dcc.Tab(label='Instructions & Details', children=[
         
         # Banner
         html.Div(
-            id="banner4",
+            id="banner5",
             className="banner",
             children=[html.Img(src=app.get_asset_url("RUSH_full_color.jpg"), 
                                style={'textAlign': 'left'}),
@@ -786,6 +886,12 @@ def update_output2_22(value):
     return 'RESP PART FILTER REG: {}'.format(value)
 
 
+@app.callback(
+    dash.dependencies.Output('incidence rate-container', 'children'),
+    [dash.dependencies.Input('inc_rate', 'value')])
+def update_output2_23(value):
+    return 'COVID positives among your employees is {}'.format(value) + '% of that for the general population'
+
 
 
 @app.callback( # Select sub-category
@@ -800,6 +906,18 @@ def update_output15(available_options, v2):
 
 
 @app.callback( # Select sub-category
+    Output('county-select2', 'value'),
+    [
+     Input('county-select2', 'options'),
+     Input('location-select2', 'value'),
+     ],
+    )
+def update_output18(available_options, v2):
+    return available_options[0]['value']
+
+
+
+@app.callback( # Select sub-category
     Output('location-select1', 'value'),
     [
      Input('location-select1', 'options'),
@@ -807,6 +925,17 @@ def update_output15(available_options, v2):
      ],
     )
 def update_output16(available_options):
+    return available_options[0]['value']
+
+
+@app.callback( # Select sub-category
+    Output('location-select2', 'value'),
+    [
+     Input('location-select2', 'options'),
+     #Input('county-select1', 'value'),
+     ],
+    )
+def update_output19(available_options):
     return available_options[0]['value']
 
 
@@ -841,6 +970,36 @@ def update_output13(v1):
 
 
 
+@app.callback( # Update available sub_categories
+    Output('county-select2', 'options'),
+    [
+     Input('location-select2', 'value'),
+     #Input('county-select1', 'value'),
+     ],
+    )
+def update_output20(v1):
+    
+    counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
+    counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
+                                                       'Out of AL', 'Out of IL',
+                                                       'Out of CO', 'Out of GA',
+                                                       'Out of HI', 'Out of LA',
+                                                       'Out of ME', 'Out of MI',
+                                                       'Out of OK', 'Out of PR',
+                                                       'Out of TN', 'Out of UT',
+                                                       ])]
+    counties_df.drop(columns=['Unnamed: 0'], inplace=True)
+    
+    tdf = counties_df[counties_df['Province/State'] == v1]
+    counties_df = 0
+    cts = sorted(list(set(tdf['Admin2'].values.tolist())))
+    tdf = 0
+    l = 'Entire state or territory'
+    cts.insert(0, l)
+    return [{"label": i, "value": i} for i in cts]
+
+
+
 
 @app.callback( # Update available sub_categories
     Output('model-select1', 'options'),
@@ -850,20 +1009,25 @@ def update_output13(v1):
      ],
     )
 def update_output14(loc1, loc2):
-    
-    if loc2 == 'Entire state or territory':
-        m = ['Logistic', '2 phase sine-logistic', '2 phase logistic', 'SEIR-SD', 
-           'Gaussian', 'Quadratic', 'Exponential']
-    else:
-        m = ['Logistic', '2 phase sine-logistic', '2 phase logistic',
-           'Gaussian', 'Quadratic', 'Exponential']
+    return [{"label": i, "value": i} for i in models]
 
-    return [{"label": i, "value": i} for i in m]
+
+@app.callback( # Update available sub_categories
+    Output('model-select2', 'options'),
+    [
+     Input('location-select2', 'value'),
+     Input('county-select2', 'value'),
+     ],
+    )
+def update_output17(loc1, loc2):
+    return [{"label": i, "value": i} for i in models]
 
 
 
 @app.callback(
-     [Output('df1', 'children'), Output("model_forecasts_plot1", "figure")],
+     [Output('df1', 'children'), 
+      Output("model_forecasts_plot1", "figure"),
+      Output("new_cases_plot1", "figure")],
      [Input("location-select1", "value"),
       Input("county-select1", "value"),
       Input("model-select1", "value"),
@@ -883,10 +1047,10 @@ def update_model_forecast1(loc, county, model, reset_click):
 
     # Return to original hm(no colored annotation) by resetting
     df_fits = app_fxns.generate_model_forecasts(loc, county, model, reset)
-    fig = app_fxns.generate_model_forecast_plot(df_fits, reset)
+    fig1 = app_fxns.generate_model_forecast_plot(df_fits, reset)
+    fig2 = app_fxns.generate_plot_new_cases(df_fits, loc, county, reset)
     
-    return df_fits, fig
-
+    return df_fits, fig1, fig2
 
 
 @app.callback(
@@ -992,6 +1156,60 @@ def update_plot_patient_census(df_census, loc, cty, reset_click):
 
     # Return to original hm(no colored annotation) by resetting
     return app_fxns.generate_plot_patient_census(df_census, reset)
+
+
+
+@app.callback(
+     Output('df3', 'children'),
+     [Input("location-select2", "value"),
+      Input("county-select2", "value"),
+      Input("model-select2", "value"),
+      Input("reset-btn2", "n_clicks")
+     ],
+)
+def update_model_forecast2(loc, county, model, reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn2":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    df_fits = app_fxns.generate_model_forecasts(loc, county, model, reset)
+    
+    return df_fits
+
+
+@app.callback(
+    Output("employee_forecast_plot1", "figure"),
+    [Input('df3', 'children'),
+     Input("location-select2", "value"),
+     Input('county-select2', 'value'),
+     Input("employees", "value"),
+     Input("inc_rate", "value"),
+     Input("furlough", "value"),
+     Input("reset-btn2", "n_clicks")],
+)
+
+def update_plot_employee_forecast(df_census, loc, cty, employees, inc_rate, furlough, reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn2":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    return app_fxns.generate_plot_employee_forecast1(df_census, loc, cty, employees, inc_rate, furlough, reset)
+
+
 
 
 @app.callback(
@@ -1337,4 +1555,4 @@ def update_generate_ventilator_vs_ICU_plot(reset_click):
 
 # Run the server
 if __name__ == "__main__":
-    app.run_server(host='127.0.0.1', port=8050, debug=True)
+    app.run_server(host='127.0.0.1', port=8050, debug=True, threaded=False, processes=11)
