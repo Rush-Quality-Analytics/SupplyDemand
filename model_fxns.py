@@ -108,8 +108,28 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
     def phase_wave2(x,  a, b, c, d, f, g,   a1, b1, c1, d1, g1, f1):
         return  a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))   +   a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1))
     
-    def phase_wave3(x,  a, b, c, d, f, g,   a1, b1, c1, d1, g1, f1,   a2, b2, c2, d2, g2, f2):
-        return  a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))   +   a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1))   +   a2 / (d2 + np.exp(-c2 * (x + g2*np.sin(f2*x)) + b2))
+    def phase_wave3(x,  
+                    a, b, c, d, f, g,   
+                    a1, b1, c1, d1, g1, f1,   
+                    a2, b2, c2, d2, g2, f2,
+                    #a3, b3, c3, d3, g3, f3,
+                    #a4, b4, c4, d4, g4, f4,
+                    ):
+        
+        y = a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))
+        
+        y = y + a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1))
+        
+        y = y + a2 / (d2 + np.exp(-c2 * (x + g2*np.sin(f2*x)) + b2))
+        
+        #y = y + a3 / (d3 + np.exp(-c3 * (x + g3*np.sin(f3*x)) + b3))
+        
+        #y = y + a4 / (d4 + np.exp(-c4 * (x + g4*np.sin(f4*x)) + b4))
+        
+        
+        return y
+        
+        #return  a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))   +   a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1))   +   a2 / (d2 + np.exp(-c2 * (x + g2*np.sin(f2*x)) + b2))
     
     # obs_x: observed x values
     # obs_y: observd y values
@@ -132,47 +152,76 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
         obs_x = np.array(obs_x)
         obs_y = np.array(obs_y)
         forecasted_y = [np.inf]
-            
+        forecasted_x = [0]
+        pred_y = [np.inf]
+        r2_opt = 1
+        popt_opt = 1
+        try:
+            popt, pcov = curve_fit(phase_wave3, 
+                                   obs_x, 
+                                   obs_y, 
+                                   sigma= 1 - 1/obs_y,
+                                   absolute_sigma=True,
+                                   method='lm', 
+                                   maxfev=40000)
+                    
+            pred_y = phase_wave3(obs_x, *popt)
+                    
+            # extend x values by number of ForecastDays
+            forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+            # get corresponding forecasted y values, i.e., extend the predictions
+            forecasted_y = phase_wave3(forecasted_x, *popt)
         
-        r2_opt = 0
-        popt_opt = 0
-        for i in [3]:
-                
-            o_y = np.array(obs_y)
-            ct = 0
+        except:
+            pass
+        
+        if max(forecasted_y) <= 3 * max(obs_y) and max(forecasted_y) >= max(obs_y):
+            popt_opt = (popt)
+            pass
+
+        else:
             
-            while max(forecasted_y) > i * max(obs_y):
-                ct += 1
-                if ct > 10:
-                    break
+            r2_opt = 0
+            popt_opt = 0
+            for i in [3]:
+                    
+                o_y = np.array(obs_y)
+                ct = 0
                 
-                try:
-                    popt, pcov = curve_fit(phase_wave3, 
-                                           obs_x, 
-                                           o_y, 
-                                           sigma= 1 - 1/o_y,
-                                           absolute_sigma=True,
-                                           method='lm', 
-                                           maxfev=40000)
+                while max(forecasted_y) > i * max(obs_y):
+                    ct += 1
+                    if ct > 10:
+                        break
                     
-                    pred_y = phase_wave3(obs_x, *popt)
-                    
-                    # extend x values by number of ForecastDays
-                    forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
-                    # get corresponding forecasted y values, i.e., extend the predictions
-                    forecasted_y = phase_wave3(forecasted_x, *popt)
-                    
-                    if max(forecasted_y) > i * max(obs_y):
-                        o_y[-1] = o_y[-1] - ((o_y[-1] - o_y[-2]) * 0.5)
-                    else:
-                        r2 = obs_pred_rsquare(obs_y, pred_y)
-                        if r2 > r2_opt:
-                            r2_opt = float(r2)
-                            popt_opt = popt
+                    try:
+                        popt, pcov = curve_fit(phase_wave3, 
+                                               obs_x, 
+                                               o_y, 
+                                               sigma= 1 - 1/o_y,
+                                               absolute_sigma=True,
+                                               method='lm', 
+                                               maxfev=40000)
                         
+                        pred_y = phase_wave3(obs_x, *popt)
+                        
+                        # extend x values by number of ForecastDays
+                        forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+                        # get corresponding forecasted y values, i.e., extend the predictions
+                        forecasted_y = phase_wave3(forecasted_x, *popt)
+                        
+                        if max(forecasted_y) > i * max(obs_y):
                             
-                except:
-                    continue
+                            o_y[-2:] = o_y[-2:]**0.999
+                        
+                        else:
+                            r2 = obs_pred_rsquare(obs_y, pred_y)
+                            if r2 > r2_opt:
+                                r2_opt = float(r2)
+                                popt_opt = popt
+                            
+                                
+                    except:
+                        continue
         
         if r2_opt > 0:
             pred_y = phase_wave3(obs_x, *popt_opt)
@@ -188,52 +237,82 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
             obs_x = np.array(obs_x)
             obs_y = np.array(obs_y)
             forecasted_y = [np.inf]
-                
+            forecasted_x = [0]
+            pred_y = [np.inf]
+            r2_opt = 1
+            popt_opt = 1
+            try:
+                popt, pcov = curve_fit(phase_wave3, 
+                                       obs_x, 
+                                       obs_y, 
+                                       sigma= 1 - 1/obs_y,
+                                       absolute_sigma=True,
+                                       method='lm', 
+                                       maxfev=40000)
+                        
+                pred_y = phase_wave3(obs_x, *popt)
+                        
+                # extend x values by number of ForecastDays
+                forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+                # get corresponding forecasted y values, i.e., extend the predictions
+                forecasted_y = phase_wave3(forecasted_x, *popt)
             
-            r2_opt = 0
-            popt_opt = 0
-            for i in [3]:
-                    
-                o_y = np.array(obs_y)
-                ct = 0
+            except:
+                pass
+            
+            if max(forecasted_y) <= 2 * max(obs_y) and max(forecasted_y) >= max(obs_y):
+                popt_opt = (popt)
+                pass
+    
+            else:
                 
-                while max(forecasted_y) > i * max(obs_y):
-                    ct += 1
-                    if ct > 10:
-                        break
+                r2_opt = 0
+                popt_opt = 0
+                for i in [2]:
+                        
+                    o_y = np.array(obs_y)
+                    ct = 0
                     
-                    try:
-                        popt, pcov = curve_fit(phase_wave2, 
-                                               obs_x, 
-                                               o_y, 
-                                               sigma= 1 - 1/o_y,
-                                               absolute_sigma=True,
-                                               method='lm', 
-                                               maxfev=40000)
+                    while max(forecasted_y) > i * max(obs_y):
+                        ct += 1
+                        if ct > 10:
+                            break
                         
-                        pred_y = phase_wave2(obs_x, *popt)
-                        
-                        # extend x values by number of ForecastDays
-                        forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
-                        # get corresponding forecasted y values, i.e., extend the predictions
-                        forecasted_y = phase_wave2(forecasted_x, *popt)
-                        
-                        if max(forecasted_y) > i * max(obs_y):
-                            o_y[-1] = o_y[-1] - ((o_y[-1] - o_y[-2]) * 0.5)
-                        else:
-                            r2 = obs_pred_rsquare(obs_y, pred_y)
-                            if r2 > r2_opt:
-                                r2_opt = float(r2)
-                                popt_opt = popt
+                        try:
+                            popt, pcov = curve_fit(phase_wave3, 
+                                                   obs_x, 
+                                                   o_y, 
+                                                   sigma= 1 - 1/o_y,
+                                                   absolute_sigma=True,
+                                                   method='lm', 
+                                                   maxfev=40000)
+                            
+                            pred_y = phase_wave3(obs_x, *popt)
+                            
+                            # extend x values by number of ForecastDays
+                            forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+                            # get corresponding forecasted y values, i.e., extend the predictions
+                            forecasted_y = phase_wave3(forecasted_x, *popt)
+                            
+                            if max(forecasted_y) > i * max(obs_y):
                                 
+                                #o_y[-1] = o_y[-1] - ((o_y[-1] - o_y[-2]) * 0.5)
+                                o_y[-2:] = o_y[-2:]**0.999
+                            
+                            else:
+                                r2 = obs_pred_rsquare(obs_y, pred_y)
+                                if r2 > r2_opt:
+                                    r2_opt = float(r2)
+                                    popt_opt = popt
                                 
-                    except:
-                        continue
+                                    
+                        except:
+                            continue
             
             if r2_opt > 0:
-                pred_y = phase_wave2(obs_x, *popt_opt)
+                pred_y = phase_wave3(obs_x, *popt_opt)
                 forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
-                forecasted_y = phase_wave2(forecasted_x, *popt_opt)
+                forecasted_y = phase_wave3(forecasted_x, *popt_opt)
                             
             
                 
