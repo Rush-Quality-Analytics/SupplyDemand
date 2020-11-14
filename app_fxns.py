@@ -46,7 +46,7 @@ counties = list(set(counties_df['Admin2']))
 counties.append('Entire state or territory')
 counties_df = 0
 
-models = ['Phase Wave', 'Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Quadratic', 'Exponential']
+models = ['Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Phase Wave', 'Quadratic', 'Exponential']
 
 day_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 
             'Friday', 'Saturday','Sunday']
