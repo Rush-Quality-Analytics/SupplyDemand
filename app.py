@@ -19,7 +19,7 @@ app.config.suppress_callback_exceptions = True
 BASE_PATH = pathlib.Path(__file__).parent.resolve()
 DATA_PATH = BASE_PATH.joinpath("data").resolve()
 
-models = ['Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Phase Wave', 'Quadratic', 'Exponential']
+models = ['Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Phase Wave', 'Time series analysis', 'Quadratic', 'Exponential']
 
 
 ######################## DASH APP FUNCTIONS ##################################

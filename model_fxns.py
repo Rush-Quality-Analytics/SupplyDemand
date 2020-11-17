@@ -62,7 +62,9 @@ def most_likely(y0, n1, n2, r = 8):
     return exp_y
 
 
-def WAF(obs_y, ForecastDays):
+def get_WAF(obs_x, obs_y, ForecastDays):
+    
+    def get_results(obs_y, ForecastDays):
     
         c = 1
         obs_y = np.array(obs_y) + 1
@@ -161,18 +163,53 @@ def WAF(obs_y, ForecastDays):
             
         forecasted_y = pred_y + forecasted_y[z:]
         return pred_y, forecasted_y
+    
+    
+    forecasted_y = [np.inf]
+    o_y = np.array(obs_y)
+    
+    pred_y, forecasted_y = get_results(o_y, ForecastDays)
+    pred_y = [sum(pred_y[0:x:1]) for x in range(len(pred_y)+1)][:-1]
+    forecasted_y = [sum(forecasted_y[0:x:1]) for x in range(len(forecasted_y)+1)][:-1]
+    
+    ct = 0
+    i = 1
+    while max(forecasted_y) > 2*max(obs_y):
+        
+        o_y[-i:] = o_y[-i:] - ((o_y[-i:] - o_y[-i-1]) * 0.001)
+        
+        pred_y, forecasted_y = get_results(o_y, ForecastDays)
+        pred_y = [sum(pred_y[0:x:1]) for x in range(len(pred_y)+1)][:-1]
+        forecasted_y = [sum(forecasted_y[0:x:1]) for x in range(len(forecasted_y)+1)][:-1]
+        
+        ct += 1
+    
+    
+    forecasted_x = list(range(len(forecasted_y)))
+    params = []
+
+    #print('---pred_y', len(pred_y), ' : obs_y', len(obs_y))
+    #print('---forecasted_y', len(forecasted_y), ' : ', 'obs_y + FD', len(obs_y) + ForecastDays - 1, '\n')
+        
+    return forecasted_y, forecasted_x, pred_y, params
 
 
 
 
 def opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model):
     
+    cf = 0.5
+    i = 3
+    if model == 'WAF':
+        cf = 0.001
+        i = 2
+
     r2_opt = 0
     ct = 0
-    i = 3
+    
     popt_opt = 0
     o_y = np.array(obs_y)
-    o_y[-1] = o_y[-1] - ((o_y[-1] - o_y[-2]) * 0.5)
+    o_y[-1] = o_y[-1] - ((o_y[-1] - o_y[-2]) * cf)
 
         
     while max(forecasted_y) > i * max(obs_y):
@@ -180,9 +217,9 @@ def opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model):
         if ct > 10:
             break
         
-        if model == 'WAF':
-            pred_y, forecasted_y = WAF(o_y, ForecastDays)
-            forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+        #if model == 'WAF':
+        #    pred_y, forecasted_y = WAF(o_y, ForecastDays)
+        #    forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
             
         if model == 'phase_wave3':
             popt, pcov = curve_fit(phase_wave3, obs_x, o_y, sigma= 1 - 1/o_y,
@@ -217,14 +254,14 @@ def opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model):
             r2_opt = float(r2)
             popt_opt = popt
             
-        o_y[-1] = o_y[-1] - ((o_y[-1] - o_y[-2]) * 0.5)
+        o_y[-1] = o_y[-1] - ((o_y[-1] - o_y[-2]) * cf)
     
     
-    if model == 'WAF':
-        pred_y, forecasted_y = WAF(o_y, ForecastDays)
-        forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+    #if model == 'WAF':
+    #    pred_y, forecasted_y = WAF(o_y, ForecastDays)
+    #    forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
         
-    elif model == 'phase_wave3':
+    if model == 'phase_wave3':
         pred_y = phase_wave3(obs_x, *popt_opt)
         forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
         forecasted_y = phase_wave3(forecasted_x, *popt_opt)
@@ -249,7 +286,7 @@ def opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model):
 
 
 
-
+'''
 def get_WAF(obs_x, obs_y, ForecastDays):
     
     forecasted_y = [np.inf]
@@ -275,7 +312,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
     params = []
 
     return forecasted_y, forecasted_x, pred_y, params
-
+'''
 
 
 
@@ -1059,7 +1096,7 @@ def fit_curve(condition):
         forecasted_y, forecasted_x, pred_y, params = get_phase_wave(obs_x, obs_y, ForecastDays)
         obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
     
-    elif model == 'WAF':
+    elif model == 'Time series analysis':
         forecasted_y, forecasted_x, pred_y, params = get_WAF(obs_x, obs_y, ForecastDays)
         obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
         

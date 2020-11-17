@@ -46,7 +46,7 @@ counties = list(set(counties_df['Admin2']))
 counties.append('Entire state or territory')
 counties_df = 0
 
-models = ['Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Phase Wave', 'Quadratic', 'Exponential']
+models = ['Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Phase Wave', 'Time series analysis', 'Quadratic', 'Exponential']
 
 day_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 
             'Friday', 'Saturday','Sunday']
@@ -316,12 +316,13 @@ def generate_control_card1():
             ),
             
             html.Br(),
-            html.P("Select a model"),
+            html.P("Select a model."),
             dcc.Dropdown(
                 id="model-select1",
                 options=[{"label": i, "value": i} for i in models],
                 value=models[0],
             ),
+            html.P("Most of these models are intensive to compute. So, allow the current model to finish before picking another model, county, or state. Otherwise, the app could time-out and you will need to refresh the page."),
             
             
             html.Br(),
