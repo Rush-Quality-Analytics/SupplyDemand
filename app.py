@@ -1029,7 +1029,8 @@ def update_output17(loc1, loc2):
     
 
 @app.callback(
-     Output('df1', 'children'), 
+     [Output('df1', 'children'), 
+      Output("model_forecasts_plot1", "figure")],
      [Input("location-select1", "value"),
       Input("county-select1", "value"),
       Input("model-select1", "value"),
@@ -1049,31 +1050,10 @@ def update_model_forecast1(loc, county, model, reset_click):
             reset = True
 
     df_fits = app_fxns.generate_model_forecasts(loc, county, model, reset)
+    fig1 = app_fxns.generate_model_forecast_plot(df_fits, reset)
     
-    return df_fits
+    return df_fits, fig1
 
-
-
-
-@app.callback(
-     Output("model_forecasts_plot1", "figure"),
-     [Input('df1', 'children'), 
-      Input("reset-btn1", "n_clicks")
-     ],
-)
-def update_model_forecast11(df, reset_click):
-    
-    reset = False
-    # Find which one has been triggered
-    ctx = dash.callback_context
-
-    if ctx.triggered:
-        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
-        if prop_id == "reset-btn1":
-            reset = True
-
-    fig1 = app_fxns.generate_model_forecast_plot(df, reset)
-    return fig1
 
 
 
