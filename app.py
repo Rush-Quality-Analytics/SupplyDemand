@@ -31,6 +31,7 @@ app.layout = html.Div([
     dcc.Tabs([
         dcc.Tab(label='COVID Calculator', children=[
         
+        
         html.Div(
             id='df1', 
             style={'display': 'none'}
@@ -1024,13 +1025,15 @@ def update_output17(loc1, loc2):
 
 
 
+
+    
+
 @app.callback(
-     [Output('df1', 'children'), 
-      Output("model_forecasts_plot1", "figure"),
-      Output("new_cases_plot1", "figure")],
+     Output('df1', 'children'), 
      [Input("location-select1", "value"),
       Input("county-select1", "value"),
       Input("model-select1", "value"),
+      #Input("add-forecast1", "n_clicks"),
       Input("reset-btn1", "n_clicks")
      ],
 )
@@ -1045,12 +1048,63 @@ def update_model_forecast1(loc, county, model, reset_click):
         if prop_id == "reset-btn1":
             reset = True
 
-    # Return to original hm(no colored annotation) by resetting
     df_fits = app_fxns.generate_model_forecasts(loc, county, model, reset)
-    fig1 = app_fxns.generate_model_forecast_plot(df_fits, reset)
-    fig2 = app_fxns.generate_plot_new_cases(df_fits, loc, county, reset)
     
-    return df_fits, fig1, fig2
+    return df_fits
+
+
+
+
+@app.callback(
+     Output("model_forecasts_plot1", "figure"),
+     [Input('df1', 'children'), 
+      Input("reset-btn1", "n_clicks")
+     ],
+)
+def update_model_forecast11(df, reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    fig1 = app_fxns.generate_model_forecast_plot(df, reset)
+    return fig1
+
+
+
+
+@app.callback(
+      Output("new_cases_plot1", "figure"),
+     [Input('df1', 'children'), 
+      Input("location-select1", "value"),
+      Input("county-select1", "value"),
+      Input("reset-btn1", "n_clicks")
+     ],
+)
+def update_model_forecast111(df, loc, county, reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    fig = app_fxns.generate_plot_new_cases(df, loc, county, reset)
+    
+    return fig
+
+
+
+
+
 
 
 @app.callback(

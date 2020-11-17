@@ -316,7 +316,7 @@ def generate_control_card1():
             ),
             
             html.Br(),
-            html.P("Select a model."),
+            html.P("Select a model"),
             dcc.Dropdown(
                 id="model-select1",
                 options=[{"label": i, "value": i} for i in models],
@@ -324,6 +324,12 @@ def generate_control_card1():
             ),
             html.P("Most of these models are intensive to compute. So, allow the current model to finish before picking another model, county, or state. Otherwise, the app could time-out and you will need to refresh the page."),
             
+            #html.Br(),
+            #html.Div(
+            #    id="add-forecast",
+            #    children=html.Button(id="add-forecast1", children="Plot prior day's forecast", n_clicks=10),
+            #),
+            #html.P("Each click will add a previous day's forecast to the top figure."),
             
             html.Br(),
             html.Hr(),
@@ -902,47 +908,50 @@ def generate_model_forecast_plot(fits_df, reset):
     
     for i, label in enumerate(labels):
             
-        sub_df = fits_df[fits_df['label'] == label]
-        r2 = sub_df['obs_pred_r2'].iloc[0]
-        
-        dates = sub_df['pred_dates'].iloc[0]
-        clr = sub_df['pred_clr'].iloc[0]
-        obs_y = sub_df['obs_y'].iloc[0]
-        if label == 'Current forecast':
+        try:
+            sub_df = fits_df[fits_df['label'] == label]
+            r2 = sub_df['obs_pred_r2'].iloc[0]
+            
+            dates = sub_df['pred_dates'].iloc[0]
+            clr = sub_df['pred_clr'].iloc[0]
+            obs_y = sub_df['obs_y'].iloc[0]
+            if label == 'Current forecast':
+                fig_data.append(
+                    go.Scatter(
+                        x=dates,
+                        y=obs_y,
+                        mode="markers",
+                        name='Observed',
+                        opacity=0.75,
+                        marker=dict(color='#262626', size=10)
+                    )
+                )
+            
+            
+            fdates = sub_df['forecast_dates'].iloc[0]
+            forecasted_y = sub_df['forecasted_y'].iloc[0]
+            clr = sub_df['fore_clr'].iloc[0]
+            #focal_loc = sub_df['focal_loc'].iloc[0]
+            #popsize = sub_df['PopSize'].iloc[0]
+                
+            pred_y = sub_df['pred_y'].iloc[0]
+            # plot forecasted y values vs. dates
+            l = int(len(pred_y)+ForecastDays)
+                
+            forecasted_y = forecasted_y[0 : l]
+            fdates = fdates[0 : l]
+            
             fig_data.append(
                 go.Scatter(
-                    x=dates,
-                    y=obs_y,
-                    mode="markers",
-                    name='Observed',
-                    opacity=0.75,
-                    marker=dict(color='#262626', size=10)
+                    x=fdates,
+                    y=forecasted_y,
+                    name=label + ': r<sup>2</sup> = ' + str(np.round(r2, 3)),
+                    mode="lines",
+                    line=dict(color=clr, width=2)
                 )
             )
-        
-        
-        fdates = sub_df['forecast_dates'].iloc[0]
-        forecasted_y = sub_df['forecasted_y'].iloc[0]
-        clr = sub_df['fore_clr'].iloc[0]
-        #focal_loc = sub_df['focal_loc'].iloc[0]
-        #popsize = sub_df['PopSize'].iloc[0]
-            
-        pred_y = sub_df['pred_y'].iloc[0]
-        # plot forecasted y values vs. dates
-        l = int(len(pred_y)+ForecastDays)
-            
-        forecasted_y = forecasted_y[0 : l]
-        fdates = fdates[0 : l]
-        
-        fig_data.append(
-            go.Scatter(
-                x=fdates,
-                y=forecasted_y,
-                name=label + ': r<sup>2</sup> = ' + str(np.round(r2, 3)),
-                mode="lines",
-                line=dict(color=clr, width=2)
-            )
-        )
+        except:
+            pass
         
 
     figure = go.Figure(
