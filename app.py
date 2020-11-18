@@ -48,6 +48,8 @@ app.layout = html.Div([
         ),
         
         
+        
+        
         # Banner
         html.Div(
             id="banner1",
@@ -1026,8 +1028,6 @@ def update_output17(loc1, loc2):
 
 
 
-    
-
 @app.callback(
      [Output('df1', 'children'), 
       Output("model_forecasts_plot1", "figure")],
@@ -1056,8 +1056,6 @@ def update_model_forecast1(loc, county, model, reset_click):
 
 
 
-
-
 @app.callback(
       Output("new_cases_plot1", "figure"),
      [Input('df1', 'children'), 
@@ -1080,10 +1078,6 @@ def update_model_forecast111(df, loc, county, reset_click):
     fig = app_fxns.generate_plot_new_cases(df, loc, county, reset)
     
     return fig
-
-
-
-
 
 
 
