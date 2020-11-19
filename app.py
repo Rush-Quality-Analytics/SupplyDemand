@@ -19,7 +19,7 @@ app.config.suppress_callback_exceptions = True
 BASE_PATH = pathlib.Path(__file__).parent.resolve()
 DATA_PATH = BASE_PATH.joinpath("data").resolve()
 
-models = ['Phase Wave', 'Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Quadratic', 'Exponential']
+models = ['Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Phase Wave', 'Time series analysis', 'Quadratic', 'Exponential']
 
 
 ######################## DASH APP FUNCTIONS ##################################
@@ -30,6 +30,7 @@ models = ['Phase Wave', 'Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Qua
 app.layout = html.Div([
     dcc.Tabs([
         dcc.Tab(label='COVID Calculator', children=[
+        
         
         html.Div(
             id='df1', 
@@ -45,6 +46,8 @@ app.layout = html.Div([
             id='df3',
             style={'display': 'none'}
         ),
+        
+        
         
         
         # Banner
@@ -370,6 +373,183 @@ app.layout = html.Div([
                 ),
                 
         ]),    
+        
+        
+        
+        dcc.Tab(label='Trends in Testing', children=[
+        
+        # Banner
+        html.Div(
+            id="banner2",
+            className="banner",
+            children=[html.Img(src=app.get_asset_url("RUSH_full_color.jpg"), 
+                               style={'textAlign': 'left'}),
+                      html.Img(src=app.get_asset_url("plotly_logo.png"), 
+                               style={'textAlign': 'right'})],
+        ),
+        # Left column
+        html.Div(
+            id="left-column2",
+            className="six columns",
+            children=[# Plot of model forecast
+                html.Div(
+                    id="map1",
+                    style={'fontSize':16},
+                    children=[
+                        html.B("Testing Rate: total test results (- & +) per 100,000 persons."),
+                        html.Hr(),
+                        dcc.Graph(id="testing_rate_map"),
+                    ],
+                ),
+                html.Div(
+                    id="map2",
+                    style={'fontSize':16},
+                    children=[
+                        html.B("Positive tests per capita"),
+                        html.Hr(),
+                        dcc.Graph(id="positive_tests_per_capita_map"),
+                    ],
+                ),
+                html.Div(
+                    id="delta_testing_rate",
+                    style={'fontSize':16},
+                    children=[
+                        html.B("Change in testing rate across time"),
+                        html.Hr(),
+                        dcc.Graph(id="delta_testing_rate_plot"),
+                    ],
+                ),
+                html.Div(
+                    id="Negative_vs_Tested",
+                    style={'fontSize':16},
+                    children=[
+                        html.B("Number of negative tests vs. Number of tests conducted"),
+                        html.Hr(),
+                        dcc.Graph(id="generate_negative_vs_tested"),
+                    ],
+                ),
+                ]
+        ),
+        # Right column
+        html.Div(
+            id="right-column2",
+            className="six columns",
+            children=[
+                
+                # Plot of model forecast
+                html.Div(
+                    id="map3",
+                    style={'fontSize':16},
+                    children=[
+                        html.B("Percent positive results"),
+                        html.Hr(),
+                        dcc.Graph(id="percent_positive_tests_map"),
+                    ],
+                ),
+                
+                html.Div(
+                    id="map4",
+                    style={'fontSize':16},
+                    children=[
+                        html.B("Rate of change in testing across time"),
+                        html.Hr(),
+                        dcc.Graph(id="testing_rate_change_map"),
+                    ],
+                ),
+                
+                html.Div(
+                    id="PopSize_vs_Tested",
+                    style={'fontSize':16},
+                    children=[
+                        html.B("Number of tests conducted vs. State population size"),
+                        html.Hr(),
+                        dcc.Graph(id="generate_PopSize_vs_Tested"),
+                    ],
+                ),
+                html.Div(
+                    id="Positive_vs_Tested",
+                    style={'fontSize':16},
+                    children=[
+                        html.B("Number of positive tests vs. Number of tests conducted. "),
+                        html.Hr(),
+                        dcc.Graph(id="generate_Positive_vs_Tested"),
+                    ],
+                ),
+            ],
+        ),
+        
+
+        ]),
+        
+        dcc.Tab(label='Trends in Hospitalizations', children=[
+            
+        # Banner
+        html.Div(
+            id="banner3",
+            className="banner",
+            children=[html.Img(src=app.get_asset_url("RUSH_full_color.jpg"), 
+                               style={'textAlign': 'left'}),
+                      html.Img(src=app.get_asset_url("plotly_logo.png"), 
+                               style={'textAlign': 'right'})],
+        ),
+        # Left column
+        html.Div(
+            id="left-column3",
+            className="six columns",
+            children=[# Plot of model forecast
+                html.Div(
+                    id="map5",
+                    style={'fontSize':16},
+                    children=[
+                        html.B("Currently hospitalized. "),
+                        html.B(" Data on hospitalization rate are not currently available"),
+                        html.Hr(),
+                        dcc.Graph(id="hospitilization_rate_map"),
+                    ],
+                ),
+                html.Div(
+                    id="ICU_vs_Hospitalized",
+                    style={'fontSize':16},
+                    children=[
+                        html.B("Number of patients in ICU vs. Number hospitalized"),
+                        html.Hr(),
+                        dcc.Graph(id="generate_ICU_vs_Hospitalized"),
+                    ],
+                ),
+                
+                ]
+        ),
+        # Right column
+        html.Div(
+            id="right-column3",
+            className="six columns",
+            children=[
+                
+                # Plot of model forecast
+                html.Div(
+                    id="map6",
+                    style={'fontSize':16},
+                    children=[
+                        html.B("Currently in ICU"),
+                        html.Hr(),
+                        dcc.Graph(id="cumulative_hospitalizations_map"),
+                    ],
+                ),
+                html.Div(
+                    id="Vent_vs_ICU",
+                    style={'fontSize':16},
+                    children=[
+                        html.B("Number of patients on ventilator vs. Number of patients in ICU"),
+                        html.Hr(),
+                        dcc.Graph(id="generate_ventilator_vs_ICU"),
+                    ],
+                ),
+            ],
+        ),
+        
+
+        ]),
+        
             
         dcc.Tab(label='Instructions & Details', children=[
         
@@ -847,13 +1027,14 @@ def update_output17(loc1, loc2):
 
 
 
+
 @app.callback(
      [Output('df1', 'children'), 
-      Output("model_forecasts_plot1", "figure"),
-      Output("new_cases_plot1", "figure")],
+      Output("model_forecasts_plot1", "figure")],
      [Input("location-select1", "value"),
       Input("county-select1", "value"),
       Input("model-select1", "value"),
+      #Input("add-forecast1", "n_clicks"),
       Input("reset-btn1", "n_clicks")
      ],
 )
@@ -868,12 +1049,36 @@ def update_model_forecast1(loc, county, model, reset_click):
         if prop_id == "reset-btn1":
             reset = True
 
-    # Return to original hm(no colored annotation) by resetting
     df_fits = app_fxns.generate_model_forecasts(loc, county, model, reset)
     fig1 = app_fxns.generate_model_forecast_plot(df_fits, reset)
-    fig2 = app_fxns.generate_plot_new_cases(df_fits, loc, county, reset)
     
-    return df_fits, fig1, fig2
+    return df_fits, fig1
+
+
+
+@app.callback(
+      Output("new_cases_plot1", "figure"),
+     [Input('df1', 'children'), 
+      Input("location-select1", "value"),
+      Input("county-select1", "value"),
+      Input("reset-btn1", "n_clicks")
+     ],
+)
+def update_model_forecast111(df, loc, county, reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    fig = app_fxns.generate_plot_new_cases(df, loc, county, reset)
+    
+    return fig
+
 
 
 @app.callback(
@@ -1129,6 +1334,249 @@ def update_table_ppe(df, loc, cty, reset_click):
 
     # Return to original hm(no colored annotation) by resetting
     return app_fxns.generate_ppe_table(df, reset)
+
+
+
+
+
+
+
+
+
+
+
+@app.callback(
+    Output("testing_rate_map", "figure"),
+    [Input("reset-btn1", "n_clicks")],
+)
+def update_map1(reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    return app_fxns.map1(reset)
+
+
+@app.callback(
+    Output("positive_tests_per_capita_map", "figure"),
+    [Input("reset-btn1", "n_clicks")],
+)
+def update_map2(reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    return app_fxns.map2(reset)
+
+
+@app.callback(
+    Output("percent_positive_tests_map", "figure"),
+    [Input("reset-btn1", "n_clicks")],
+)
+def update_map3(reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    return app_fxns.map3(reset)
+
+
+@app.callback(
+    Output("testing_rate_change_map", "figure"),
+    [Input("reset-btn1", "n_clicks")],
+)
+def update_map4(reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    return app_fxns.map4(reset)
+
+
+
+@app.callback(
+    Output("hospitilization_rate_map", "figure"),
+    [Input("reset-btn1", "n_clicks")],
+)
+def update_map5(reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    return app_fxns.map5(reset)
+
+
+
+@app.callback(
+    Output("cumulative_hospitalizations_map", "figure"),
+    [Input("reset-btn1", "n_clicks")],
+)
+def update_map6(reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    return app_fxns.map6(reset)
+
+
+
+
+@app.callback(
+    Output("delta_testing_rate_plot", "figure"),
+    [Input("reset-btn1", "n_clicks")],
+)
+def update_generate_delta_testing_plot(reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    return app_fxns.generate_delta_testing_plot(reset)
+
+
+
+@app.callback(
+    Output("generate_PopSize_vs_Tested", "figure"),
+    [Input("reset-btn1", "n_clicks")],
+)
+def update_generate_PopSize_vs_Tested_plot(reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    return app_fxns.generate_PopSize_vs_Tested(reset)
+
+
+@app.callback(
+    Output("generate_negative_vs_tested", "figure"),
+    [Input("reset-btn1", "n_clicks")],
+)
+def update_generate_Negative_vs_Tested_plot(reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    return app_fxns.generate_Negative_vs_Tested(reset)
+
+
+@app.callback(
+    Output("generate_Positive_vs_Tested", "figure"),
+    [Input("reset-btn1", "n_clicks")],
+)
+def update_generate_Positive_vs_Tested_plot(reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    return app_fxns.generate_Positive_vs_Tested(reset)
+
+
+
+@app.callback(
+    Output("generate_ICU_vs_Hospitalized", "figure"),
+    [Input("reset-btn1", "n_clicks")],
+)
+def update_generate_ICU_vs_Hospitalized_plot(reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    return app_fxns.generate_ICU_vs_Hospitalized(reset)
+
+
+@app.callback(
+    Output("generate_ventilator_vs_ICU", "figure"),
+    [Input("reset-btn1", "n_clicks")],
+)
+def update_generate_ventilator_vs_ICU_plot(reset_click):
+    
+    reset = False
+    # Find which one has been triggered
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if prop_id == "reset-btn1":
+            reset = True
+
+    # Return to original hm(no colored annotation) by resetting
+    return app_fxns.generate_ventilator_vs_ICU(reset)
 
 
 
