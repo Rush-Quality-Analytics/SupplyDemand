@@ -64,6 +64,16 @@ def most_likely(y0, n1, n2, r = 8):
 
 def get_WAF(obs_x, obs_y, ForecastDays):
     
+    def smooth(x):
+        xx = list(range(len(x))) #np.linspace(n0.min(), n0.max(), len(n0))
+        # interpolate + smooth
+        itp = interp1d(xx, x, kind='linear')
+        window_size, poly_order = 41, 3
+        x = savgol_filter(itp(xx), window_size, poly_order)
+        
+        return x
+        
+        
     def get_results(obs_y, ForecastDays):
     
         c = 1
@@ -77,19 +87,15 @@ def get_WAF(obs_x, obs_y, ForecastDays):
         # We assume the number of new cases reported on the first day is equal to the first 
         # value in obs_y, since nothing was reported before the first day.
         
+        #obs_y = smooth(obs_y)
+        
         n0 = [obs_y[0]]
         for i, val in enumerate(obs_y):
             if i > 0:
                 n0.append(obs_y[i] - obs_y[i-1])
         
         
-        xx = list(range(len(n0))) #np.linspace(n0.min(), n0.max(), len(n0))
-        # interpolate + smooth
-        itp = interp1d(xx, n0, kind='linear')
-        window_size, poly_order = 21, 2
-        n0 = savgol_filter(itp(xx), window_size, poly_order)
-        
-        
+        #n0 = smooth(n0)
         n1 = [0]
         for i, val in enumerate(n0):
             if i > 0:
@@ -101,7 +107,6 @@ def get_WAF(obs_x, obs_y, ForecastDays):
                     
                 n1.append((n0[i] - n0[i-1])/n0[i-1])
 
-        
         # n2 is a staggered copy of n1. So, if the first element of n1 is the number of new cases
         # reported on the first day, then the first element of n2 is the number of new cases
         # reported on the second day.
@@ -162,6 +167,10 @@ def get_WAF(obs_x, obs_y, ForecastDays):
             
             
         forecasted_y = pred_y + forecasted_y[z:]
+        
+        pred_y = smooth(pred_y)
+        forecasted_y = smooth(forecasted_y)
+        
         return pred_y, forecasted_y
     
     
@@ -174,7 +183,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
     
     ct = 0
     i = 1
-    while max(forecasted_y) > 2*max(obs_y):
+    while max(forecasted_y) > 2 * max(obs_y):
         
         o_y[-i:] = o_y[-i:] - ((o_y[-i:] - o_y[-i-1]) * 0.001)
         
