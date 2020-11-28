@@ -32,27 +32,32 @@ exclude_abbv = ['AS', 'VI', 'MP', 'GU', 'PR']
 #Atlantic_df = pd.read_csv('https://raw.githubusercontent.com/COVID19Tracking/covid-tracking-data/master/data/states_daily_4pm_et.csv', sep=',')
 Atlantic_df = requests.get('https://api.covidtracking.com/v1/states/daily.csv')
 
+
 f = open('data/Atlantic_df.csv', "w")
 f.write(Atlantic_df.text)
 f.close()
 
 Atlantic_df = pd.read_csv('data/Atlantic_df.csv', sep=',')
-
 Atlantic_df.drop(['hash', 'dateChecked', 'fips', 'posNeg'], axis=1, inplace=True)
 Atlantic_df = Atlantic_df.loc[~Atlantic_df['state'].isin(exclude_abbv)]
 state_abvs = Atlantic_df['state'].tolist()
 
-
-
 dates = Atlantic_df['date'].tolist()
 dates_reformat = []
+
 for d1 in dates:
     d2 = datetime.datetime.strptime(str(d1), '%Y%m%d')
     d2 = d2.strftime("%m/%d/%y")
     dates_reformat.append(d2)
+
     
 Atlantic_df['formatted_dates'] = dates_reformat
 Atlantic_df['UniqueRow'] = Atlantic_df['formatted_dates'] + '-' + Atlantic_df['state']
+
+#print(sorted(list(set(Atlantic_df['date']))))
+#print('\n')
+#print(sorted(list(set(Atlantic_df['formatted_dates']))))
+#sys.exit()
 
 
 pop_sizes = []
@@ -103,16 +108,38 @@ df0['%Poor'] = per_poor
 df0['UniqueRow'] = unique_rows
 df0['DeltaTestingRate'] = delta_testing_rate
 
+'''
+#print(Atlantic_df.columns)
+#print(sorted(list(set(Atlantic_df['date']))))
+#print('\n')
+print('Atlantic_df')
+print(Atlantic_df.head())
+print('\n\n')
+print('df0')
+print(df0.tail())
+print('\n\n')
+'''
 
 main_df = pd.merge(df0, Atlantic_df, on='UniqueRow')
-main_df.tail(10)
-main_df.columns = main_df.columns.str.replace('date_x', 'date')
 
+'''
+print('main_df')
+print(main_df.tail())
+print(main_df.columns)
+#sys.exit()
+'''
+
+main_df.columns = main_df.columns.str.replace('date_x', 'date')
 main_df['sqrt_PopSize'] = np.sqrt(main_df['PopSize'].tolist()).tolist()
 main_df['Positives per capita'] = main_df.positive/main_df.PopSize
 main_df['Negatives per capita'] = main_df.negative/main_df.PopSize
 main_df['Percent positive'] = np.round(100 * main_df.positive/main_df.totalTestResults, 2)
 main_df['Tests per capita'] = main_df.People_Tested/main_df.PopSize
+
+#print(main_df.columns)
+#print(sorted(list(set(main_df['date']))))
+#sys.exit()
+
 
 try:
     main_df.drop(['Unnamed: 0'], axis=1, inplace=True)
@@ -121,8 +148,7 @@ except:
 
 
 dates = main_df['date'].tolist()
-
-df_today = main_df[main_df['date'] == dates[-1]].copy()  #'08/27/20'
+df_today = main_df[main_df['date'] == dates[-1]].copy()
 #print(df_today.shape)
 #print(df_today['date'])
 
@@ -137,8 +163,11 @@ df_today['log_inIcuCurrently'] = np.log10(df_today['inIcuCurrently'])
 df_today['log_onVentilatorCurrently'] = np.log10(df_today['onVentilatorCurrently'])
 
 
-print(list(df_today))
-hrate = df_today['Hospitalization_Rate'].tolist()
+#print(df_today.head())
+#sys.exit()
+#print(list(df_today))
+
+hrate = df_today['People_Tested'].tolist()
 dates = df_today['date'].tolist()
 for i, val in enumerate(dates):
     print(val, '  ', hrate[i])    
