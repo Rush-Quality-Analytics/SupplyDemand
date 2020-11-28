@@ -68,7 +68,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
         xx = list(range(len(x))) #np.linspace(n0.min(), n0.max(), len(n0))
         # interpolate + smooth
         itp = interp1d(xx, x, kind='linear')
-        window_size, poly_order = 41, 3
+        window_size, poly_order = 41, 5
         x = savgol_filter(itp(xx), window_size, poly_order)
         
         return x
@@ -87,7 +87,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
         # We assume the number of new cases reported on the first day is equal to the first 
         # value in obs_y, since nothing was reported before the first day.
         
-        #obs_y = smooth(obs_y)
+        obs_y = smooth(obs_y)
         
         n0 = [obs_y[0]]
         for i, val in enumerate(obs_y):
@@ -168,8 +168,8 @@ def get_WAF(obs_x, obs_y, ForecastDays):
             
         forecasted_y = pred_y + forecasted_y[z:]
         
-        pred_y = smooth(pred_y)
-        forecasted_y = smooth(forecasted_y)
+        #pred_y = smooth(pred_y)
+        #forecasted_y = smooth(forecasted_y)
         
         return pred_y, forecasted_y
     
