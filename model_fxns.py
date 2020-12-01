@@ -55,7 +55,7 @@ def logistic3(x, a, b, c, d,  a1, b1, c1, d1,  a2, b2, c2, d2):
     return  (a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1)))   +   (a2 / (d2 + np.exp(-c2 * x + b2)))
     
 
-def most_likely(y0, n1, n2, r = 8):
+def most_likely(y0, n1, n2, r = 0):
     c = 10**-r
     wts = (c/(c + np.abs(y0 - n1))) ** r
     exp_y = np.average(n2, weights=wts)
@@ -95,7 +95,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
                 n0.append(obs_y[i] - obs_y[i-1])
         
         
-        #n0 = smooth(n0)
+        n0 = smooth(n0)
         n1 = [0]
         for i, val in enumerate(n0):
             if i > 0:
@@ -124,6 +124,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
         
         
         z = 1
+        r = 6
         # Initiate the list of predicted values with the first value in n1. 
         pred_y = [obs_y[1]]
         for i, y1 in enumerate(n0):
@@ -135,7 +136,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
                     n0[i-1] == c
                 
                 pc = (n0[i] - n0[i-1])/(n0[i-1])
-                pc = most_likely(pc, n1, n2)
+                pc = most_likely(pc, n1, n2, r)
                 
                 y2 = y1 + pc*y1
                 
@@ -148,7 +149,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
         ##### GET FORECASTED ######
         
         forecasted_y = [pred_y[-2], pred_y[-1]]
-        for i in range(ForecastDays + 1 - 2):
+        for i in range(ForecastDays - 1):
             
             if i > 0:
                 if forecasted_y[i] == 0:
@@ -157,7 +158,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
                     forecasted_y[i-1] == c
                 
                 pc = (forecasted_y[i] - forecasted_y[i-1])/(forecasted_y[i-1])
-                pc = most_likely(pc, n1, n2)
+                pc = most_likely(pc, n1, n2, r)
                 
                 y2 = forecasted_y[i] + pc*forecasted_y[i]
                 
@@ -168,8 +169,8 @@ def get_WAF(obs_x, obs_y, ForecastDays):
             
         forecasted_y = pred_y + forecasted_y[z:]
         
-        #pred_y = smooth(pred_y)
-        #forecasted_y = smooth(forecasted_y)
+        pred_y = smooth(pred_y)
+        forecasted_y = smooth(forecasted_y)
         
         return pred_y, forecasted_y
     
@@ -181,9 +182,10 @@ def get_WAF(obs_x, obs_y, ForecastDays):
     pred_y = [sum(pred_y[0:x:1]) for x in range(len(pred_y)+1)][:-1]
     forecasted_y = [sum(forecasted_y[0:x:1]) for x in range(len(forecasted_y)+1)][:-1]
     
+    '''
     ct = 0
     i = 1
-    while max(forecasted_y) > 2 * max(obs_y):
+    while max(forecasted_y) > 2 * max(obs_y) and ct < 100:
         
         o_y[-i:] = o_y[-i:] - ((o_y[-i:] - o_y[-i-1]) * 0.001)
         
@@ -192,7 +194,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
         forecasted_y = [sum(forecasted_y[0:x:1]) for x in range(len(forecasted_y)+1)][:-1]
         
         ct += 1
-    
+    '''
     
     forecasted_x = list(range(len(forecasted_y)))
     params = []
