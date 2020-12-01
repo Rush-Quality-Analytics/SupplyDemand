@@ -182,7 +182,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
     pred_y = [sum(pred_y[0:x:1]) for x in range(len(pred_y)+1)][:-1]
     forecasted_y = [sum(forecasted_y[0:x:1]) for x in range(len(forecasted_y)+1)][:-1]
     
-    '''
+    
     ct = 0
     i = 1
     while max(forecasted_y) > 2 * max(obs_y) and ct < 100:
@@ -194,7 +194,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
         forecasted_y = [sum(forecasted_y[0:x:1]) for x in range(len(forecasted_y)+1)][:-1]
         
         ct += 1
-    '''
+    
     
     forecasted_x = list(range(len(forecasted_y)))
     params = []
