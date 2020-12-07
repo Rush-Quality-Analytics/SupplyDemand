@@ -44,13 +44,13 @@ def phase_wave3(x, a, b, c, d, f, g,   a1, b1, c1, d1, g1, f1,   a2, b2, c2, d2,
         
     
 def logistic1(x, a, b, c, d):
-    return  x + ((a / (d + np.exp(-c * x + b))))
+    return  x**2 + ((a / (d + np.exp(-c * x + b))))
     
-def logistic2(x, a, b, c, d,  a1, b1, c1, d1,  a2, b2, c2, d2):
-    return  x + ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1)))   +   (a2 / (d2 + np.exp(-c2 * x + b2))))
+def logistic2(x, a, b, c, d,  a1, b1, c1, d1):
+    return  x**2 + ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1))))   #+   (a2 / (d2 + np.exp(-c2 * x + b2))))
 
-def logistic3(x, a, b, c, d,  a1, b1, c1, d1,  a2, b2, c2, d2,  a3, b3, c3, d3):
-    return  x + ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1)))   +   (a2 / (d2 + np.exp(-c2 * x + b2))) + (a3 / (d3 + np.exp(-c3 * x + b3))))
+def logistic3(x, e, a, b, c, d,  a1, b1, c1, d1,  a2, b2, c2, d2):
+    return  x**2 + ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1)))   +   (a2 / (d2 + np.exp(-c2 * x + b2)))) #+ (a3 / (d3 + np.exp(-c3 * x + b3))))
     
 
 
