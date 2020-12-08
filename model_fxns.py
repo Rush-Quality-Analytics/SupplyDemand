@@ -23,39 +23,39 @@ def obs_pred_rsquare(obs, pred):
 
 def gaussian1(x, n, s, m):  
     #return n**2 * (1/(s*((2*pi)**0.5))) * np.exp(-0.5 * ((x - m)/s)**2)
-    return n**2 * 0.5 * (1 + sc.special.erf((x - m)/(s*2**0.5)))
+    return x + (n**2 * 0.5 * (1 + sc.special.erf((x - m)/(s*2**0.5))))
     
 def gaussian2(x, n, s, m, s1, m1):
-    return n**2 * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))))
+    return x + (n**2 * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5)))))
     
 def gaussian3(x, n, s, m, s1, m1, s2, m2):  
-    return n**2 * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5))))
-    
+    return x +  (n**2 * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5)))))
+  
+  
     
 def phase_wave1(x,  a, b, c, d, f, g):
-    return  a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))
+    return  x + (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b)))
     
 def phase_wave2(x,  a, b, c, d, f, g,   a1, b1, c1, d1, g1, f1):
-    return  a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))   +   a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1))
+    return  x + (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))   +   a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1)))
     
 def phase_wave3(x, a, b, c, d, f, g,   a1, b1, c1, d1, g1, f1,   a2, b2, c2, d2, g2, f2):
-        y = a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))
-        y = y + a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1))
-        y = y + a2 / (d2 + np.exp(-c2 * (x + g2*np.sin(f2*x)) + b2))
-        #return  a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))   +   a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1))   +   a2 / (d2 + np.exp(-c2 * (x + g2*np.sin(f2*x)) + b2))
-        return y
+    return  x + (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b)) + a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1)) + a2 / (d2 + np.exp(-c2 * (x + g2*np.sin(f2*x)) + b2)))
         
+    
 def logistic1(x, a, b, c, d):
-    return  (a / (d + np.exp(-c * x + b)))
+    return  x**2 + ((a / (d + np.exp(-c * x + b))))
     
-def logistic2(x, a, b, c, d, a1, b1, c1, d1):
-    return  (a / (d + np.exp(-c * x + b)) + a1 / (d1 + np.exp(-c1 * x + b1)))
-    
-def logistic3(x, a, b, c, d,  a1, b1, c1, d1,  a2, b2, c2, d2):
-    return  (a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1)))   +   (a2 / (d2 + np.exp(-c2 * x + b2)))
+def logistic2(x, a, b, c, d,  a1, b1, c1, d1):
+    return  x**2 + ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1))))   #+   (a2 / (d2 + np.exp(-c2 * x + b2))))
+
+def logistic3(x, e, a, b, c, d,  a1, b1, c1, d1,  a2, b2, c2, d2):
+    return  x**2 + ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1)))   +   (a2 / (d2 + np.exp(-c2 * x + b2)))) #+ (a3 / (d3 + np.exp(-c3 * x + b3))))
     
 
-def most_likely(y0, n1, n2, r = 8):
+
+
+def most_likely(y0, n1, n2, r = 0):
     c = 10**-r
     wts = (c/(c + np.abs(y0 - n1))) ** r
     exp_y = np.average(n2, weights=wts)
@@ -95,7 +95,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
                 n0.append(obs_y[i] - obs_y[i-1])
         
         
-        #n0 = smooth(n0)
+        n0 = smooth(n0)
         n1 = [0]
         for i, val in enumerate(n0):
             if i > 0:
@@ -124,6 +124,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
         
         
         z = 1
+        r = 6
         # Initiate the list of predicted values with the first value in n1. 
         pred_y = [obs_y[1]]
         for i, y1 in enumerate(n0):
@@ -135,7 +136,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
                     n0[i-1] == c
                 
                 pc = (n0[i] - n0[i-1])/(n0[i-1])
-                pc = most_likely(pc, n1, n2)
+                pc = most_likely(pc, n1, n2, r)
                 
                 y2 = y1 + pc*y1
                 
@@ -148,7 +149,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
         ##### GET FORECASTED ######
         
         forecasted_y = [pred_y[-2], pred_y[-1]]
-        for i in range(ForecastDays + 1 - 2):
+        for i in range(ForecastDays - 1):
             
             if i > 0:
                 if forecasted_y[i] == 0:
@@ -157,7 +158,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
                     forecasted_y[i-1] == c
                 
                 pc = (forecasted_y[i] - forecasted_y[i-1])/(forecasted_y[i-1])
-                pc = most_likely(pc, n1, n2)
+                pc = most_likely(pc, n1, n2, r)
                 
                 y2 = forecasted_y[i] + pc*forecasted_y[i]
                 
@@ -168,8 +169,8 @@ def get_WAF(obs_x, obs_y, ForecastDays):
             
         forecasted_y = pred_y + forecasted_y[z:]
         
-        #pred_y = smooth(pred_y)
-        #forecasted_y = smooth(forecasted_y)
+        pred_y = smooth(pred_y)
+        forecasted_y = smooth(forecasted_y)
         
         return pred_y, forecasted_y
     
@@ -181,11 +182,12 @@ def get_WAF(obs_x, obs_y, ForecastDays):
     pred_y = [sum(pred_y[0:x:1]) for x in range(len(pred_y)+1)][:-1]
     forecasted_y = [sum(forecasted_y[0:x:1]) for x in range(len(forecasted_y)+1)][:-1]
     
+    
     ct = 0
-    i = 1
-    while max(forecasted_y) > 2 * max(obs_y):
+    i = 2
+    while max(forecasted_y) > 2 * max(obs_y) and ct < 100:
         
-        o_y[-i:] = o_y[-i:] - ((o_y[-i:] - o_y[-i-1]) * 0.001)
+        o_y[-i:] = o_y[-i:] - ((o_y[-i:] - o_y[-i-1]) * 0.1)
         
         pred_y, forecasted_y = get_results(o_y, ForecastDays)
         pred_y = [sum(pred_y[0:x:1]) for x in range(len(pred_y)+1)][:-1]
@@ -207,18 +209,19 @@ def get_WAF(obs_x, obs_y, ForecastDays):
 
 def opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model):
     
+    # A FUNCTION TO IMPROVE SCIPY'S ABILITY TO FIND A FITTED CURVE
+    
     cf = 0.5
-    i = 3
+    i = 4
     if model == 'WAF':
-        cf = 0.001
-        i = 2
-
+        cf = 0.1
+    
     r2_opt = 0
     ct = 0
     
     popt_opt = 0
     o_y = np.array(obs_y)
-    o_y[-1] = o_y[-1] - ((o_y[-1] - o_y[-2]) * cf)
+    o_y[-i:] = o_y[-i:] - ((o_y[-i:] - o_y[-i-1]) * cf)
 
         
     while max(forecasted_y) > i * max(obs_y):
@@ -229,31 +232,47 @@ def opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model):
         #if model == 'WAF':
         #    pred_y, forecasted_y = WAF(o_y, ForecastDays)
         #    forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
-            
+        
         if model == 'phase_wave3':
-            popt, pcov = curve_fit(phase_wave3, obs_x, o_y, sigma= 1 - 1/o_y,
-                                       absolute_sigma=True, method='lm', maxfev=20000)
+            popt, pcov = curve_fit(phase_wave3, obs_x, o_y, 
+                                   #sigma= 1 - 1/o_y,
+                                   #absolute_sigma=True, 
+                                   method='lm', 
+                                   maxfev=20000)
+            
             pred_y = phase_wave3(obs_x, *popt)
             forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
             forecasted_y = phase_wave3(forecasted_x, *popt)
                 
         elif model == 'phase_wave2':
-            popt, pcov = curve_fit(phase_wave2, obs_x, o_y, sigma= 1 - 1/o_y,
-                                       absolute_sigma=True, method='lm', maxfev=20000)
+            popt, pcov = curve_fit(phase_wave2, obs_x, o_y, 
+                                   #sigma= 1 - 1/o_y,
+                                   #absolute_sigma=True, 
+                                   method='lm', 
+                                   maxfev=20000)
+            
             pred_y = phase_wave2(obs_x, *popt)
             forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
             forecasted_y = phase_wave2(forecasted_x, *popt)
                 
         elif model == 'logistic3':
-            popt, pcov = curve_fit(logistic3, obs_x, o_y, sigma= 1 - 1/o_y,
-                                       absolute_sigma=True, method='lm', maxfev=20000)
+            popt, pcov = curve_fit(logistic3, obs_x, o_y, 
+                                   #sigma= 1 - 1/o_y,
+                                   #absolute_sigma=True, 
+                                   method='lm', 
+                                   maxfev=20000)
+            
             pred_y = logistic3(obs_x, *popt)
             forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
             forecasted_y = logistic3(forecasted_x, *popt)
                 
         elif model == 'logistic2':
-            popt, pcov = curve_fit(logistic2, obs_x, o_y, sigma= 1 - 1/o_y,
-                                       absolute_sigma=True, method='lm', maxfev=20000)
+            popt, pcov = curve_fit(logistic2, obs_x, o_y, 
+                                   #sigma= 1 - 1/o_y,
+                                   #absolute_sigma=True, 
+                                   method='lm', 
+                                   maxfev=20000)
+            
             pred_y = logistic2(obs_x, *popt)
             forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
             forecasted_y = logistic2(forecasted_x, *popt)
@@ -263,7 +282,7 @@ def opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model):
             r2_opt = float(r2)
             popt_opt = popt
             
-        o_y[-1] = o_y[-1] - ((o_y[-1] - o_y[-2]) * cf)
+        o_y[-i:] = o_y[-i:] - ((o_y[-i:] - o_y[-i-1]) * cf)
     
     
     if model == 'phase_wave3':
@@ -402,9 +421,9 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
         if r2 in [np.inf, -np.inf, np.nan]:
             g = 1 + []
             
-        elif max(forecasted_y) > 3*max(obs_y):
-            model = 'phase_wave3'
-            pred_y, forecasted_x, forecasted_y = opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model)
+        #elif max(forecasted_y) > 3*max(obs_y):
+        #    model = 'phase_wave3'
+        #    pred_y, forecasted_x, forecasted_y = opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model)
             
     except:
         try:
@@ -424,9 +443,9 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
             if r2 in [np.inf, -np.inf, np.nan]:
                 g = 1 + []
                 
-            elif max(forecasted_y) > 3*max(obs_y):
-                model = 'phase_wave2'
-                pred_y, forecasted_x, forecasted_y = opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model)
+            #elif max(forecasted_y) > 3*max(obs_y):
+            #    model = 'phase_wave2'
+            #    pred_y, forecasted_x, forecasted_y = opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model)
             
                 
         except:
@@ -465,7 +484,7 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
 
 def get_logistic(obs_x, obs_y, ForecastDays):
     
-        # obs_x: observed x values
+    # obs_x: observed x values
     # obs_y: observd y values
     # ForecastDays: number of days ahead to extend prediction
     
