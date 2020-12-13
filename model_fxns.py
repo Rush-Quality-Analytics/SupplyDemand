@@ -47,10 +47,10 @@ def logistic1(x, a, b, c, d):
     return  x**2 + ((a / (d + np.exp(-c * x + b))))
     
 def logistic2(x, a, b, c, d,  a1, b1, c1, d1):
-    return  x**2 + ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1))))   #+   (a2 / (d2 + np.exp(-c2 * x + b2))))
+    return  x**2 + ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1))))
 
 def logistic3(x, e, a, b, c, d,  a1, b1, c1, d1,  a2, b2, c2, d2):
-    return  x**2 + ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1)))   +   (a2 / (d2 + np.exp(-c2 * x + b2)))) #+ (a3 / (d3 + np.exp(-c3 * x + b3))))
+    return  x**2 + ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1)))   +   (a2 / (d2 + np.exp(-c2 * x + b2)))) 
     
 
 
@@ -68,7 +68,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
         xx = list(range(len(x))) #np.linspace(n0.min(), n0.max(), len(n0))
         # interpolate + smooth
         itp = interp1d(xx, x, kind='linear')
-        window_size, poly_order = 41, 5
+        window_size, poly_order = 71, 6
         x = savgol_filter(itp(xx), window_size, poly_order)
         
         return x
@@ -87,7 +87,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
         # We assume the number of new cases reported on the first day is equal to the first 
         # value in obs_y, since nothing was reported before the first day.
         
-        obs_y = smooth(obs_y)
+        #obs_y = smooth(obs_y)
         
         n0 = [obs_y[0]]
         for i, val in enumerate(obs_y):
