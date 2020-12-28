@@ -34,13 +34,13 @@ def gaussian3(x, n, s, m, s1, m1, s2, m2):
   
     
 def phase_wave1(x,  a, b, c, d, f, g):
-    return  x + (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b)))
+    return  x**2 + (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b)))
     
 def phase_wave2(x,  a, b, c, d, f, g,   a1, b1, c1, d1, g1, f1):
-    return  x + (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))   +   a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1)))
+    return  x**2 + (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))   +   a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1)))
     
 def phase_wave3(x, a, b, c, d, f, g,   a1, b1, c1, d1, g1, f1,   a2, b2, c2, d2, g2, f2):
-    return  x + (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b)) + a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1)) + a2 / (d2 + np.exp(-c2 * (x + g2*np.sin(f2*x)) + b2)))
+    return  x**2 + (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b)) + a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1)) + a2 / (d2 + np.exp(-c2 * (x + g2*np.sin(f2*x)) + b2)))
         
     
 def logistic1(x, a, b, c, d):
@@ -68,7 +68,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
         xx = list(range(len(x))) #np.linspace(n0.min(), n0.max(), len(n0))
         # interpolate + smooth
         itp = interp1d(xx, x, kind='linear')
-        window_size, poly_order = 61, 5
+        window_size, poly_order = 21, 2
         x = savgol_filter(itp(xx), window_size, poly_order)
         
         return x
@@ -87,7 +87,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
         # We assume the number of new cases reported on the first day is equal to the first 
         # value in obs_y, since nothing was reported before the first day.
         
-        #obs_y = smooth(obs_y)
+        obs_y = smooth(obs_y)
         
         n0 = [obs_y[0]]
         for i, val in enumerate(obs_y):
