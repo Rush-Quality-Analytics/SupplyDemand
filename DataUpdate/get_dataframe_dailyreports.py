@@ -57,12 +57,12 @@ def dataframe():
     df_main['date'] = pd.to_datetime(df_main['date'])
     df_main['date'] = df_main['date'].dt.strftime('%m/%d/%Y')
 
-    try:
-        df_main['date'] = df_main['date'].map(lambda x: x.rstrip('0'))
-        df_main['date'] = df_main['date'].map(lambda x: x.rstrip('2'))
-        df_main['date'] = df_main['date'].map(lambda x: x.lstrip('0'))
-    except:
-        pass
+    #try:
+    #    df_main['date'] = df_main['date'].map(lambda x: x.rstrip('0'))
+    #    df_main['date'] = df_main['date'].map(lambda x: x.rstrip('2'))
+    #    df_main['date'] = df_main['date'].map(lambda x: x.lstrip('0'))
+    #except:
+    #    pass
 
     df_sums = df_main.drop(['Admin2'], axis=1)
     df_sums = df_main.groupby(['Province/State','date'])['Confirmed'].sum().reset_index()
@@ -83,9 +83,9 @@ dates = pd.date_range(start='3/10/2020', end=today, freq='d')
 dates = pd.to_datetime(dates, format='%m/%d/%Y')
 dates = dates.strftime('%m/%d/%Y')
 
-dates = dates.map(lambda x: x.rstrip('0'))
-dates = dates.map(lambda x: x.rstrip('2'))
-dates = dates.map(lambda x: x.lstrip('0'))
+#dates = dates.map(lambda x: x.rstrip('0'))
+#dates = dates.map(lambda x: x.rstrip('2'))
+#dates = dates.map(lambda x: x.lstrip('0'))
 
 
 
