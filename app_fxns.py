@@ -843,7 +843,7 @@ def generate_model_forecasts(loc, county, model, reset):
             
         # get all dates from ArrivalDate to the last day in the forecast window
         fdates = pd.date_range(start=first_date, end=future_date)
-        fdates = fdates.strftime('%m/%d')
+        fdates = fdates.strftime('%m/%d/%Y')
             
         # designature plot label for legend
         if j == 0:
@@ -866,7 +866,7 @@ def generate_model_forecasts(loc, county, model, reset):
                 
         # get dates from ArrivalDate to the current day
         dates = pd.date_range(start=first_date, end=latest_date)
-        dates = dates.strftime('%m/%d')
+        dates = dates.strftime('%m/%d/%Y')
             
             
         output_list = [y.tolist(), pred_y.tolist(), forecasted_y.tolist(), dates, fdates,
@@ -1259,7 +1259,7 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     
     # get all dates from ArrivalDate to the last day in the forecast window
     fdates = pd.date_range(start=first_date, end=future_date)
-    fdates = fdates.strftime('%m/%d')
+    fdates = fdates.strftime('%m/%d/%Y')
     
     # designature plot label for legend
     for i, val in enumerate(forecasted_y):
@@ -1284,7 +1284,7 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
                 
     # get dates from ArrivalDate to the current day
     dates = pd.date_range(start=first_date, end=latest_date)
-    dates = dates.strftime('%m/%d')
+    dates = dates.strftime('%m/%d/%Y')
             
     # declare column labels
     col_labels = ['date', 'Total cases', 'New visits', 
@@ -2317,7 +2317,7 @@ def generate_patient_census_table(census_df, reset):
     csv_string = df_table.to_csv(index=False, encoding='utf-8')
     csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
     
-    df_table['dates'] = df_table['date'] + '/2020'
+    df_table['dates'] = df_table['date'] #+ '/2020'
     df_table['dates'] = pd.to_datetime(df_table['dates']).dt.date
     df_table = df_table[df_table['dates'] >= pd.Timestamp('today')]
     df_table.drop(['dates'], axis=1, inplace=True)
@@ -2458,7 +2458,7 @@ def generate_ppe_table(df, reset):
     csv_string = df_table.to_csv(index=False, encoding='utf-8')
     csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
     
-    df_table['dates'] = df_table['date'] + '/2020'
+    df_table['dates'] = df_table['date'] #+ '/2020'
     df_table['dates'] = pd.to_datetime(df_table['dates']).dt.date
     df_table = df_table[df_table['dates'] >= pd.Timestamp('today')]
     df_table.drop(['dates'], axis=1, inplace=True)
