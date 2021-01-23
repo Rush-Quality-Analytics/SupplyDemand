@@ -392,7 +392,7 @@ def get_gaussian(obs_x, obs_y, ForecastDays):
 
 def get_phase_wave(obs_x, obs_y, ForecastDays):
     
-        # obs_x: observed x values
+    # obs_x: observed x values
     # obs_y: observd y values
     # ForecastDays: number of days ahead to extend prediction
     
