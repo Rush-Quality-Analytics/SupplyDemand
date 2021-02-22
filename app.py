@@ -951,8 +951,11 @@ def update_output19(available_options):
      ],
     )
 def update_output13(v1):
+    counties_df = []
+    with open('DataUpdate/data/COVID-CASES-Counties-DF.txt.gz', 'rb') as csvfile:
+                counties_df = pd.read_csv(csvfile, compression='gzip', sep='\t')
+    counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
     
-    counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
     counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
                                                        'Out of AL', 'Out of IL',
                                                        'Out of CO', 'Out of GA',
@@ -961,7 +964,6 @@ def update_output13(v1):
                                                        'Out of OK', 'Out of PR',
                                                        'Out of TN', 'Out of UT',
                                                        ])]
-    counties_df.drop(columns=['Unnamed: 0'], inplace=True)
     
     tdf = counties_df[counties_df['Province/State'] == v1]
     counties_df = 0
@@ -981,8 +983,11 @@ def update_output13(v1):
      ],
     )
 def update_output20(v1):
+    counties_df = []
+    with open('DataUpdate/data/COVID-CASES-Counties-DF.txt.gz', 'rb') as csvfile:
+                counties_df = pd.read_csv(csvfile, compression='gzip', sep='\t')
+    counties_df.drop(['Unnamed: 0'], axis=1, inplace=True) 
     
-    counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
     counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
                                                        'Out of AL', 'Out of IL',
                                                        'Out of CO', 'Out of GA',
@@ -991,7 +996,6 @@ def update_output20(v1):
                                                        'Out of OK', 'Out of PR',
                                                        'Out of TN', 'Out of UT',
                                                        ])]
-    counties_df.drop(columns=['Unnamed: 0'], inplace=True)
     
     tdf = counties_df[counties_df['Province/State'] == v1]
     counties_df = 0

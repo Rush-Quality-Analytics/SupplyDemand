@@ -21,6 +21,7 @@ pd.set_option('display.max_columns', None)
 statepops = pd.read_csv('DataUpdate/data/StatePops.csv')
 
 locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+
 locs_df = locs_df[locs_df['Country/Region'] == 'US']
 locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
                                                 'Diamond Princess', 'Grand Princess', 'Recovered', 
@@ -32,7 +33,11 @@ locations = sorted(list(set(locs_df['Province/State'])))
 locations.insert(0, locations.pop(locations.index('Illinois')))
 locs_df = 0
 
-counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
+counties_df = []
+with open('DataUpdate/data/COVID-CASES-Counties-DF.txt.gz', 'rb') as csvfile:
+                counties_df = pd.read_csv(csvfile, compression='gzip', sep='\t')
+counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
+
 counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
                                                        'Out of AL', 'Out of IL',
                                                        'Out of CO', 'Out of GA',
@@ -41,7 +46,6 @@ counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-sta
                                                        'Out of OK', 'Out of PR',
                                                        'Out of TN', 'Out of UT',
                                                        ])]
-counties_df.drop(columns=['Unnamed: 0'], inplace=True)
 counties = list(set(counties_df['Admin2']))
 counties.append('Entire state or territory')
 counties_df = 0
@@ -672,7 +676,11 @@ def generate_model_forecasts(loc, county, model, reset):
     else:
         
         try:
-            counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
+            counties_df = []
+            with open('DataUpdate/data/COVID-CASES-Counties-DF.txt.gz', 'rb') as csvfile:
+                counties_df = pd.read_csv(csvfile, compression='gzip', sep='\t')
+            counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
+            
             counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
                                                                    'Out of AL', 'Out of IL',
                                                                    'Out of CO', 'Out of GA',
@@ -681,7 +689,6 @@ def generate_model_forecasts(loc, county, model, reset):
                                                                    'Out of OK', 'Out of PR',
                                                                    'Out of TN', 'Out of UT',
                                                                    ])]
-            counties_df.drop(columns=['Unnamed: 0'], inplace=True)
             #counties = list(set(counties_df['Admin2']))
             #counties.append('Entire state or territory')
 
@@ -1135,8 +1142,11 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     else:
         
         try:
+            counties_df = []
+            with open('DataUpdate/data/COVID-CASES-Counties-DF.txt.gz', 'rb') as csvfile:
+                counties_df = pd.read_csv(csvfile, compression='gzip', sep='\t')
+            counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
             
-            counties_df = pd.read_csv('DataUpdate/data/COVID-CASES-Counties-DF.txt', sep='\t') 
             counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
                                                                    'Out of AL', 'Out of IL',
                                                                    'Out of CO', 'Out of GA',
@@ -1145,7 +1155,7 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
                                                                    'Out of OK', 'Out of PR',
                                                                    'Out of TN', 'Out of UT',
                                                                    ])]
-            counties_df.drop(columns=['Unnamed: 0'], inplace=True)
+            
             #counties = list(set(counties_df['Admin2']))
             #counties.append('Entire state or territory')
 
