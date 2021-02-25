@@ -129,4 +129,4 @@ if sum(sum_col) == 0:
 
 df.to_csv('data/COVID-CASES-DF.txt', sep='\t')
 df_main = df_main[~df_main['Admin2'].isin(['', None, np.nan])]
-df_main.to_csv('data/COVID-CASES-Counties-DF.txt', sep='\t')
+df_main.to_csv('data/COVID-CASES-Counties-DF.txt.gz', sep='\t', compression='gzip')
