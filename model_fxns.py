@@ -68,7 +68,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
         xx = list(range(len(x))) #np.linspace(n0.min(), n0.max(), len(n0))
         # interpolate + smooth
         itp = interp1d(xx, x, kind='linear')
-        window_size, poly_order = 85, 4
+        window_size, poly_order = 61, 4
         x = savgol_filter(itp(xx), window_size, poly_order)
         
         return x
