@@ -14,6 +14,7 @@ from scipy.signal import savgol_filter
 
 #### FUNCTIONS FOR MODELING THE SPREAD OF COVID-19 CASES
 
+
 def obs_pred_rsquare(obs, pred):
     # Determines the prop of variability in a data set accounted for by a model
     # In other words, this determines the proportion of variation explained by
@@ -23,34 +24,34 @@ def obs_pred_rsquare(obs, pred):
 
 def gaussian1(x, n, s, m):  
     #return n**2 * (1/(s*((2*pi)**0.5))) * np.exp(-0.5 * ((x - m)/s)**2)
-    return x + (n**2 * 0.5 * (1 + sc.special.erf((x - m)/(s*2**0.5))))
+    return (n**2 * 0.5 * (1 + sc.special.erf((x - m)/(s*2**0.5))))
     
 def gaussian2(x, n, s, m, s1, m1):
-    return x + (n**2 * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5)))))
+    return (n**2 * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5)))))
     
 def gaussian3(x, n, s, m, s1, m1, s2, m2):  
-    return x +  (n**2 * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5)))))
+    return (n**2 * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5)))))
   
   
     
 def phase_wave1(x,  a, b, c, d, f, g):
-    return  x**2 + (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b)))
+    return  (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b)))
     
 def phase_wave2(x,  a, b, c, d, f, g,   a1, b1, c1, d1, g1, f1):
-    return  x**2 + (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))   +   a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1)))
+    return  (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))   +   a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1)))
     
 def phase_wave3(x, a, b, c, d, f, g,   a1, b1, c1, d1, g1, f1,   a2, b2, c2, d2, g2, f2):
-    return  x**2 + (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b)) + a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1)) + a2 / (d2 + np.exp(-c2 * (x + g2*np.sin(f2*x)) + b2)))
+    return  (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b)) + a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1)) + a2 / (d2 + np.exp(-c2 * (x + g2*np.sin(f2*x)) + b2)))
         
     
 def logistic1(x, a, b, c, d):
-    return  x**2 + ((a / (d + np.exp(-c * x + b))))
+    return  ((a / (d + np.exp(-c * x + b))))
     
 def logistic2(x, a, b, c, d,  a1, b1, c1, d1):
-    return  x**2 + ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1))))
+    return  ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1))))
 
 def logistic3(x, e, a, b, c, d,  a1, b1, c1, d1,  a2, b2, c2, d2):
-    return  x**2 + ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1)))   +   (a2 / (d2 + np.exp(-c2 * x + b2)))) 
+    return  ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1)))   +   (a2 / (d2 + np.exp(-c2 * x + b2)))) 
     
 
 
