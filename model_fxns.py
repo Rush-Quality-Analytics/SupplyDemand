@@ -24,16 +24,16 @@ def obs_pred_rsquare(obs, pred):
 
 def gaussian1(x, n, s, m):  
     #return n**2 * (1/(s*((2*pi)**0.5))) * np.exp(-0.5 * ((x - m)/s)**2)
-    return (n**2 * 0.5 * (1 + sc.special.erf((x - m)/(s*2**0.5))))
+    return (n * 0.5 * (1 + sc.special.erf((x - m)/(s*2**0.5))))
     
 def gaussian2(x, n, s, m, s1, m1):
-    return (n**2 * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5)))))
+    return (n * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5)))))
     
 def gaussian3(x, n, s, m, s1, m1, s2, m2):  
-    return (n**2 * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5)))))
+    return (n * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5)))))
   
 def gaussian4(x, n, s, m, s1, m1, s2, m2, s3, m3):  
-    return (n**2 * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5)))) + (1 + sc.special.erf((x - m3)/(s3*2**0.5))))
+    return (n * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5)))) + (1 + sc.special.erf((x - m3)/(s3*2**0.5))))
   
     
 def phase_wave1(x,  a, b, c, d, f, g):
