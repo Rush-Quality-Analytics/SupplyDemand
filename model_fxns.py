@@ -14,6 +14,7 @@ from scipy.signal import savgol_filter
 
 #### FUNCTIONS FOR MODELING THE SPREAD OF COVID-19 CASES
 
+
 def obs_pred_rsquare(obs, pred):
     # Determines the prop of variability in a data set accounted for by a model
     # In other words, this determines the proportion of variation explained by
@@ -23,35 +24,44 @@ def obs_pred_rsquare(obs, pred):
 
 def gaussian1(x, n, s, m):  
     #return n**2 * (1/(s*((2*pi)**0.5))) * np.exp(-0.5 * ((x - m)/s)**2)
-    return x + (n**2 * 0.5 * (1 + sc.special.erf((x - m)/(s*2**0.5))))
+    return (n * 0.5 * (1 + sc.special.erf((x - m)/(s*2**0.5))))
     
 def gaussian2(x, n, s, m, s1, m1):
-    return x + (n**2 * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5)))))
+    return (n * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5)))))
     
 def gaussian3(x, n, s, m, s1, m1, s2, m2):  
-    return x +  (n**2 * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5)))))
+    return (n * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5)))))
   
+def gaussian4(x, n, s, m, s1, m1, s2, m2, s3, m3):  
+    return (n * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5)))) + (1 + sc.special.erf((x - m3)/(s3*2**0.5))))
   
     
 def phase_wave1(x,  a, b, c, d, f, g):
-    return  x**2 + (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b)))
+    return  (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b)))
     
 def phase_wave2(x,  a, b, c, d, f, g,   a1, b1, c1, d1, g1, f1):
-    return  x**2 + (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))   +   a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1)))
+    return  (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b))   +   a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1)))
     
 def phase_wave3(x, a, b, c, d, f, g,   a1, b1, c1, d1, g1, f1,   a2, b2, c2, d2, g2, f2):
-    return  x**2 + (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b)) + a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1)) + a2 / (d2 + np.exp(-c2 * (x + g2*np.sin(f2*x)) + b2)))
+    return  (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b)) + a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1)) + a2 / (d2 + np.exp(-c2 * (x + g2*np.sin(f2*x)) + b2)))
         
+def phase_wave4(x, a, b, c, d, f, g,   a1, b1, c1, d1, g1, f1,   a2, b2, c2, d2, g2, f2,  a3, b3, c3, d3, g3, f3):
+    return  (a / (d + np.exp(-c * (x + g*np.sin(f*x)) + b)) + a1 / (d1 + np.exp(-c1 * (x + g1*np.sin(f1*x)) + b1)) + a2 / (d2 + np.exp(-c2 * (x + g2*np.sin(f2*x)) + b2))) + a3 / (d3 + np.exp(-c3 * (x + g3*np.sin(f3*x)) + b3))
+
+
     
 def logistic1(x, a, b, c, d):
-    return  x**2 + ((a / (d + np.exp(-c * x + b))))
+    return  ((a / (d + np.exp(-c * x + b))))
     
 def logistic2(x, a, b, c, d,  a1, b1, c1, d1):
-    return  x**2 + ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1))))
+    return  ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1))))
 
 def logistic3(x, e, a, b, c, d,  a1, b1, c1, d1,  a2, b2, c2, d2):
-    return  x**2 + ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1)))   +   (a2 / (d2 + np.exp(-c2 * x + b2)))) 
-    
+    return  ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1)))   +   (a2 / (d2 + np.exp(-c2 * x + b2)))) 
+
+def logistic4(x, e, a, b, c, d,  a1, b1, c1, d1,  a2, b2, c2, d2,  a3, b3, c3, d3):
+    return  ((a / (d + np.exp(-c * x + b)))   +   (a1 / (d1 + np.exp(-c1 * x + b1)))   +   (a2 / (d2 + np.exp(-c2 * x + b2)))) + (a3 / (d3 + np.exp(-c3 * x + b3))) 
+
 
 
 
@@ -68,7 +78,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
         xx = list(range(len(x))) #np.linspace(n0.min(), n0.max(), len(n0))
         # interpolate + smooth
         itp = interp1d(xx, x, kind='linear')
-        window_size, poly_order = 85, 4
+        window_size, poly_order = 61, 4
         x = savgol_filter(itp(xx), window_size, poly_order)
         
         return x
@@ -233,6 +243,17 @@ def opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model):
         #    pred_y, forecasted_y = WAF(o_y, ForecastDays)
         #    forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
         
+        if model == 'phase_wave4':
+            popt, pcov = curve_fit(phase_wave4, obs_x, o_y, 
+                                   #sigma= 1 - 1/o_y,
+                                   #absolute_sigma=True, 
+                                   method='lm', 
+                                   maxfev=20000)
+            
+            pred_y = phase_wave4(obs_x, *popt)
+            forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+            forecasted_y = phase_wave3(forecasted_x, *popt)
+            
         if model == 'phase_wave3':
             popt, pcov = curve_fit(phase_wave3, obs_x, o_y, 
                                    #sigma= 1 - 1/o_y,
@@ -254,7 +275,18 @@ def opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model):
             pred_y = phase_wave2(obs_x, *popt)
             forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
             forecasted_y = phase_wave2(forecasted_x, *popt)
-                
+        
+        elif model == 'logistic4':
+            popt, pcov = curve_fit(logistic4, obs_x, o_y, 
+                                   #sigma= 1 - 1/o_y,
+                                   #absolute_sigma=True, 
+                                   method='lm', 
+                                   maxfev=20000)
+            
+            pred_y = logistic4(obs_x, *popt)
+            forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+            forecasted_y = logistic3(forecasted_x, *popt)
+            
         elif model == 'logistic3':
             popt, pcov = curve_fit(logistic3, obs_x, o_y, 
                                    #sigma= 1 - 1/o_y,
@@ -285,7 +317,12 @@ def opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model):
         o_y[-i:] = o_y[-i:] - ((o_y[-i:] - o_y[-i-1]) * cf)
     
     
-    if model == 'phase_wave3':
+    if model == 'phase_wave4':
+        pred_y = phase_wave4(obs_x, *popt_opt)
+        forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+        forecasted_y = phase_wave3(forecasted_x, *popt_opt)
+        
+    elif model == 'phase_wave3':
         pred_y = phase_wave3(obs_x, *popt_opt)
         forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
         forecasted_y = phase_wave3(forecasted_x, *popt_opt)
@@ -294,7 +331,12 @@ def opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model):
         pred_y = phase_wave2(obs_x, *popt_opt)
         forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
         forecasted_y = phase_wave2(forecasted_x, *popt_opt)
-                
+        
+    elif model == 'logistic4':
+        pred_y = logistic4(obs_x, *popt_opt)
+        forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+        forecasted_y = logistic3(forecasted_x, *popt_opt)
+        
     elif model == 'logistic3':
         pred_y = logistic3(obs_x, *popt_opt)
         forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
@@ -343,33 +385,50 @@ def get_gaussian(obs_x, obs_y, ForecastDays):
             
     except:
         try:
-            
             # attempt to fit the logistic model to the observed data
             # popt: optimized model parameter values
-            popt, pcov = curve_fit(gaussian2, obs_x, obs_y,
+            popt, pcov = curve_fit(gaussian3, obs_x, obs_y,
                                    method='lm', maxfev=20000)
             # get predicted y values
-            pred_y = gaussian2(obs_x, *popt)
+            pred_y = gaussian3(obs_x, *popt)
             # extend x values by number of ForecastDays
             forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
             # get corresponding forecasted y values, i.e., extend the predictions
-            forecasted_y = gaussian2(forecasted_x, *popt)
+            forecasted_y = gaussian3(forecasted_x, *popt)
             
             r2 = obs_pred_rsquare(obs_y, pred_y)
             if r2 in [np.inf, -np.inf, np.nan]:
                 g = 1 + []
                 
         except:
-            # attempt to fit the logistic model to the observed data
-            # popt: optimized model parameter values
-            popt, pcov = curve_fit(gaussian1, obs_x, obs_y,
-                                   method='lm', maxfev=20000)
-            # get predicted y values
-            pred_y = gaussian1(obs_x, *popt)
-            # extend x values by number of ForecastDays
-            forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
-            # get corresponding forecasted y values, i.e., extend the predictions
-            forecasted_y = gaussian1(forecasted_x, *popt)
+            try:
+                
+                # attempt to fit the logistic model to the observed data
+                # popt: optimized model parameter values
+                popt, pcov = curve_fit(gaussian2, obs_x, obs_y,
+                                       method='lm', maxfev=20000)
+                # get predicted y values
+                pred_y = gaussian2(obs_x, *popt)
+                # extend x values by number of ForecastDays
+                forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+                # get corresponding forecasted y values, i.e., extend the predictions
+                forecasted_y = gaussian2(forecasted_x, *popt)
+                
+                r2 = obs_pred_rsquare(obs_y, pred_y)
+                if r2 in [np.inf, -np.inf, np.nan]:
+                    g = 1 + []
+                    
+            except:
+                # attempt to fit the logistic model to the observed data
+                # popt: optimized model parameter values
+                popt, pcov = curve_fit(gaussian1, obs_x, obs_y,
+                                       method='lm', maxfev=20000)
+                # get predicted y values
+                pred_y = gaussian1(obs_x, *popt)
+                # extend x values by number of ForecastDays
+                forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+                # get corresponding forecasted y values, i.e., extend the predictions
+                forecasted_y = gaussian1(forecasted_x, *popt)
     
     
     # return the forecasted x-y values and predicted y values
@@ -408,14 +467,14 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
     try:
         # attempt to fit the logistic model to the observed data
         # popt: optimized model parameter values
-        popt, pcov = curve_fit(phase_wave3, obs_x, obs_y,
+        popt, pcov = curve_fit(phase_wave4, obs_x, obs_y,
                                method='lm', maxfev=20000)
         # get predicted y values
-        pred_y = phase_wave3(obs_x, *popt)
+        pred_y = phase_wave4(obs_x, *popt)
         # extend x values by number of ForecastDays
         forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
         # get corresponding forecasted y values, i.e., extend the predictions
-        forecasted_y = phase_wave3(forecasted_x, *popt)
+        forecasted_y = phase_wave4(forecasted_x, *popt)
         
         r2 = obs_pred_rsquare(obs_y, pred_y)
         if r2 in [np.inf, -np.inf, np.nan]:
@@ -427,38 +486,59 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
             
     except:
         try:
-            
             # attempt to fit the logistic model to the observed data
             # popt: optimized model parameter values
-            popt, pcov = curve_fit(phase_wave2, obs_x, obs_y,
+            popt, pcov = curve_fit(phase_wave3, obs_x, obs_y,
                                    method='lm', maxfev=20000)
             # get predicted y values
-            pred_y = phase_wave2(obs_x, *popt)
+            pred_y = phase_wave3(obs_x, *popt)
             # extend x values by number of ForecastDays
             forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
             # get corresponding forecasted y values, i.e., extend the predictions
-            forecasted_y = phase_wave2(forecasted_x, *popt)
+            forecasted_y = phase_wave3(forecasted_x, *popt)
             
             r2 = obs_pred_rsquare(obs_y, pred_y)
             if r2 in [np.inf, -np.inf, np.nan]:
                 g = 1 + []
                 
             #elif max(forecasted_y) > 3*max(obs_y):
-            #    model = 'phase_wave2'
+            #    model = 'phase_wave3'
             #    pred_y, forecasted_x, forecasted_y = opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model)
-            
                 
         except:
-            # attempt to fit the logistic model to the observed data
-            # popt: optimized model parameter values
-            popt, pcov = curve_fit(phase_wave1, obs_x, obs_y,
-                                   method='lm', maxfev=20000)
-            # get predicted y values
-            pred_y = phase_wave1(obs_x, *popt)
-            # extend x values by number of ForecastDays
-            forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
-            # get corresponding forecasted y values, i.e., extend the predictions
-            forecasted_y = phase_wave1(forecasted_x, *popt)
+            try:
+                
+                # attempt to fit the logistic model to the observed data
+                # popt: optimized model parameter values
+                popt, pcov = curve_fit(phase_wave2, obs_x, obs_y,
+                                       method='lm', maxfev=20000)
+                # get predicted y values
+                pred_y = phase_wave2(obs_x, *popt)
+                # extend x values by number of ForecastDays
+                forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+                # get corresponding forecasted y values, i.e., extend the predictions
+                forecasted_y = phase_wave2(forecasted_x, *popt)
+                
+                r2 = obs_pred_rsquare(obs_y, pred_y)
+                if r2 in [np.inf, -np.inf, np.nan]:
+                    g = 1 + []
+                    
+                #elif max(forecasted_y) > 3*max(obs_y):
+                #    model = 'phase_wave2'
+                #    pred_y, forecasted_x, forecasted_y = opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model)
+                
+                    
+            except:
+                # attempt to fit the logistic model to the observed data
+                # popt: optimized model parameter values
+                popt, pcov = curve_fit(phase_wave1, obs_x, obs_y,
+                                       method='lm', maxfev=20000)
+                # get predicted y values
+                pred_y = phase_wave1(obs_x, *popt)
+                # extend x values by number of ForecastDays
+                forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+                # get corresponding forecasted y values, i.e., extend the predictions
+                forecasted_y = phase_wave1(forecasted_x, *popt)
     
     
     # return the forecasted x-y values and predicted y values
@@ -500,14 +580,14 @@ def get_logistic(obs_x, obs_y, ForecastDays):
     try:
         # attempt to fit the logistic model to the observed data
         # popt: optimized model parameter values
-        popt, pcov = curve_fit(logistic3, obs_x, obs_y,
+        popt, pcov = curve_fit(logistic4, obs_x, obs_y,
                                method='lm', maxfev=20000)
         # get predicted y values
-        pred_y = logistic3(obs_x, *popt)
+        pred_y = logistic4(obs_x, *popt)
         # extend x values by number of ForecastDays
         forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
         # get corresponding forecasted y values, i.e., extend the predictions
-        forecasted_y = logistic3(forecasted_x, *popt)
+        forecasted_y = logistic4(forecasted_x, *popt)
         
         r2 = obs_pred_rsquare(obs_y, pred_y)
         if r2 in [np.inf, -np.inf, np.nan]:
@@ -516,42 +596,63 @@ def get_logistic(obs_x, obs_y, ForecastDays):
         elif max(forecasted_y) > 3*max(obs_y):
             model = 'logistic3'
             pred_y, forecasted_x, forecasted_y = opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model)
-        
-            
+   
     except:
         try:
-            
             # attempt to fit the logistic model to the observed data
             # popt: optimized model parameter values
-            popt, pcov = curve_fit(logistic2, obs_x, obs_y,
+            popt, pcov = curve_fit(logistic3, obs_x, obs_y,
                                    method='lm', maxfev=20000)
             # get predicted y values
-            pred_y = logistic2(obs_x, *popt)
+            pred_y = logistic3(obs_x, *popt)
             # extend x values by number of ForecastDays
             forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
             # get corresponding forecasted y values, i.e., extend the predictions
-            forecasted_y = logistic2(forecasted_x, *popt)
+            forecasted_y = logistic3(forecasted_x, *popt)
             
             r2 = obs_pred_rsquare(obs_y, pred_y)
             if r2 in [np.inf, -np.inf, np.nan]:
                 g = 1 + []
                 
             elif max(forecasted_y) > 3*max(obs_y):
-                model = 'logistic2'
+                model = 'logistic3'
                 pred_y, forecasted_x, forecasted_y = opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model)
-                
+        
+            
         except:
-            # attempt to fit the logistic model to the observed data
-            # popt: optimized model parameter values
-            popt, pcov = curve_fit(logistic1, obs_x, obs_y,
-                                   method='lm', maxfev=20000)
-            # get predicted y values
-            pred_y = logistic1(obs_x, *popt)
-            # extend x values by number of ForecastDays
-            forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
-            # get corresponding forecasted y values, i.e., extend the predictions
-            forecasted_y = logistic1(forecasted_x, *popt)
-    
+            try:
+                
+                # attempt to fit the logistic model to the observed data
+                # popt: optimized model parameter values
+                popt, pcov = curve_fit(logistic2, obs_x, obs_y,
+                                       method='lm', maxfev=20000)
+                # get predicted y values
+                pred_y = logistic2(obs_x, *popt)
+                # extend x values by number of ForecastDays
+                forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+                # get corresponding forecasted y values, i.e., extend the predictions
+                forecasted_y = logistic2(forecasted_x, *popt)
+                
+                r2 = obs_pred_rsquare(obs_y, pred_y)
+                if r2 in [np.inf, -np.inf, np.nan]:
+                    g = 1 + []
+                    
+                elif max(forecasted_y) > 3*max(obs_y):
+                    model = 'logistic2'
+                    pred_y, forecasted_x, forecasted_y = opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model)
+                    
+            except:
+                # attempt to fit the logistic model to the observed data
+                # popt: optimized model parameter values
+                popt, pcov = curve_fit(logistic1, obs_x, obs_y,
+                                       method='lm', maxfev=20000)
+                # get predicted y values
+                pred_y = logistic1(obs_x, *popt)
+                # extend x values by number of ForecastDays
+                forecasted_x = np.array(list(range(max(obs_x) + ForecastDays)))
+                # get corresponding forecasted y values, i.e., extend the predictions
+                forecasted_y = logistic1(forecasted_x, *popt)
+        
     
     # return the forecasted x-y values and predicted y values
     params = []
