@@ -246,6 +246,7 @@ def get_WAF(obs_x, obs_y, ForecastDays):
     # forecasted y-values are those corresponding to days not yet observed
     pred_y, forecasted_y = get_results(obs_y, ForecastDays)
     
+    
     ### CONVERTE PREDICTED AND FORECASTED VALUES TO CUMULATIVE VALUES
     pred_y = [sum(pred_y[0:x:1]) for x in range(len(pred_y)+1)][:-1]
     forecasted_y = [sum(forecasted_y[0:x:1]) for x in range(len(forecasted_y)+1)][:-1]
