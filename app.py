@@ -780,24 +780,16 @@ def update_output19(available_options):
     )
 def update_output13(v1):
     counties_df = []
-    with open('DataUpdate/data/COVID-CASES-Counties-DF.txt', 'rb') as csvfile:
+    
+    with open('DataUpdate/data/States_Counties.txt', 'rb') as csvfile:
                 counties_df = pd.read_csv(csvfile, sep='\t')
-    counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
     
-    counties_df['date'] = pd.to_datetime(counties_df['date']).dt.date
-    counties_df = counties_df[counties_df['date'] > pd.to_datetime("2020-1-1").date()]
-    
-    counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
-                                                       'Out of AL', 'Out of IL',
-                                                       'Out of CO', 'Out of GA',
-                                                       'Out of HI', 'Out of LA',
-                                                       'Out of ME', 'Out of MI',
-                                                       'Out of OK', 'Out of PR',
-                                                       'Out of TN', 'Out of UT',
-                                                       ])]
+    try:
+        counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
+    except:
+        pass
     
     tdf = counties_df[counties_df['Province/State'] == v1]
-    counties_df = 0
     cts = sorted(list(set(tdf['Admin2'].values.tolist())))
     tdf = 0
     l = 'Entire state or territory'
@@ -814,25 +806,15 @@ def update_output13(v1):
      ],
     )
 def update_output20(v1):
-    counties_df = []
-    with open('DataUpdate/data/COVID-CASES-Counties-DF.txt', 'rb') as csvfile:
+    with open('DataUpdate/data/States_Counties.txt', 'rb') as csvfile:
                 counties_df = pd.read_csv(csvfile, sep='\t')
-    counties_df.drop(['Unnamed: 0'], axis=1, inplace=True) 
     
-    counties_df['date'] = pd.to_datetime(counties_df['date']).dt.date
-    counties_df = counties_df[counties_df['date'] > pd.to_datetime("2020-1-1").date()]
-
-    counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
-                                                       'Out of AL', 'Out of IL',
-                                                       'Out of CO', 'Out of GA',
-                                                       'Out of HI', 'Out of LA',
-                                                       'Out of ME', 'Out of MI',
-                                                       'Out of OK', 'Out of PR',
-                                                       'Out of TN', 'Out of UT',
-                                                       ])]
+    try:
+        counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
+    except:
+        pass
     
     tdf = counties_df[counties_df['Province/State'] == v1]
-    counties_df = 0
     cts = sorted(list(set(tdf['Admin2'].values.tolist())))
     tdf = 0
     l = 'Entire state or territory'
@@ -1178,4 +1160,5 @@ def update_table_ppe(df, loc, cty, reset_click):
 
 # Run the server
 if __name__ == "__main__":
-    app.run_server(host='127.0.0.1', port=8050, debug=True, threaded=False, processes=11)
+    #app.run_server(host='127.0.0.1', port=8050, debug=True, threaded=False, processes=11)
+    app.run_server(host='127.0.0.1', port=8050, debug=True)

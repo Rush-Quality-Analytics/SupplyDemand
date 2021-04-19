@@ -34,21 +34,13 @@ locations.insert(0, locations.pop(locations.index('Illinois')))
 locs_df = 0
 
 counties_df = []
-with open('DataUpdate/data/COVID-CASES-Counties-DF.txt', 'rb') as csvfile:
+with open('DataUpdate/data/States_Counties.txt', 'rb') as csvfile:
                 counties_df = pd.read_csv(csvfile, sep='\t')
-counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
+try:
+    counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
+except:
+    pass
 
-counties_df['date'] = pd.to_datetime(counties_df['date']).dt.date
-counties_df = counties_df[counties_df['date'] > pd.to_datetime("2020-1-1").date()]
-
-counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
-                                                       'Out of AL', 'Out of IL',
-                                                       'Out of CO', 'Out of GA',
-                                                       'Out of HI', 'Out of LA',
-                                                       'Out of ME', 'Out of MI',
-                                                       'Out of OK', 'Out of PR',
-                                                       'Out of TN', 'Out of UT',
-                                                       ])]
 counties = list(set(counties_df['Admin2']))
 counties.append('Entire state or territory')
 counties_df = 0
@@ -679,33 +671,16 @@ def generate_model_forecasts(loc, county, model, reset):
     else:
         
         try:
-            counties_df = []
-            with open('DataUpdate/data/COVID-CASES-Counties-DF.txt', 'rb') as csvfile:
-                counties_df = pd.read_csv(csvfile, sep='\t')
-            counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
             
-            counties_df['date'] = pd.to_datetime(counties_df['date']).dt.date
-            counties_df = counties_df[counties_df['date'] > pd.to_datetime("2020-1-1").date()]
+            url = 'https://raw.githubusercontent.com/klocey/StateCovidData/main/data/' + loc + '-' + county + '-' + 'COVID-CASES.txt'
             
-            counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
-                                                                   'Out of AL', 'Out of IL',
-                                                                   'Out of CO', 'Out of GA',
-                                                                   'Out of HI', 'Out of LA',
-                                                                   'Out of ME', 'Out of MI',
-                                                                   'Out of OK', 'Out of PR',
-                                                                   'Out of TN', 'Out of UT',
-                                                                   ])]
-            #counties = list(set(counties_df['Admin2']))
-            #counties.append('Entire state or territory')
-
-            df_sub = counties_df[counties_df['Province/State'] == loc]
-            df_sub = df_sub[df_sub['Admin2'] == county]
+            df_sub = pd.read_csv(url, sep='\t')
+            
+            #counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
             df_sub = df_sub.filter(items=['date', 'Confirmed'], axis=1)
             df_sub = df_sub.set_index('date').transpose()
             df_sub = df_sub.reset_index(drop=True)
             #df_sub.drop(['date'], axis=1, inplace=True)
-            
-            counties_df = 0
             
             df_sub['Province/State'] = loc
             df_sub['Country/Region'] = 'US'
@@ -1148,31 +1123,10 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     else:
         
         try:
-            counties_df = []
-            with open('DataUpdate/data/COVID-CASES-Counties-DF.txt', 'rb') as csvfile:
-                counties_df = pd.read_csv(csvfile, sep='\t')
-            counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
-            
-            counties_df['date'] = pd.to_datetime(counties_df['date']).dt.date
-            counties_df = counties_df[counties_df['date'] > pd.to_datetime("2020-1-1").date()]
+            url = 'https://raw.githubusercontent.com/klocey/StateCovidData/main/data/' + loc + '-' + county + '-' + 'COVID-CASES.txt'
+            df_sub = pd.read_csv(url, sep='\t') #index_col=0)
 
-            counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
-                                                                   'Out of AL', 'Out of IL',
-                                                                   'Out of CO', 'Out of GA',
-                                                                   'Out of HI', 'Out of LA',
-                                                                   'Out of ME', 'Out of MI',
-                                                                   'Out of OK', 'Out of PR',
-                                                                   'Out of TN', 'Out of UT',
-                                                                   ])]
-            
-            #counties = list(set(counties_df['Admin2']))
-            #counties.append('Entire state or territory')
-
-
-            df_sub = counties_df[counties_df['Province/State'] == loc]
-            counties_df = 0
-            
-            df_sub = df_sub[df_sub['Admin2'] == county]
+            #counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
             df_sub = df_sub.filter(items=['date', 'Confirmed'], axis=1)
             df_sub = df_sub.set_index('date').transpose()
             df_sub = df_sub.reset_index(drop=True)
