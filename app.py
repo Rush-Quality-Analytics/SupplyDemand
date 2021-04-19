@@ -780,9 +780,12 @@ def update_output19(available_options):
     )
 def update_output13(v1):
     counties_df = []
-    with open('DataUpdate/data/COVID-CASES-Counties-DF.txt.gz', 'rb') as csvfile:
-                counties_df = pd.read_csv(csvfile, compression='gzip', sep='\t')
+    with open('DataUpdate/data/COVID-CASES-Counties-DF.txt', 'rb') as csvfile:
+                counties_df = pd.read_csv(csvfile, sep='\t')
     counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
+    
+    counties_df['date'] = pd.to_datetime(counties_df['date']).dt.date
+    counties_df = counties_df[counties_df['date'] > pd.to_datetime("2020-1-1").date()]
     
     counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
                                                        'Out of AL', 'Out of IL',
@@ -812,10 +815,13 @@ def update_output13(v1):
     )
 def update_output20(v1):
     counties_df = []
-    with open('DataUpdate/data/COVID-CASES-Counties-DF.txt.gz', 'rb') as csvfile:
-                counties_df = pd.read_csv(csvfile, compression='gzip', sep='\t')
+    with open('DataUpdate/data/COVID-CASES-Counties-DF.txt', 'rb') as csvfile:
+                counties_df = pd.read_csv(csvfile, sep='\t')
     counties_df.drop(['Unnamed: 0'], axis=1, inplace=True) 
     
+    counties_df['date'] = pd.to_datetime(counties_df['date']).dt.date
+    counties_df = counties_df[counties_df['date'] > pd.to_datetime("2020-1-1").date()]
+
     counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
                                                        'Out of AL', 'Out of IL',
                                                        'Out of CO', 'Out of GA',

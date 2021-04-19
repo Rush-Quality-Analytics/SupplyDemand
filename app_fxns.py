@@ -34,9 +34,12 @@ locations.insert(0, locations.pop(locations.index('Illinois')))
 locs_df = 0
 
 counties_df = []
-with open('DataUpdate/data/COVID-CASES-Counties-DF.txt.gz', 'rb') as csvfile:
-                counties_df = pd.read_csv(csvfile, compression='gzip', sep='\t')
+with open('DataUpdate/data/COVID-CASES-Counties-DF.txt', 'rb') as csvfile:
+                counties_df = pd.read_csv(csvfile, sep='\t')
 counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
+
+counties_df['date'] = pd.to_datetime(counties_df['date']).dt.date
+counties_df = counties_df[counties_df['date'] > pd.to_datetime("2020-1-1").date()]
 
 counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
                                                        'Out of AL', 'Out of IL',
@@ -50,7 +53,7 @@ counties = list(set(counties_df['Admin2']))
 counties.append('Entire state or territory')
 counties_df = 0
 
-models = ['Quadratic', 'Time series analysis', 'Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Phase Wave', 'Quadratic', 'Exponential']
+models = ['Time series analysis', 'Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Phase Wave', 'Quadratic', 'Exponential']
 
 day_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 
             'Friday', 'Saturday','Sunday']
@@ -677,9 +680,12 @@ def generate_model_forecasts(loc, county, model, reset):
         
         try:
             counties_df = []
-            with open('DataUpdate/data/COVID-CASES-Counties-DF.txt.gz', 'rb') as csvfile:
-                counties_df = pd.read_csv(csvfile, compression='gzip', sep='\t')
+            with open('DataUpdate/data/COVID-CASES-Counties-DF.txt', 'rb') as csvfile:
+                counties_df = pd.read_csv(csvfile, sep='\t')
             counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
+            
+            counties_df['date'] = pd.to_datetime(counties_df['date']).dt.date
+            counties_df = counties_df[counties_df['date'] > pd.to_datetime("2020-1-1").date()]
             
             counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
                                                                    'Out of AL', 'Out of IL',
@@ -1143,10 +1149,13 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
         
         try:
             counties_df = []
-            with open('DataUpdate/data/COVID-CASES-Counties-DF.txt.gz', 'rb') as csvfile:
-                counties_df = pd.read_csv(csvfile, compression='gzip', sep='\t')
+            with open('DataUpdate/data/COVID-CASES-Counties-DF.txt', 'rb') as csvfile:
+                counties_df = pd.read_csv(csvfile, sep='\t')
             counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
             
+            counties_df['date'] = pd.to_datetime(counties_df['date']).dt.date
+            counties_df = counties_df[counties_df['date'] > pd.to_datetime("2020-1-1").date()]
+
             counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
                                                                    'Out of AL', 'Out of IL',
                                                                    'Out of CO', 'Out of GA',
@@ -2327,7 +2336,7 @@ def generate_patient_census_table(census_df, reset):
     csv_string = df_table.to_csv(index=False, encoding='utf-8')
     csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
     
-    df_table['dates'] = df_table['date'] #+ '/2020'
+    df_table['dates'] = df_table['date'] 
     df_table['dates'] = pd.to_datetime(df_table['dates']).dt.date
     df_table = df_table[df_table['dates'] >= pd.Timestamp('today')]
     df_table.drop(['dates'], axis=1, inplace=True)
@@ -2468,7 +2477,7 @@ def generate_ppe_table(df, reset):
     csv_string = df_table.to_csv(index=False, encoding='utf-8')
     csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
     
-    df_table['dates'] = df_table['date'] #+ '/2020'
+    df_table['dates'] = df_table['date'] 
     df_table['dates'] = pd.to_datetime(df_table['dates']).dt.date
     df_table = df_table[df_table['dates'] >= pd.Timestamp('today')]
     df_table.drop(['dates'], axis=1, inplace=True)
