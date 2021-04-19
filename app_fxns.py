@@ -9,30 +9,19 @@ import plotly.graph_objects as go
 import plotly.express as px
 from scipy import stats
 import urllib
+import sys
+
+import multiprocessing as mp
+from multiprocessing import Pool
 
 import model_fxns as fxns
 
+pd.set_option('display.max_columns', None)
 
-
-testing_df_mrd = pd.read_pickle('DataUpdate/data/Testing_Dataframe_Most_Recent_Day.pkl')
-testing_df = pd.read_pickle('DataUpdate/data/Testing_Dataframe.pkl')
-
-col_names1 =  ['obs_y', 'pred_y', 'forecasted_y', 'pred_dates', 'label', 
-               'forecast_dates',  'obs_pred_r2', 'model', 'focal_loc', 
-               'PopSize', 'ArrivalDate', 'pred_clr', 'fore_clr']
-fits_df = pd.DataFrame(columns = col_names1)
-
-
-col_names2 = ['Total cases', 'New cases', 'New visits', 'New admits',
-                  'All COVID', 'Non-ICU', 'ICU', 'Vent',
-                  'Discharged from ICU deceased', 'Discharged from ICU alive',
-                  'Discharged from non-ICU alive']
-census_df = pd.DataFrame(columns = col_names2)
-
-seir_fits_df = pd.read_csv('DataUpdate/data/SEIR-SD_States_Update.txt', sep='\t')
 statepops = pd.read_csv('DataUpdate/data/StatePops.csv')
 
 locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+
 locs_df = locs_df[locs_df['Country/Region'] == 'US']
 locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
                                                 'Diamond Princess', 'Grand Princess', 'Recovered', 
@@ -40,17 +29,38 @@ locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Nort
                                                 'Wuhan Evacuee'])]
 
 locs_df.drop(columns=['Unnamed: 0'], inplace=True)
+locations = sorted(list(set(locs_df['Province/State'])))
+locations.insert(0, locations.pop(locations.index('Illinois')))
+locs_df = 0
 
-locations = list(set(locs_df['Province/State']))
-locations.sort()
+counties_df = []
+with open('DataUpdate/data/COVID-CASES-Counties-DF.txt.gz', 'rb') as csvfile:
+                counties_df = pd.read_csv(csvfile, compression='gzip', sep='\t')
+counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
 
-models = ['SEIR-SD', '2 phase sine-logistic', '2 phase logistic', 'Logistic', 'Gaussian', 'Quadratic', 'Exponential']
+counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
+                                                       'Out of AL', 'Out of IL',
+                                                       'Out of CO', 'Out of GA',
+                                                       'Out of HI', 'Out of LA',
+                                                       'Out of ME', 'Out of MI',
+                                                       'Out of OK', 'Out of PR',
+                                                       'Out of TN', 'Out of UT',
+                                                       ])]
+counties = list(set(counties_df['Admin2']))
+counties.append('Entire state or territory')
+counties_df = 0
+
+models = ['Quadratic', 'Time series analysis', 'Logistic (multi-phase)', 'Gaussian (multi-phase)', 'Phase Wave', 'Quadratic', 'Exponential']
+
 day_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 
             'Friday', 'Saturday','Sunday']
 
 
 
 
+
+
+    
 
 def description_card1():
     """
@@ -72,6 +82,26 @@ def description_card1():
         ],
     )
 
+
+def description_card1b():
+    """
+
+    :return: A Div containing dashboard title & descriptions.
+    """
+    return html.Div(
+        id="description-card1b",
+        children=[
+            html.H5("Center for Quality, Safety and Value Analytics", style={
+            'textAlign': 'left',
+            #'color': '#2F9314'
+        }),
+            html.Div(
+                id="intro1b",
+                children="Obtain forecasts for active COVID cases among your employees. THIS TAB IS UNDER CURRENT DEVELOPMENT. ",
+            ),
+            html.Br(),
+        ],
+    )
 
 
 def description_card2():
@@ -104,15 +134,25 @@ def description_card3():
     return html.Div(
         id="description-card3",
         children=[
+            html.H5("Important Updates", style={
+            'textAlign': 'left',
+            }),
+            dcc.Markdown("-------"),
+            dcc.Markdown("We have added two new models. These are the logistic (multiphase) and Gaussian (multiphase)." +
+                         " We have removed the 2-phase logistic and 2-phase sine logistic because the new models offer a faster" +
+                         " and more elegant solution. We also removed the SEIR-SD model because its poor performance did not justify" +
+                         " the computational resources to maintain it. We have also added functionality to forecast active cases." +
+                         " and to allow users to select county level data."),
+            
+            html.Br(),
             html.H5("Instructions for using the COVID Calculator", style={
             'textAlign': 'left',
             }),
             dcc.Markdown("-------"),
             dcc.Markdown("**MODEL FORECASTS**"),
             dcc.Markdown("**1. Select a State and a Model to fit.**" +
-                         " Choose from 7 models to obtain forecasts for COVID-19 cases across US states and select terroritories." + 
-                         " See the [preprint](https://www.medrxiv.org/content/10.1101/2020.04.20.20073031v2) or Details box below for an explanation of each model." + 
-                         " Some models run very quickly (exponential, logistic, quadratic, gaussian, SEIR-SD)." + 
+                         " Choose from 4 models to obtain forecasts for COVID-19 cases across US states and select terroritories." + 
+                         " Some models run very quickly (exponential, logistic, quadratic, gaussian)." + 
                          " Other models take several seconds to run (2-phase sine-logistic, 2-phase logistic)."
                          ),
                          
@@ -160,7 +200,7 @@ def description_card3():
                          ),
             
             html.Br(),
-            dcc.Markdown("**See the Details box below or our [preprint](https://www.medrxiv.org/content/10.1101/2020.04.20.20073031v2) for deeper insights.**"),
+            dcc.Markdown("**See the Details box below or our [publication](https://academic.oup.com/jamiaopen/advance-article/doi/10.1093/jamiaopen/ooaa045/5907917) for deeper insights.**"),
             html.Br(),
         ],
     )
@@ -201,68 +241,25 @@ def description_card4():
                          "eventually fail as COVID-19 cases saturate."
                          ),
             html.Br(),
-            dcc.Markdown("**Logistic:** " +  
+            dcc.Markdown("**Logistic (Multiphase):** " +  
                          "Exponential growth within a population cannot continue *ad infinitum*. Instead, growth must slow as an upper limit " +
                          "is approached or as natural limitations to disease spread (e.g., immunity, contact among hosts) are encountered. " +
                          "The logistic model captures this slowing and eventual saturation, resulting in a sigmoidal or s-shaped growth curve. " +
                          "In addition to exponential and quadratic growth, early COVID-19 studies have implicated logistic growth in the spread " + 
                          "of the disease. The logistic model takes a relatively simple functional form, " +
-                         "N_t=α/(1+e^(-rt) ), where α is the upper limit of N and r is the intrinsic rate of increase. Our application uses " +
-                         "numerical optimization of α and r to find the best fit logistic function and hence, predicted values for N. "
+                         "N_t=α/(1+e^(-rt) ), where α is the upper limit of N and r is the intrinsic rate of increase. Our application extends " +
+                         "the logistic model to take multiple phases of logistic growth and uses numerical optimization to find the best fit parameters. "
                          ),
             html.Br(),
-            dcc.Markdown("**Gaussian:** " +  
+            dcc.Markdown("**Gaussian (Multiphase):** " +  
                          "The Gaussian (i.e., normal) distribution can provide a relatively simple and close approximation to complex epidemiological " +
                          "models. This symmetrical curve has two parameters, mean = μ, standard deviation = σ, and belongs to the family of exponential " +
                          "distributions. When used to model spread of disease, Gaussian curves are symmetrical around a climax day with the change " +
                          "in the rate of growth determining the standard deviation about the curve. Gaussian models have previously been successful " +
-                         "in approximating the spread of COVID-19 in Germany. Our application uses numerical optimization of μ and σ and the " +
-                         "cumulative distribution function of the Gaussian model to find the best fit cumulative Gaussian function and hence, " +
-                         "predicted values for N."
-                         ),
-            html.Br(),
-            dcc.Markdown("**SEIR-SD:** " +  
-                         "To date, COVID-19 studies have used a variety of epidemiological models to characterize the spread of the disease within " +
-                         "populations. The modeling in several of these studies has been based on refinements to the classic SEIR model. In this model, " +
-                         "a contagious disease drives changes in the fraction of susceptible persons (S), the fraction of persons exposed but not yet " +
-                         "exhibiting infection (E), the fraction of infectious persons (I), and the fraction of persons recovered (R), where S + E + I + R = 1. "+
-                         "These SEIR subpopulations are modeled as compartments in a set of ordinary differential equations:"
-                         ),
-            dcc.Markdown("dS/dt = βSI , dE/dt = βSI-αE , dI/dt = αE-γI , dR/dt = γI"),
-            dcc.Markdown("In these equations, α is the inverse of the incubation period, and γ is the inverse of the average infectious period, and β is " +
-                         "the average number of contacts of infected persons with susceptible persons per unit time. Our application imputes the initial " +
-                         "value of β from a well-known simplifying relationship between γ and the basic reproductive number (R0), i.e., β = γ R0 [20-22]." +
-                         "We allowed β to decrease in proportion to I. We assumed that people will, on average, reduce their contact with others when the " + 
-                         "populace is aware that an increasing percent of their population is infected. This approach allows an inherent degree of social " +
-                         "distancing to emerge as a frequency-dependent phenomenon. We also simulated an explicit effect of social distancing (λ) to capture " +
-                         "the overall strength of response to public health policies. These effects were included as time-iterative modifications to β." +
-                         "We also modified the classic SEIR model to account for initial time lags in COVID-19 testing. Specifically, and particularly " +
-                         "in the US, widespread testing for COVID-19 may have artificially dampened the apparent number of positive cases within the first "+
-                         "month of the first reported infection. We accounted for this effect by modifying the apparent size of I while allowing the actual "+
-                         "size of I to grow according to the SEIR-SD dynamic. " +
-                         "This modification models testing as low-to-nonexistent during the initial weeks of outbreak, and then accelerates afterwards. " +
-                         "Our application performs a pseudo-optimization on the SEIR-SD model parameters and a likely date of initial " +
-                         "infection, as opposed to using the first reported occurrence. Our implementation of the SEIR-SD model is based on an unbiased " +
-                         "search of multivariate parameter space within ranges of parameter values derived from population sizes for US states and territories "+
-                         "and the increasing corpus of COVID-19 literature. Our application performs 200,000 iterations and chooses the set of parameters "+
-                         "that maximize the explained variation in observed data. This implementation avoids the computational challenges of applying "+
-                         "numerical optimizers to complex simulation models and avoids the problems that these optimizers can have in becoming trapped "+
-                         "in local minima."
-                         ),
-            html.Br(),
-            dcc.Markdown("**Resurgence model: 2-phase logistic:** " +  
-                         "This model assumes that growth occurs in two primary logistic phases. That is, that growth increases exponentially and saturates "+
-                         ", but then increases exponentially once more and then saturates again. Our implementation finds the optimal breakpoint between the 2 "+
-                         "phases by iterating across the time series of observed growth."
-                         ),
-            html.Br(),
-            dcc.Markdown("**Resurgence model: 2-phase sine-logistic:** " +  
-                         "This model assumes that growth occurs as in the 2-phase logistic model but that growth is also characterized by periodic fluctuation, "+
-                         "as in a sine-wave, hence, sine-logistic. Our implementation of the 2 phase sine-logistic model finds the optimal breakpoint between the 2 "+
-                         "primary phases of growth by iterating across the time series of observed growth."
+                         "in approximating the spread of COVID-19 in Germany. Our application extends the Gaussian model to take multiple phases of " +
+                         "guassian growth and uses numerical optimization to find the best fit parameters. "
                          ),
                         
-            dcc.Markdown("**See our [preprint](https://www.medrxiv.org/content/10.1101/2020.04.20.20073031v2) for deeper insights.**"),
             
             html.Br(),
             html.Br(),
@@ -299,7 +296,7 @@ def generate_control_card1():
     return html.Div(
         id="control-card1",
         children=[
-            html.P("Select a location"),
+            html.P("Select a state or territory"),
             dcc.Dropdown(
                 id="location-select1",
                 options=[{"label": i, "value": i} for i in locations],
@@ -309,14 +306,34 @@ def generate_control_card1():
                     'font-size': "100%",
                     }
             ),
+            
+            html.Br(),
+            html.P("Select a county or other area"),
+            dcc.Dropdown(
+                id="county-select1",
+                options=[{"label": i, "value": i} for i in counties],
+                value='Entire state or territory',
+                style={
+                    'width': '250px', 
+                    'font-size': "100%",
+                    }
+            ),
+            
             html.Br(),
             html.P("Select a model"),
             dcc.Dropdown(
                 id="model-select1",
                 options=[{"label": i, "value": i} for i in models],
-                value='SEIR-SD',
+                value=models[0],
             ),
+            html.P("Most of these models are intensive to compute. So, allow the current model to finish before picking another model, county, or state. Otherwise, the app could time-out and you will need to refresh the page."),
             
+            #html.Br(),
+            #html.Div(
+            #    id="add-forecast",
+            #    children=html.Button(id="add-forecast1", children="Plot prior day's forecast", n_clicks=10),
+            #),
+            #html.P("Each click will add a previous day's forecast to the top figure."),
             
             html.Br(),
             html.Hr(),
@@ -524,54 +541,265 @@ def generate_control_card1():
 
 
 
-
-
-
-
-
-
-
-def generate_model_forecasts(loc,  model, reset):
+def generate_control_card2():
     
+    """
+    :return: A Div containing controls for graphs.
+    """
+    return html.Div(
+        id="control-card2",
+        children=[
+            html.P("Select a state or territory"),
+            dcc.Dropdown(
+                id="location-select2",
+                options=[{"label": i, "value": i} for i in locations],
+                value='Illinois',
+                style={
+                    'width': '250px', 
+                    'font-size': "100%",
+                    }
+            ),
+            
+            html.Br(),
+            html.P("Select a county or other area"),
+            dcc.Dropdown(
+                id="county-select2",
+                options=[{"label": i, "value": i} for i in counties],
+                value='Entire state or territory',
+                style={
+                    'width': '250px', 
+                    'font-size': "100%",
+                    }
+            ),
+            
+            html.Br(),
+            html.P("Select a model"),
+            dcc.Dropdown(
+                id="model-select2",
+                options=[{"label": i, "value": i} for i in models],
+                value=models[0],
+            ),
+            
+            
+            html.Br(),
+            html.Hr(),
+            
+            html.H5("Employee variables"),
+            
+            html.P("No. of employees"),
+            dcc.Input(
+                id="employees",
+                placeholder=1000,
+                value=1000,
+                type='number',
+            ),
+            
+            html.Br(),
+            html.Br(),
+            html.P("No. of employees needed per covid patient"),
+            dcc.Input(
+                id="employees per patient or per bed",
+                placeholder=3,
+                value=3,
+                type='number',
+            ),
+            
+            html.Br(),
+            html.Br(),
+            html.P("Minimum furlough days after an employee tests positive"),
+            dcc.Input(
+                id="furlough",
+                placeholder=10,
+                value=10,
+                type='number',
+            ),
+            
+            html.Br(),
+            html.Br(),
+            html.P('Relative positivity rate'),
+            dcc.Slider(
+                id="inc_rate",
+                min=0,
+                max=200,
+                value=100,
+                step=1,
+                marks={
+                    0: '0%',
+                    50: '50%',
+                    100: '100%',
+                    150: '150%',
+                    200: '200%',
+                },
+                ),
+            html.Div(id='incidence rate-container'),
+            
+            html.Br(),
+            html.Br(),
+            html.Div(
+                id="reset-btn-outer2",
+                children=html.Button(id="reset-btn2", children="Reset Plots2", n_clicks=0),
+            ),
+        ],
+    )
+
+
+
+def generate_model_forecasts(loc, county, model, reset):
+    
+        
     new_cases = []
     ForecastDays = 60
     
     col_names =  ['obs_y', 'pred_y', 'forecasted_y', 'pred_dates', 'forecast_dates', 
-                  'label', 'obs_pred_r2', 'model', 'focal_loc', 'PopSize', 
-                  'ArrivalDate', 'pred_clr', 'fore_clr']
+                  'label', 'obs_pred_r2', 'model', 'focal_loc', 
+                  'pred_clr', 'fore_clr']
         
     fits_df = pd.DataFrame(columns = col_names)
 
-    PopSize = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
-    PopSize = PopSize[0]
+    if county == 'Entire state or territory':
         
-    ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
-    ArrivalDate = ArrivalDate[0]
+        locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+        locs_df = locs_df[locs_df['Country/Region'] == 'US']
+        locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
+                            'Diamond Princess', 'Grand Princess', 'Recovered', 'United States Virgin Islands', 
+                            'Virgin Islands, U.S.', 'Wuhan Evacuee'])]
         
-    SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
+        locs_df.drop(columns=['Unnamed: 0'], inplace=True)
+
+
+        df_sub = locs_df[locs_df['Province/State'] == loc]
+        locs_df = 0
+        ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
+        ArrivalDate = ArrivalDate[0]
+
+    
+    else:
         
+        try:
+            counties_df = []
+            with open('DataUpdate/data/COVID-CASES-Counties-DF.txt.gz', 'rb') as csvfile:
+                counties_df = pd.read_csv(csvfile, compression='gzip', sep='\t')
+            counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
+            
+            counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
+                                                                   'Out of AL', 'Out of IL',
+                                                                   'Out of CO', 'Out of GA',
+                                                                   'Out of HI', 'Out of LA',
+                                                                   'Out of ME', 'Out of MI',
+                                                                   'Out of OK', 'Out of PR',
+                                                                   'Out of TN', 'Out of UT',
+                                                                   ])]
+            #counties = list(set(counties_df['Admin2']))
+            #counties.append('Entire state or territory')
+
+            df_sub = counties_df[counties_df['Province/State'] == loc]
+            df_sub = df_sub[df_sub['Admin2'] == county]
+            df_sub = df_sub.filter(items=['date', 'Confirmed'], axis=1)
+            df_sub = df_sub.set_index('date').transpose()
+            df_sub = df_sub.reset_index(drop=True)
+            #df_sub.drop(['date'], axis=1, inplace=True)
+            
+            counties_df = 0
+            
+            df_sub['Province/State'] = loc
+            df_sub['Country/Region'] = 'US'
+            df_sub['Lat'] = 0
+            df_sub['Long'] = 0
+            
+            col = df_sub.pop('Long')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Lat')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Country/Region')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Province/State')
+            df_sub.insert(0, col.name, col)
+
+            
+        except:
+            PopSize = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
+            PopSize = PopSize[0]
+    
+            locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+            locs_df = locs_df[locs_df['Country/Region'] == 'US']
+            locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
+                                                            'Diamond Princess', 'Grand Princess', 'Recovered', 
+                                                             'United States Virgin Islands', 'Virgin Islands, U.S.',
+                                                            'Wuhan Evacuee'])]
+            
+            locs_df.drop(columns=['Unnamed: 0'], inplace=True)
+
+            df_sub = locs_df[locs_df['Province/State'] == loc]
+            locs_df = 0
+            
         
     # add 1 to number of forecast days for indexing purposes
     ForecastDays = int(ForecastDays+1)
-        
-        
-    # filter main dataframe to include only the chosen location
-    df_sub = locs_df[locs_df['Province/State'] == loc]
-        
+                
     # get column labels, will filter below to extract dates
     yi = list(df_sub)
-        
         
     obs_y_trunc = []
     fore_clrs =  ['purple',  'mediumorchid', 'plum', 'blue', 'deepskyblue', 
                   'darkturquoise', 'green', 'limegreen', 'gold', 'orange', 'red']
     pred_clrs = ['0.0', '0.1', '0.2', '0.25', '0.3', '0.35', '0.4', '0.5',
                  '0.6', '0.7', '0.8']
+    
+    conditions = []        
+    for i, j in enumerate(list(range(-10, 1))):
             
+        if j == 0:
+            # get dates for today's predictions/forecast
+            obs_y_trunc = df_sub.iloc[0,4:].values
+        else:
+            # get dates for previous days predictions/forecast
+            obs_y_trunc = df_sub.iloc[0,4:j].values
+            
+        
+        ii = 0
+        while obs_y_trunc[ii] == 0: ii+=1
+        y = obs_y_trunc[ii:]
+        
+        y = list(y)
+        if y != sorted(y):
+            for ii, val in enumerate(y):
+                if ii == 0: 
+                    continue
+                elif val < y[ii-1]:
+                    y[ii] = y[ii-1]
+                    
+        
+        # declare x as a list of integers from 0 to len(y)
+        x = list(range(len(y)))
+        iterations = 2
+        # Call function to use chosen model to obtain:
+        #    r-square for observed vs. predicted
+        #    predicted y-values
+        #    forecasted x and y values
+        
+        condition = [x, y, model, ForecastDays, j, iterations]
+        conditions.append(condition)
+    
+    pool = Pool()
+    results = pool.map(fxns.fit_curve, conditions)
+    pool.close() 
+    pool.join()
+    
+    
     for i, j in enumerate(list(range(-10, 1))):
         pred_clr = pred_clrs[i]
         fore_clr = fore_clrs[i]
+        
+        # designature plot label for legend
+        if j == 0:
+            label='Current forecast'
             
+        else:
+            label = str(-j)+' day old forecast'
+        
         if j == 0:
             # get dates for today's predictions/forecast
             DATES = yi[4:]
@@ -586,19 +814,12 @@ def generate_model_forecasts(loc,  model, reset):
         while obs_y_trunc[ii] == 0: ii+=1
         y = obs_y_trunc[ii:]
         dates = DATES[ii:]
+        
             
-    
-        # declare x as a list of integers from 0 to len(y)
-        x = list(range(len(y)))
-
-        # Call function to use chosen model to obtain:
-        #    r-square for observed vs. predicted
-        #    predicted y-values
-        #    forecasted x and y values
-        iterations = 2
-        obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = fxns.fit_curve(x, y, 
-                            model, ForecastDays, PopSize, ArrivalDate, j, iterations, SEIR_Fit)
-            
+        result = results[i]
+        
+        obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = result
+        
         # convert y values to numpy array
         y = np.array(y)
 
@@ -629,7 +850,7 @@ def generate_model_forecasts(loc,  model, reset):
             
         # get all dates from ArrivalDate to the last day in the forecast window
         fdates = pd.date_range(start=first_date, end=future_date)
-        fdates = fdates.strftime('%m/%d')
+        fdates = fdates.strftime('%m/%d/%Y')
             
         # designature plot label for legend
         if j == 0:
@@ -640,28 +861,36 @@ def generate_model_forecasts(loc,  model, reset):
             
             
         if label == 'Current forecast':
-            for i, val in enumerate(forecasted_y):
-                if i > 0:
-                    if forecasted_y[i] - forecasted_y[i-1] > 0:
-                        new_cases.append(forecasted_y[i] - forecasted_y[i-1])
+            for ii, val in enumerate(forecasted_y):
+                if ii > 0:
+                    if forecasted_y[ii] - forecasted_y[ii-1] > 0:
+                        new_cases.append(forecasted_y[ii] - forecasted_y[ii-1])
                     else:
                         new_cases.append(0)
-                if i == 0:
-                    new_cases.append(forecasted_y[i])
+                if ii == 0:
+                    new_cases.append(forecasted_y[ii])
                         
                 
         # get dates from ArrivalDate to the current day
         dates = pd.date_range(start=first_date, end=latest_date)
-        dates = dates.strftime('%m/%d')
+        dates = dates.strftime('%m/%d/%Y')
             
             
         output_list = [y.tolist(), pred_y.tolist(), forecasted_y.tolist(), dates, fdates,
-                       label, obs_pred_r2, model, loc, PopSize, 
-                       ArrivalDate, pred_clr, fore_clr]
+                       label, obs_pred_r2, model, loc, #PopSize, ArrivalDate, 
+                       pred_clr, fore_clr]
             
         fits_df.loc[len(fits_df)] = output_list
 
-    fits_df = fits_df.to_dict()
+    dates = 0
+    df_sub = 0
+    output_list = 0
+    fdates = 0
+    pred_y = 0
+    forecasted_y = 0
+    output_list = 0
+    
+    fits_df = fits_df.to_json()
     return fits_df
 
 
@@ -669,7 +898,7 @@ def generate_model_forecasts(loc,  model, reset):
     
 
 def generate_model_forecast_plot(fits_df, reset):
-    fits_df = pd.DataFrame.from_dict(fits_df)
+    fits_df = pd.read_json(fits_df)
     
     ForecastDays = 60
     #labels = fits_df['label'].tolist()
@@ -686,47 +915,50 @@ def generate_model_forecast_plot(fits_df, reset):
     
     for i, label in enumerate(labels):
             
-        sub_df = fits_df[fits_df['label'] == label]
-        r2 = sub_df['obs_pred_r2'].iloc[0]
-        
-        dates = sub_df['pred_dates'].iloc[0]
-        clr = sub_df['pred_clr'].iloc[0]
-        obs_y = sub_df['obs_y'].iloc[0]
-        if label == 'Current forecast':
+        try:
+            sub_df = fits_df[fits_df['label'] == label]
+            r2 = sub_df['obs_pred_r2'].iloc[0]
+            
+            dates = sub_df['pred_dates'].iloc[0]
+            clr = sub_df['pred_clr'].iloc[0]
+            obs_y = sub_df['obs_y'].iloc[0]
+            if label == 'Current forecast':
+                fig_data.append(
+                    go.Scatter(
+                        x=dates,
+                        y=obs_y,
+                        mode="markers",
+                        name='Observed',
+                        opacity=0.75,
+                        marker=dict(color='#262626', size=10)
+                    )
+                )
+            
+            
+            fdates = sub_df['forecast_dates'].iloc[0]
+            forecasted_y = sub_df['forecasted_y'].iloc[0]
+            clr = sub_df['fore_clr'].iloc[0]
+            #focal_loc = sub_df['focal_loc'].iloc[0]
+            #popsize = sub_df['PopSize'].iloc[0]
+                
+            pred_y = sub_df['pred_y'].iloc[0]
+            # plot forecasted y values vs. dates
+            l = int(len(pred_y)+ForecastDays)
+                
+            forecasted_y = forecasted_y[0 : l]
+            fdates = fdates[0 : l]
+            
             fig_data.append(
                 go.Scatter(
-                    x=dates,
-                    y=obs_y,
-                    mode="markers",
-                    name='Observed',
-                    opacity=0.75,
-                    marker=dict(color='#262626', size=10)
+                    x=fdates,
+                    y=forecasted_y,
+                    name=label + ': r<sup>2</sup> = ' + str(np.round(r2, 3)),
+                    mode="lines",
+                    line=dict(color=clr, width=2)
                 )
             )
-        
-        
-        fdates = sub_df['forecast_dates'].iloc[0]
-        forecasted_y = sub_df['forecasted_y'].iloc[0]
-        clr = sub_df['fore_clr'].iloc[0]
-        #focal_loc = sub_df['focal_loc'].iloc[0]
-        #popsize = sub_df['PopSize'].iloc[0]
-            
-        pred_y = sub_df['pred_y'].iloc[0]
-        # plot forecasted y values vs. dates
-        l = int(len(pred_y)+ForecastDays)
-            
-        forecasted_y = forecasted_y[0 : l]
-        fdates = fdates[0 : l]
-        
-        fig_data.append(
-            go.Scatter(
-                x=fdates,
-                y=forecasted_y,
-                name=label + ': r<sup>2</sup> = ' + str(np.round(r2, 3)),
-                mode="lines",
-                line=dict(color=clr, width=2)
-            )
-        )
+        except:
+            pass
         
 
     figure = go.Figure(
@@ -748,7 +980,7 @@ def generate_model_forecast_plot(fits_df, reset):
             
             yaxis=dict(
                 title=dict(
-                    text="<b>Cumulative cases</b>",
+                    text="<b>Cumulative COVID-19 cases</b>",
                     font=dict(
                         family='"Open Sans", "HelveticaNeue", "Helvetica Neue",'
                         " Helvetica, Arial, sans-serif",
@@ -771,7 +1003,7 @@ def generate_model_forecast_plot(fits_df, reset):
     
     figure.update_yaxes(range=[0, 1.5*max(obs_y)])
     figure.update_layout(
-        title=dict(text="r<sup>2</sup> values pertain to the fits of models (colored lines) to observed data (black dots).",
+        title=dict(text="r<sup>2</sup> values pertain to the fits of models (colored lines) to the previous 30 days of observed data.",
                    font=dict(
                         family='"Open Sans", "HelveticaNeue", "Helvetica Neue",'
                         " Helvetica, Arial, sans-serif",
@@ -779,62 +1011,70 @@ def generate_model_forecast_plot(fits_df, reset):
                     ),
                     ),
         )
+    
+    dates = 0
+    sub_df = 0
+    fits_df = 0
+    fdates = 0
+    pred_y = 0
+    forecasted_y = 0
+    
     return figure
 
 
 
 def generate_model_forecast_table(fits_df, reset):
-    df = pd.DataFrame.from_dict(fits_df)
+    df = pd.read_json(fits_df)
     df_table = pd.DataFrame()
     
-    col0 = df.forecast_dates[-1]
+    col0 = df.forecast_dates.iloc[-1]
     max_len = len(col0)
     
-    col1 = df.obs_y[-1]    
+    col1 = df.obs_y.iloc[-1]    
     zs = [0] * (max_len - len(col1))
     col1.extend(zs)
     
-    col2 = df.forecasted_y[-1]
+    col2 = df.forecasted_y.iloc[-1]
     zs = [0] * (max_len - len(col2))
     col2.extend(zs)
     
-    col3 = df.forecasted_y[-2]
+    col3 = df.forecasted_y.iloc[-2]
     zs = [0] * (max_len - len(col3))
     col3.extend(zs)
     
-    col4 = df.forecasted_y[-3]
+    col4 = df.forecasted_y.iloc[-3]
     zs = [0] * (max_len - len(col4))
     col4.extend(zs)
     
-    col5 = df.forecasted_y[-4]
+    col5 = df.forecasted_y.iloc[-4]
     zs = [0] * (max_len - len(col5))
     col5.extend(zs)
     
-    col6 = df.forecasted_y[-5]
+    col6 = df.forecasted_y.iloc[-5]
     zs = [0] * (max_len - len(col6))
     col6.extend(zs)
     
-    col7 = df.forecasted_y[-6]
+    col7 = df.forecasted_y.iloc[-6]
     zs = [0] * (max_len - len(col7))
     col7.extend(zs)
     
-    col8 = df.forecasted_y[-7]
+    col8 = df.forecasted_y.iloc[-7]
     zs = [0] * (max_len - len(col8))
     col8.extend(zs)
     
-    col9 = df.forecasted_y[-8]
+    col9 = df.forecasted_y.iloc[-8]
     zs = [0] * (max_len - len(col9))
     col9.extend(zs)
     
-    col10 = df.forecasted_y[-9]
+    col10 = df.forecasted_y.iloc[-9]
     zs = [0] * (max_len - len(col10))
     col10.extend(zs)
     
-    col11 = df.forecasted_y[-10]
+    col11 = df.forecasted_y.iloc[-10]
     zs = [0] * (max_len - len(col11))
     col11.extend(zs)
     
-    col12 = df.forecasted_y[-11]
+    col12 = df.forecasted_y.iloc[-11]
     zs = [0] * (max_len - len(col12))
     col12.extend(zs)
 
@@ -853,10 +1093,13 @@ def generate_model_forecast_table(fits_df, reset):
     df_table['9 days ago'] = np.round(col11, 0)
     df_table['10 days ago'] = np.round(col12, 0)
     
-    
-    
     csv_string = df_table.to_csv(index=False, encoding='utf-8')
     csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
+    
+    col0, col1, col1, col3, col4, col5, col6, col7, col8 = 0, 0, 0, 0, 0, 0, 0, 0, 0
+    col9, col10, col11, col12 = 0, 0, 0, 0
+    df_table = 0
+    fits_df = 0
     
     return csv_string
     
@@ -865,7 +1108,7 @@ def generate_model_forecast_table(fits_df, reset):
 
 
         
-def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_admit, 
+def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, per_admit, 
     per_cc, LOS_cc, LOS_nc, per_vent, TimeLag, transfers, per_ICU_transfer, 
     mortality, GLOVE_SURGICAL, GLOVE_EXAM_NITRILE, GLOVE_EXAM_VINYL, 
     MASK_FACE_PROC_ANTI_FOG, MASK_PROC_FLUID_RESISTANT, GOWN_ISOLATION_XL_YELLOW, 
@@ -878,18 +1121,93 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
     
     PopSize = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
     PopSize = PopSize[0]
+    
+
+    if county == 'Entire state or territory':
+        locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+        locs_df = locs_df[locs_df['Country/Region'] == 'US']
+        locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
+                                                        'Diamond Princess', 'Grand Princess', 'Recovered', 
+                                                         'United States Virgin Islands', 'Virgin Islands, U.S.',
+                                                        'Wuhan Evacuee'])]
         
-    ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
-    ArrivalDate = ArrivalDate[0]
+        locs_df.drop(columns=['Unnamed: 0'], inplace=True)
+
+        df_sub = locs_df[locs_df['Province/State'] == loc]
+        ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
+        ArrivalDate = ArrivalDate[0]
+        locs_df = 0
         
-    SEIR_Fit = seir_fits_df[seir_fits_df['focal_loc'] == loc]
+    
+    else:
+        
+        try:
+            counties_df = []
+            with open('DataUpdate/data/COVID-CASES-Counties-DF.txt.gz', 'rb') as csvfile:
+                counties_df = pd.read_csv(csvfile, compression='gzip', sep='\t')
+            counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
+            
+            counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
+                                                                   'Out of AL', 'Out of IL',
+                                                                   'Out of CO', 'Out of GA',
+                                                                   'Out of HI', 'Out of LA',
+                                                                   'Out of ME', 'Out of MI',
+                                                                   'Out of OK', 'Out of PR',
+                                                                   'Out of TN', 'Out of UT',
+                                                                   ])]
+            
+            #counties = list(set(counties_df['Admin2']))
+            #counties.append('Entire state or territory')
+
+
+            df_sub = counties_df[counties_df['Province/State'] == loc]
+            counties_df = 0
+            
+            df_sub = df_sub[df_sub['Admin2'] == county]
+            df_sub = df_sub.filter(items=['date', 'Confirmed'], axis=1)
+            df_sub = df_sub.set_index('date').transpose()
+            df_sub = df_sub.reset_index(drop=True)
+            #df_sub.drop(['date'], axis=1, inplace=True)
+            
+            df_sub['Province/State'] = loc
+            df_sub['Country/Region'] = 'US'
+            df_sub['Lat'] = 0
+            df_sub['Long'] = 0
+            
+            col = df_sub.pop('Long')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Lat')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Country/Region')
+            df_sub.insert(0, col.name, col)
+            
+            col = df_sub.pop('Province/State')
+            df_sub.insert(0, col.name, col)
+            
+    
+            ArrivalDate = np.nan
+            
+            
+        except:
+            locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+            locs_df = locs_df[locs_df['Country/Region'] == 'US']
+            locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
+                                                            'Diamond Princess', 'Grand Princess', 'Recovered', 
+                                                             'United States Virgin Islands', 'Virgin Islands, U.S.',
+                                                            'Wuhan Evacuee'])]
+            
+            locs_df.drop(columns=['Unnamed: 0'], inplace=True)
+
+            df_sub = locs_df[locs_df['Province/State'] == loc]
+            ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
+            ArrivalDate = ArrivalDate[0]
+            locs_df = 0
+            
       
     # add 1 to number of forecast days for indexing purposes
     ForecastDays = int(ForecastDays+1)
-        
-        
-    # filter main dataframe to include only the chosen location
-    df_sub = locs_df[locs_df['Province/State'] == loc]
         
     # get column labels, will filter below to extract dates
     yi = list(df_sub)
@@ -902,8 +1220,15 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
     while obs_y_trunc[ii] == 0: ii+=1
     y = obs_y_trunc[ii:]
     dates = DATES[ii:]
-            
-    
+        
+    y = list(y)
+    if y != sorted(y):
+        for ii, val in enumerate(y):
+            if ii == 0: 
+                continue
+            elif val < y[ii-1]:
+                y[ii] = y[ii-1]
+                    
     # declare x as a list of integers from 0 to len(y)
     x = list(range(len(y)))
 
@@ -912,9 +1237,11 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
     #    predicted y-values
     #    forecasted x and y values
     iterations = 2
-    obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = fxns.fit_curve(x, y, 
-                            model, ForecastDays, PopSize, ArrivalDate, 0, iterations, SEIR_Fit)
-            
+    
+    condition = [x, y, model, ForecastDays, 0, iterations]
+    result = fxns.fit_curve(condition)
+    obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = result
+    
     # convert y values to numpy array
     y = np.array(y)
 
@@ -942,7 +1269,7 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
     
     # get all dates from ArrivalDate to the last day in the forecast window
     fdates = pd.date_range(start=first_date, end=future_date)
-    fdates = fdates.strftime('%m/%d')
+    fdates = fdates.strftime('%m/%d/%Y')
     
     # designature plot label for legend
     for i, val in enumerate(forecasted_y):
@@ -952,16 +1279,26 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
             else:
                 new_cases.append(0)
         if i == 0:
-            new_cases.append(forecasted_y[i])
-                        
+            new_cases.append(0)
+            
+    new_obs = []
+    for i, val in enumerate(y):
+        if i > 0:
+            if y[i] - y[i-1] > 0:
+                new_obs.append(y[i] - y[i-1])
+            else:
+                new_obs.append(0)
+        if i == 0:
+            new_obs.append(0)
+
                 
     # get dates from ArrivalDate to the current day
     dates = pd.date_range(start=first_date, end=latest_date)
-    dates = dates.strftime('%m/%d')
+    dates = dates.strftime('%m/%d/%Y')
             
     # declare column labels
-    col_labels = ['date', 'Total cases', 'New cases', 'New visits', 'New admits',
-                  'All COVID', 'Non-ICU', 'ICU', 'Vent',
+    col_labels = ['date', 'Total cases', 'New visits', 
+                  'New admits', 'All COVID', 'Non-ICU', 'ICU', 'Vent',
                   'Discharged from ICU deceased', 'Discharged from ICU alive',
                   'Discharged from non-ICU alive']
     
@@ -1001,19 +1338,14 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
     # row labels are the dates
     row_labels = fdates.tolist()  
 
-    # Declare pandas dataframe to hold data for download
-    #census_df = pd.DataFrame(columns = ['date'] + col_labels)
-    
     #### Construct arrays for critical care and non-critical care patients
-    # use lognormal cdf
-    
+
+    # Use lognormal cdf to parameterize patient turnover
     sigma = 0.5
     n_cc = np.log(LOS_cc) - (sigma**2)/2
     n_nc = np.log(LOS_nc) - (sigma**2)/2
     
     x_vars = np.array(list(range(1, len(fdates)+1)))
-    #y = (1/(x_vars * (2 * pi * sigma**2)**0.5)) * np.exp((-1/(2*sigma**2)) * (np.log(x_vars) - LOS_cc)**2)
-
     
     p_nc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_nc)/(2**0.5*sigma))
     p_cc = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_cc)/(2**0.5*sigma))
@@ -1044,6 +1376,7 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
         d1 = np.sum(0.01 * mortality * discharged_cc)
         d2 = np.sum((1 - 0.01 * mortality) * discharged_cc)
         d3 = np.sum(discharged_nc)
+        #a1 = np.sum(inactive)
         
         discharged_dead_cc.append(d1)
         discharged_alive_cc.append(d2)
@@ -1058,26 +1391,17 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
         LOScc[0] = ts_lag[i] * (0.01 * per_cc) * (0.01 * per_admit) * (0.01 * per_loc) + ((0.01 * per_ICU_transfer) * tr)
         LOSnc[0] = ts_lag[i] * (1 - (0.01 * per_cc)) * (0.01 * per_admit) * (0.01 * per_loc) + ((1 - 0.01 * per_ICU_transfer) * tr)
         
-        
         total_nc.append(np.sum(LOSnc))
         total_cc.append(np.sum(LOScc))
         
     
     cells = []
+    
     for i in range(len(row_labels)):
             
-        new = new_cases[i]
         val = ts_lag[i]
-            
-        # each cell is a row with 4 columns:
-        #     Total cases, 
-        #     new cases, 
-        #     time-lagged visits to your hospital,
-        #     time-lagged admits to your hospital
-        
         cell = [row_labels[i],
                 int(np.round(forecasted_y[i])), 
-                int(np.round(new)), 
                 int(np.round(val * (per_loc * 0.01))),
                 int(np.round((0.01 * per_admit) * val * (per_loc * 0.01))),
                 int(np.round(total_nc[i] + total_cc[i])), 
@@ -1086,13 +1410,13 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
                 int(np.round(total_cc[i]*(0.01*per_vent))),
                 int(discharged_dead_cc[i]),
                 int(discharged_alive_cc[i]),
-                int(discharged_alive_nc[i])]
+                int(discharged_alive_nc[i]),
+                ]
         
         cells.append(cell)
         
     # Add the row to the dataframe
     census_df = pd.DataFrame.from_records(cells, columns=col_labels)    
-    
     
     #### Construct arrays for critical care and non-critical care patients
         
@@ -1146,16 +1470,164 @@ def generate_patient_census(loc,  model, icu_beds, nonicu_beds, per_loc, per_adm
         census_df[col] = ppe_df[col].tolist()
     
     
-    census_df = census_df.to_dict()
+    census_df = census_df.to_json()
+    
+    dates = 0
+    df_sub = 0
+    fdates = 0
+    forecasted_y = 0
+    ppe_ls = 0
+    col_labels = 0
+    cells = 0
+    ppe_df = 0
+    glove_surgical = 0
+    glove_nitrile = 0
+    glove_vinyl = 0
+    face_mask = 0
+    procedure_mask = 0
+    isolation_gown = 0
+    surgical_mask = 0
+    face_shield = 0
+    respirator = 0
+    PUI_COVID = 0
+    new_visits_your_hospital = 0
+    PUI_COVID = 0
+    cell = 0
+    total_nc = 0
+    total_cc = 0
+    discharged_dead_cc = 0
+    discharged_alive_cc = 0
+    discharged_alive_nc = 0
+    ar = 0
+    ts_lag = 0
+    row_labels = 0
+    n_cc = 0
+    n_nc = 0
+    x_vars = 0
+    p_nc = 0
+    p_cc = 0    
+    LOScc = 0
+    LOSnc = 0
+    lag_pop = 0
+    new_cases_lag = 0
+    lol = 0
     
     return census_df
+
+
+
+
+
+def generate_new_and_active_cases(df, loc, county, model, reset):
+    
+    df = pd.read_json(df)
+    df = df[df['label'] == 'Current forecast']
+    
+    #df['forecast_dates'] = df['forecast_dates'].dt.strftime('%m/%d')#.values.tolist()
+    fdates = df['forecast_dates'].iloc[0]
+    y = df['obs_y'].iloc[0]
+    forecasted_y = df['forecasted_y'].iloc[0]
+    
+    new_cases = []
+    ForecastDays = 60
+    
+    # add 1 to number of forecast days for indexing purposes
+    ForecastDays = int(ForecastDays+1)
+    
+    # designature plot label for legend
+    for i, val in enumerate(forecasted_y):
+        if i > 0:
+            if forecasted_y[i] - forecasted_y[i-1] > 0:
+                new_cases.append(forecasted_y[i] - forecasted_y[i-1])
+            else:
+                new_cases.append(0)
+        if i == 0:
+            new_cases.append(0)
+            
+    new_obs = []
+    for i, val in enumerate(y):
+        if i > 0:
+            if y[i] - y[i-1] > 0:
+                new_obs.append(y[i] - y[i-1])
+            else:
+                new_obs.append(0)
+        if i == 0:
+            new_obs.append(0)
+
+                
+    # declare column labels
+    col_labels = ['date', 'Active cases', 'New cases (Forecasted)', 'New cases (Observed)']
+    
+    # row labels are the dates
+    row_labels = fdates
+
+    #### Construct arrays for critical care and non-critical care patients
+    total_active = []
+    
+    ## Use lognormal to parameterize turnover of active cases
+    x_vars = np.array(list(range(1, len(fdates)+1)))
+    
+    sigma = 0.1
+    n_active = np.log(14) - (sigma**2)/2
+    p_active = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_active)/(2**0.5*sigma))
+    
+    # Initiate lists to hold number of active covid cases
+    Active = np.zeros(len(fdates))
+    Active[0] = new_cases[0]
+    
+    
+    # Roll up patient carry-over into lists of total critical care and total
+    # non-critical patients expected
+    
+    for i, day in enumerate(fdates):
+        
+        inactive = Active * p_active
+        #a1 = np.sum(inactive)
+        Active = Active - inactive
+        Active = np.roll(Active, shift=1)
+        Active[0] = new_cases[i]
+        total_active.append(np.sum(Active))
+        
+    for i, val in enumerate(forecasted_y):
+        try:
+            new_obs[i]
+        except:
+            new_obs.append(np.nan)
+    
+    cells = []
+    for i in range(len(row_labels)):
+            
+        new = new_cases[i]
+        cell = [row_labels[i], int(np.round(total_active[i])), int(np.round(new)), new_obs[i]]
+        cells.append(cell)
+        
+    # Add the row to the dataframe
+    df = pd.DataFrame.from_records(cells, columns=col_labels)    
+    
+    #### Construct arrays for critical care and non-critical care patients
+        
+    # Add the row to the dataframe
+    
+    df = df.to_json()
+    
+    fdates = 0
+    forecasted_y = 0
+    col_labels = 0
+    cells = 0
+    cell = 0
+    row_labels = 0
+    total_active = 0
+    Active = 0
+    
+    return df
+
 
 
 
         
 def generate_plot_patient_census(census_df, reset):
     
-    census_df = pd.DataFrame.from_dict(census_df)
+    census_df = pd.read_json(census_df)
     
     nogo = ['GLOVE SURGICAL', 'GLOVE EXAM NITRILE', 
             'GLOVE EXAM VINYL', 'MASK FACE PROCEDURE ANTI FOG',
@@ -1170,7 +1642,7 @@ def generate_plot_patient_census(census_df, reset):
     labels = labels[1:]
     fig_data = []
     
-    clrs = ['purple',  'mediumorchid', 'blue', 'dodgerblue', 'deepskyblue',
+    clrs = ['', 'black', '#737373', 'black', 'purple',  'mediumorchid', 'blue', 'dodgerblue', 'deepskyblue',
             'green', 'limegreen', 'gold', 'orange', 'red', 'darkred']
     
     for i, label in enumerate(labels):
@@ -1178,25 +1650,39 @@ def generate_plot_patient_census(census_df, reset):
         if label in ['date', 'Discharged from ICU deceased', 
                      'Discharged from ICU alive',
                      'Discharged from non-ICU alive',
-                     'Total cases', 'New cases']:
-            #, 'Total cases', 'New cases', 'New visits']:
+                     'Total cases']:
+            
             continue
         
         dates = census_df['date'].tolist()
         clr = clrs[i]
         obs_y = census_df[label].tolist()
 
-        
-        fig_data.append(
-            go.Scatter(
-                x=dates,
-                y=obs_y,
-                mode="lines",
-                name=label,
-                opacity=0.75,
-                line=dict(color=clr, width=2)
+        if label != 'New cases (Observed)':
+            fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=obs_y,
+                    mode="lines",
+                    name=label,
+                    #visible=lo,
+                    opacity=0.75,
+                    line=dict(color=clr, width=2)
+                )
             )
-        )
+        else:
+            fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=obs_y,
+                    mode="markers",
+                    name=label,
+                    #visible=lo,
+                    opacity=0.75,
+                    marker=dict(size=10,
+                                color='DarkSlateGrey'),
+                )
+            )
         
     
     figure = go.Figure(
@@ -1239,8 +1725,497 @@ def generate_plot_patient_census(census_df, reset):
         ),
     )
     
+    dates = 0
+    census_df = 0
+    
     return figure
 
+
+
+def generate_plot_new_cases(df, loc, cty, reset):
+    
+    pop_size = int()
+    if cty == 'Entire state or territory':
+        
+        pop_size = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
+        pop_size = pop_size[0]
+    
+    else:
+        cty_pops = pd.read_pickle('DataUpdate/data/County_Pops.pkl')
+        
+        try:
+            pop_size = cty_pops[(cty_pops['State'] == loc) & (cty_pops['County'] == cty)]['Population size'].iloc[0]
+    
+        except:
+            pop_size = 0
+        
+    cty_pops = 0
+     
+    df = pd.read_json(df)
+    df = df[df['label'] == 'Current forecast']
+    
+    #df['forecast_dates'] = df['forecast_dates'].dt.strftime('%m/%d')#.values.tolist()
+    fdates = df['forecast_dates'].iloc[0]
+    y = df['obs_y'].iloc[0]
+    forecasted_y = df['forecasted_y'].iloc[0]
+    
+    new_cases = []
+    ForecastDays = 60
+    
+    # add 1 to number of forecast days for indexing purposes
+    ForecastDays = int(ForecastDays+1)
+    
+    # designature plot label for legend
+    for i, val in enumerate(forecasted_y):
+        if i > 0:
+            if forecasted_y[i] - forecasted_y[i-1] > 0:
+                new_cases.append(forecasted_y[i] - forecasted_y[i-1])
+            else:
+                new_cases.append(0)
+        if i == 0:
+            new_cases.append(0)
+            
+    new_obs = []
+    for i, val in enumerate(y):
+        if i > 0:
+            if y[i] - y[i-1] > 0:
+                new_obs.append(y[i] - y[i-1])
+            else:
+                new_obs.append(0)
+        if i == 0:
+            new_obs.append(0)
+
+                
+    # declare column labels
+    col_labels = ['date', 'Active cases', 'New cases (Forecasted)', 'New cases (Observed)']
+    
+    # row labels are the dates
+    row_labels = fdates
+
+    #### Construct arrays for critical care and non-critical care patients
+    total_active = []
+    
+    ## Use lognormal to parameterize turnover of active cases
+    x_vars = np.array(list(range(1, len(fdates)+1)))
+    
+    sigma = 0.1
+    n_active = np.log(14) - (sigma**2)/2
+    p_active = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_active)/(2**0.5*sigma))
+    
+    # Initiate lists to hold number of active covid cases
+    Active = np.zeros(len(fdates))
+    Active[0] = new_cases[0]
+    
+    
+    # Roll up patient carry-over into lists of total critical care and total
+    # non-critical patients expected
+    
+    for i, day in enumerate(fdates):
+        
+        inactive = Active * p_active
+        #a1 = np.sum(inactive)
+        Active = Active - inactive
+        Active = np.roll(Active, shift=1)
+        Active[0] = new_cases[i]
+        total_active.append(np.sum(Active))
+        
+    for i, val in enumerate(forecasted_y):
+        try:
+            new_obs[i]
+        except:
+            new_obs.append(np.nan)
+    
+    cells = []
+    for i in range(len(row_labels)):
+            
+        new = new_cases[i]
+        cell = [row_labels[i], int(np.round(total_active[i])), int(np.round(new)), new_obs[i]]
+        cells.append(cell)
+        
+    # Add the row to the dataframe
+    df = pd.DataFrame.from_records(cells, columns=col_labels)    
+    
+    #### Construct arrays for critical care and non-critical care patients
+        
+    # Add the row to the dataframe
+    
+    fdates = 0
+    forecasted_y = 0
+    col_labels = 0
+    cells = 0
+    cell = 0
+    row_labels = 0
+    total_active = 0
+    Active = 0
+    
+    #df = pd.read_json(df)
+    labels = list(df)
+    labels = labels[1:]
+    fig_data = []
+    
+    clrs = ['#cc0000', '#2e5cb8', '#2e5cb8', 'purple',  'mediumorchid', 'blue', 'dodgerblue', 'deepskyblue',
+            'green', 'limegreen', 'gold', 'orange', 'red', 'darkred']
+    
+    for i, label in enumerate(labels):
+        #if label in ['Active cases', 'New cases (Forecasted)', 'New cases (Observed)']:
+        #    lo = 'legendonly'
+        #else:
+        #    lo = True
+            
+        if label in ['date']:
+            continue
+        
+        label2 = str(label)
+        if label2 == 'Active cases':
+            label2 = 'Active cases (Forecasted)'
+            
+        dates = df['date'].tolist()
+        clr = clrs[i]
+        obs_y = df[label].tolist()
+
+        if label != 'New cases (Observed)':
+            fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=obs_y,
+                    mode="lines",
+                    name=label2,
+                    #visible=lo,
+                    opacity=0.95,
+                    line=dict(color=clr, width=2)
+                )
+            )
+        else:
+            fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=obs_y,
+                    mode="markers",
+                    name=label2,
+                    #visible=lo,
+                    opacity=0.65,
+                    marker=dict(size=10,
+                                color=clr),
+                )
+            )
+        
+    if pop_size > 0:
+        p_active = 100 * df['Active cases']/pop_size
+        fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=p_active,
+                    mode="lines",
+                    name='% active cases per capita',
+                    #visible=lo,
+                    opacity=0.75,
+                    marker=dict(size=10,
+                                color='red'),
+                )
+            )
+        
+    
+    figure = go.Figure(
+        data=fig_data,
+        layout=go.Layout(
+            xaxis=dict(
+                title=dict(
+                    text="<b>Date</b>",
+                    font=dict(
+                        family='"Open Sans", "HelveticaNeue", "Helvetica Neue",'
+                        " Helvetica, Arial, sans-serif",
+                        size=18,
+                    ),
+                ),
+                rangemode="tozero",
+                zeroline=True,
+                showticklabels=True,
+            ),
+            
+            yaxis=dict(
+                title=dict(
+                    text="<b>COVID-19 cases</b>",
+                    font=dict(
+                        family='"Open Sans", "HelveticaNeue", "Helvetica Neue",'
+                        " Helvetica, Arial, sans-serif",
+                        size=18,
+                        
+                    ),
+                ),
+                rangemode="tozero",
+                zeroline=True,
+                showticklabels=True,
+            ),
+            
+            margin=dict(l=60, r=30, b=10, t=40),
+            showlegend=True,
+            height=400,
+            paper_bgcolor="rgb(245, 247, 249)",
+            plot_bgcolor="rgb(245, 247, 249)",
+        ),
+    )
+    
+    dates = 0
+    df = 0
+    
+    return figure
+
+
+
+
+
+def generate_plot_employee_forecast1(df, loc, cty, employees, inc_rate, furlough, reset):
+    
+    pop_size = int()
+    pop_size_e = int()
+    
+    if cty == 'Entire state or territory':
+        
+        pop_size = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
+        pop_size = pop_size[0]
+    
+    
+    else:
+        cty_pops = pd.read_pickle('DataUpdate/data/County_Pops.pkl')
+        
+        try:
+            pop_size = cty_pops[(cty_pops['State'] == loc) & (cty_pops['County'] == cty)]['Population size'].iloc[0]
+    
+        except:
+            pop_size = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
+            pop_size = pop_size[0]
+    
+    if employees is None or employees == 'Enter a number':
+        pop_size_e = int(pop_size)
+    else:
+        pop_size_e = int(employees)
+        
+    cty_pops = 0
+     
+    df = pd.read_json(df)
+    df = df[df['label'] == 'Current forecast']
+    
+    #df['forecast_dates'] = df['forecast_dates'].dt.strftime('%m/%d')#.values.tolist()
+    fdates = df['forecast_dates'].iloc[0]
+    y = df['obs_y'].iloc[0]
+    forecasted_y = np.array(df['forecasted_y'].iloc[0])
+    
+    new_cases = []
+    new_cases_e = []
+    ForecastDays = 60
+    
+    # add 1 to number of forecast days for indexing purposes
+    ForecastDays = int(ForecastDays+1)
+    
+    # designature plot label for legend
+    for i, val in enumerate(forecasted_y):
+        if i > 0:
+            if forecasted_y[i] - forecasted_y[i-1] > 0:
+                new_cases.append(forecasted_y[i] - forecasted_y[i-1])
+            else:
+                new_cases.append(0)
+        if i == 0:
+            new_cases.append(0)
+    
+    inc_rate = inc_rate/100
+    new_cases_e = np.array(new_cases) * (pop_size_e/pop_size) * inc_rate
+             
+    
+    # declare column labels
+    col_labels = ['date', 'Active cases (gen pop)', 'Active employee cases', 'New employee cases']
+    
+    # row labels are the dates
+    row_labels = fdates
+
+    total_active = []
+    total_active_e = []
+    
+    ## Use lognormal to parameterize turnover of active cases
+    x_vars = np.array(list(range(1, len(fdates)+1)))
+    
+    # General population
+    sigma = 0.1
+    n_active = np.log(14) - (sigma**2)/2
+    p_active = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_active)/(2**0.5*sigma))
+    
+    # Initiate lists to hold number of active covid cases
+    Active = np.zeros(len(fdates))
+    Active[0] = new_cases[0]
+    
+    # Employees
+    sigma = 0.05
+    n_active_e = (np.log(furlough) + 0.1) - (sigma**2)/2 # for median we include (sigma**2)/2
+    p_active_e = 0.5 + 0.5 * sc.special.erf((np.log(x_vars) - n_active_e)/(2**0.5*sigma))
+    
+    # Initiate lists to hold number of active covid cases
+    Active_e = np.zeros(len(fdates))
+    Active_e[0] = new_cases_e[0]
+    
+    
+    
+    # Roll up patient carry-over into lists of total critical care and total
+    # non-critical patients expected
+    
+    for i, day in enumerate(fdates):
+        
+        inactive = Active * p_active
+        #a1 = np.sum(inactive)
+        Active = Active - inactive
+        Active = np.roll(Active, shift=1)
+        Active[0] = new_cases[i]
+        total_active.append(np.sum(Active))
+        
+        inactive_e = Active_e * p_active_e
+        #a1 = np.sum(inactive)
+        Active_e = Active_e - inactive_e
+        Active_e = np.roll(Active_e, shift=1)
+        Active_e[0] = new_cases_e[i]
+        total_active_e.append(np.sum(Active_e))
+        
+    
+    cells = []
+    for i in range(len(row_labels)):
+        cell = [row_labels[i], int(np.round(total_active[i])), int(np.round(total_active_e[i])), int(np.round(new_cases_e[i]))]
+        cells.append(cell)
+        
+    # Add the row to the dataframe
+    df = pd.DataFrame.from_records(cells, columns=col_labels)    
+    
+    #### Construct arrays for critical care and non-critical care patients
+        
+    # Add the row to the dataframe
+    
+    fdates = 0
+    forecasted_y = 0
+    col_labels = 0
+    cells = 0
+    cell = 0
+    row_labels = 0
+    total_active = 0
+    Active = 0
+    total_active_e = 0
+    Active_e = 0
+    new_cases_e = 0
+    new_cases = 0
+    
+    #df = pd.read_json(df)
+    labels = list(df)
+    
+    labels = labels[1:]
+    fig_data = []
+    
+    clrs = ['#cc0000', '#2e5cb8', 'deepskyblue',  'mediumorchid', 'blue', 'dodgerblue', 'deepskyblue',
+            'green', 'limegreen', 'gold', 'orange', 'red', 'darkred']
+    
+    for i, label in enumerate(labels):
+        if label in ['New cases (Observed)']: continue
+        
+        if label == 'Active cases (gen pop)':
+            lo = 'legendonly'
+        else:
+            lo = True
+            
+        if label in ['date']:
+            continue
+        
+        label2 = str(label)
+            
+        dates = df['date'].tolist()
+        clr = clrs[i]
+        obs_y = df[label].tolist()
+
+        if label == ['Active employee cases']:
+            label = 'No. of employees with active COVID'
+            
+        fig_data.append(
+            go.Scatter(
+                x=dates,
+                y=obs_y,
+                mode="lines",
+                name=label2,
+                    visible=lo,
+                opacity=0.95,
+                line=dict(color=clr, width=2)
+            )
+        )
+        
+    if pop_size > 0:
+        p_active = 100 * df['Active cases (gen pop)']/pop_size
+        fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=p_active,
+                    mode="lines",
+                    name='% active cases per capita',
+                    visible=lo,
+                    opacity=0.5,
+                    marker=dict(size=10,
+                                color='red'),
+                )
+            )
+        
+    if pop_size_e > 0:
+        p_active = 100 * df['Active employee cases']/pop_size_e
+        fig_data.append(
+                go.Scatter(
+                    x=dates,
+                    y=p_active,
+                    mode="lines",
+                    name='% of employees furloughed',
+                    visible=lo,
+                    opacity=0.9,
+                    marker=dict(size=10,
+                                color='red'),
+                )
+            )
+        
+    
+    figure = go.Figure(
+        data=fig_data,
+        layout=go.Layout(
+            xaxis=dict(
+                title=dict(
+                    text="<b>Date</b>",
+                    font=dict(
+                        family='"Open Sans", "HelveticaNeue", "Helvetica Neue",'
+                        " Helvetica, Arial, sans-serif",
+                        size=18,
+                    ),
+                ),
+                rangemode="tozero",
+                zeroline=True,
+                showticklabels=True,
+            ),
+            
+            yaxis=dict(
+                title=dict(
+                    text="<b>COVID-19 cases (# or %)</b>",
+                    font=dict(
+                        family='"Open Sans", "HelveticaNeue", "Helvetica Neue",'
+                        " Helvetica, Arial, sans-serif",
+                        size=18,
+                        
+                    ),
+                ),
+                rangemode="tozero",
+                zeroline=True,
+                showticklabels=True,
+            ),
+            
+            margin=dict(l=60, r=30, b=10, t=40),
+            showlegend=True,
+            height=500,
+            paper_bgcolor="rgb(245, 247, 249)",
+            plot_bgcolor="rgb(245, 247, 249)",
+        ),
+    )
+    
+    dates = 0
+    df = 0
+    
+    
+    
+    return figure
 
 
 
@@ -1248,13 +2223,14 @@ def generate_plot_patient_census(census_df, reset):
 
 def generate_plot_discharge_census(census_df, reset):
     
-    census_df = pd.DataFrame.from_dict(census_df)
+    census_df = pd.read_json(census_df)
     
     nogo = ['GLOVE SURGICAL', 'GLOVE EXAM NITRILE', 
             'GLOVE EXAM VINYL', 'MASK FACE PROCEDURE ANTI FOG',
             'MASK PROCEDURE FLUID RESISTANT', 'GOWN ISOLATION XLARGE YELLOW', 
             'MASK SURGICAL ANTI FOG W/FILM', 'SHIELD FACE FULL ANTI FOG',
-            'RESPIRATOR PARTICULATE FILTER REG']
+            'RESPIRATOR PARTICULATE FILTER REG',
+            'Total cases', 'New visits', ]
     
     census_df.drop(nogo, axis=1, inplace=True)
     
@@ -1267,8 +2243,7 @@ def generate_plot_discharge_census(census_df, reset):
             'green', 'limegreen', 'gold', 'orange', 'red', 'darkred']
     
     for i, label in enumerate(labels):
-        
-        if label in ['date']:#, 'Total cases', 'New cases', 'New visits']:
+        if label in ['date']:
             continue
         if label in ['Discharged from ICU deceased', 'Discharged from ICU alive', 
                      'Discharged from non-ICU alive']:
@@ -1330,25 +2305,29 @@ def generate_plot_discharge_census(census_df, reset):
         ),
     )
     
+    dates = 0
+    census_df = 0
+    
     return figure
 
 
 
 def generate_patient_census_table(census_df, reset):
-    df_table = pd.DataFrame.from_dict(census_df)
+    df_table = pd.read_json(census_df)
     
     nogo = ['GLOVE SURGICAL', 'GLOVE EXAM NITRILE', 
             'GLOVE EXAM VINYL', 'MASK FACE PROCEDURE ANTI FOG',
             'MASK PROCEDURE FLUID RESISTANT', 'GOWN ISOLATION XLARGE YELLOW', 
             'MASK SURGICAL ANTI FOG W/FILM', 'SHIELD FACE FULL ANTI FOG',
-            'RESPIRATOR PARTICULATE FILTER REG']
+            'RESPIRATOR PARTICULATE FILTER REG', 'Total cases', 
+            ]
     
     df_table.drop(nogo, axis=1, inplace=True)
     
     csv_string = df_table.to_csv(index=False, encoding='utf-8')
     csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
     
-    df_table['dates'] = df_table['date'] + '/2020'
+    df_table['dates'] = df_table['date'] #+ '/2020'
     df_table['dates'] = pd.to_datetime(df_table['dates']).dt.date
     df_table = df_table[df_table['dates'] >= pd.Timestamp('today')]
     df_table.drop(['dates'], axis=1, inplace=True)
@@ -1358,11 +2337,13 @@ def generate_patient_census_table(census_df, reset):
                 fill_color='lavender',
                 align='left', 
                 height=30),
-        cells=dict(values=[df_table['date'], df_table['Total cases'],
-                       df_table['New cases'], df_table['New visits'],
+        cells=dict(values=[df_table['date'], #df_table['Total cases'],
+                       #df_table['New cases'], df_table['Active cases'],
+                       df_table['New visits'],
                        df_table['New admits'], df_table['All COVID'],
                        df_table['Non-ICU'], df_table['ICU'],
-                       df_table['Vent'], df_table['Discharged from ICU deceased'],
+                       df_table['Vent'], 
+                       df_table['Discharged from ICU deceased'],
                        df_table['Discharged from ICU alive'], 
                        df_table['Discharged from non-ICU alive']],
                        fill_color="rgb(245, 247, 249)",
@@ -1377,7 +2358,7 @@ def generate_patient_census_table(census_df, reset):
             plot_bgcolor="rgb(245, 247, 249)",
         ),)
     
-    
+    df_table = 0
     
     return figure, csv_string
 
@@ -1385,9 +2366,9 @@ def generate_patient_census_table(census_df, reset):
 
 def generate_plot_ppe(df, reset):
     
-    ppe_df = pd.DataFrame.from_dict(df)
+    ppe_df = pd.read_json(df)
     
-    nogo = ['Total cases', 'New cases', 'New visits', 'New admits',
+    nogo = ['Total cases', 'New visits', 'New admits',
                   'All COVID', 'Non-ICU', 'ICU', 'Vent',
                   'Discharged from ICU deceased', 'Discharged from ICU alive',
                   'Discharged from non-ICU alive']
@@ -1463,14 +2444,17 @@ def generate_plot_ppe(df, reset):
         ),
     )
     
+    ppe_df = 0
+    dates = 0
+    
     return figure
 
 
 
 def generate_ppe_table(df, reset):
-    df_table = pd.DataFrame.from_dict(df)
+    df_table = pd.read_json(df)
     
-    nogo = ['Total cases', 'New cases', 'New visits', 'New admits',
+    nogo = ['Total cases', 'New visits', 'New admits',
                   'All COVID', 'Non-ICU', 'ICU', 'Vent',
                   'Discharged from ICU deceased', 'Discharged from ICU alive',
                   'Discharged from non-ICU alive']
@@ -1484,7 +2468,7 @@ def generate_ppe_table(df, reset):
     csv_string = df_table.to_csv(index=False, encoding='utf-8')
     csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
     
-    df_table['dates'] = df_table['date'] + '/2020'
+    df_table['dates'] = df_table['date'] #+ '/2020'
     df_table['dates'] = pd.to_datetime(df_table['dates']).dt.date
     df_table = df_table[df_table['dates'] >= pd.Timestamp('today')]
     df_table.drop(['dates'], axis=1, inplace=True)
@@ -1511,368 +2495,7 @@ def generate_ppe_table(df, reset):
             plot_bgcolor="rgb(245, 247, 249)",
         ),)
     
-    
+    df_table = 0
     
     return figure, csv_string
 
-
-
-
-
-
-
-
-def map1(reset):
-    
-    fig = go.Figure(data=go.Choropleth(
-    locations = testing_df_mrd['state'], # Spatial coordinates
-    z = testing_df_mrd['Testing_Rate'].astype(float), # Data to be color-coded
-    locationmode = 'USA-states', # set of locations match entries in `locations`
-    colorscale = 'Plasma',
-    colorbar_title = "Testing Rate",
-    marker_line_color='grey',
-    text = testing_df_mrd['date'],
-    ))
-
-    fig.update_layout(
-        geo_scope='usa',
-        margin=dict(l=0, r=0, b=0, t=0),
-            showlegend=True,
-            height=400,
-            paper_bgcolor="rgb(245, 247, 249)",
-            plot_bgcolor="rgb(245, 247, 249)")
-    
-    return fig
-
-
-def map2(reset):
-    
-    fig = go.Figure(data=go.Choropleth(
-    locations=testing_df_mrd['state'], # Spatial coordinates
-    z = testing_df_mrd['Positives per capita'].astype(float), # Data to be color-coded
-    locationmode = 'USA-states', # set of locations match entries in `locations`
-    colorscale = 'Viridis',
-    colorbar_title = "Positives per capita",
-    marker_line_color='grey',
-    text = testing_df_mrd['date'],
-    ))
-
-    fig.update_layout(
-        geo_scope='usa',
-        margin=dict(l=0, r=0, b=0, t=0),
-            showlegend=True,
-            height=400,
-            paper_bgcolor="rgb(245, 247, 249)",
-            plot_bgcolor="rgb(245, 247, 249)")
-
-    return fig
-
-
-def map3(reset):
-    
-    fig = go.Figure(data=go.Choropleth(
-    locations=testing_df_mrd['state'], # Spatial coordinates
-    z = testing_df_mrd['Percent positive'].astype(float), # Data to be color-coded
-    locationmode = 'USA-states', # set of locations match entries in `locations`
-    colorscale = 'Cividis',
-    colorbar_title = "Percent positive",
-    marker_line_color='grey',
-    text = testing_df_mrd['date'],
-    ))
-
-    fig.update_layout(
-        geo_scope='usa',
-        margin=dict(l=0, r=0, b=0, t=0),
-            showlegend=True,
-            height=400,
-            paper_bgcolor="rgb(245, 247, 249)",
-            plot_bgcolor="rgb(245, 247, 249)")
-    
-    return fig
-
-
-def map4(reset):
-    
-    fig = go.Figure(data=go.Choropleth(
-    locations=testing_df_mrd['state'], # Spatial coordinates
-    z = testing_df['DeltaTestingRate'].astype(float), # Data to be color-coded
-    locationmode = 'USA-states', # set of locations match entries in `locations`
-    colorscale = 'haline',
-    colorbar_title = "Change in testing rate",
-    marker_line_color='grey',
-    text = testing_df_mrd['date'],
-    ))
-
-    fig.update_layout(
-        geo_scope='usa',
-        margin=dict(l=0, r=0, b=0, t=0),
-            showlegend=True,
-            height=400,
-            paper_bgcolor="rgb(245, 247, 249)",
-            plot_bgcolor="rgb(245, 247, 249)")
-    
-    return fig
-
-
-
-
-def map5(reset):
-    
-    fig = go.Figure(data=go.Choropleth(
-    locations = testing_df_mrd['state'], # Spatial coordinates
-    z = testing_df_mrd['hospitalizedCurrently'].astype(float), # Data to be color-coded
-    locationmode = 'USA-states', # set of locations match entries in `locations`
-    colorscale = 'haline',
-    colorbar_title = "Hospitalized",
-    marker_line_color='grey',
-    text = testing_df_mrd['date'],
-    ))
-
-    fig.update_layout(
-        geo_scope='usa',
-        margin=dict(l=0, r=0, b=0, t=0),
-            showlegend=True,
-            height=400,
-            paper_bgcolor="rgb(245, 247, 249)",
-            plot_bgcolor="rgb(245, 247, 249)")
-    
-    return fig
-
-
-
-
-def map6(reset):
-    
-    
-    fig = go.Figure(data=go.Choropleth(
-    locations=testing_df_mrd['state'], # Spatial coordinates
-    z = testing_df_mrd['inIcuCurrently'].astype(float), # Data to be color-coded
-    locationmode = 'USA-states', # set of locations match entries in `locations`
-    colorscale = 'haline',
-    colorbar_title = "In ICU",
-    marker_line_color='grey',
-    text = testing_df_mrd['date'],
-    ))
-
-    fig.update_layout(
-        geo_scope='usa',
-        margin=dict(l=0, r=0, b=0, t=0),
-            showlegend=True,
-            height=400,
-            paper_bgcolor="rgb(245, 247, 249)",
-            plot_bgcolor="rgb(245, 247, 249)")
-    
-    return fig
-
-
-
-
-def generate_delta_testing_plot(reset):
-    
-    fig = px.line(testing_df, x="date", y="Testing_Rate", color="state",
-              line_group="state", hover_name="state",
-              labels={'Testing_Rate': 'Testing rate'})
-
-    fig.update_xaxes(title_font=dict(size=14, family='Arial', color='black'))
-    fig.update_yaxes(title_font=dict(size=14, family='Arial', color='black'))
-
-    fig.update_layout(title_font=dict(size=14, 
-                      color='black', 
-                      family='Arial'),
-                      showlegend=True,
-                      margin=dict(l=10, r=40, b=80, t=20),
-                      #height=400,
-                      paper_bgcolor="rgb(245, 247, 249)",
-                      plot_bgcolor="rgb(245, 247, 249)",)
-    
-    return fig
-
-
-def generate_PopSize_vs_Tested(reset):
-    
-    slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['log_PopSize'], 
-                                                                   testing_df_mrd['log_People_Tested'])
-    
-    pred_y = slope * testing_df_mrd['log_PopSize'] + intercept
-    
-    lab = 'Power law slope = ' + str(np.round(slope,2)) + ', r-square = ' + str(np.round(r_value**2,2))
-    
-    fig = go.Figure()
-    
-    fig = px.scatter(testing_df_mrd, x="log_PopSize", y="log_People_Tested",
-                 color='%Poor',
-                 symbol='color',
-                 size='%Black', hover_data=['Province_State','Confirmed', 'Deaths'],
-                 labels={'log_PopSize': 'log(State population size)', 
-                         'log_People_Tested': 'log(Number of tests conducted)'})
-    
-    fig.add_trace(go.Scatter(x=testing_df_mrd['log_PopSize'], y=pred_y,
-                    mode='lines',
-                    ))
-    
-    
-    fig.update_layout(title = lab,
-                      title_font=dict(size=14, 
-                      color='black', 
-                      family='Arial'),
-                      showlegend=False,
-                      margin=dict(l=10, r=10, b=80, t=20),
-                      #height=400,
-                      paper_bgcolor="rgb(245, 247, 249)",
-                      plot_bgcolor="rgb(245, 247, 249)",)
-    
-    return fig
-
-
-def generate_Negative_vs_Tested(reset):
-    
-    slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['log_People_Tested'], testing_df_mrd['log_negative'])
-    
-    pred_y = slope * testing_df_mrd['log_People_Tested'] + intercept
-    
-    lab = 'Power law slope = ' + str(np.round(slope,2)) + ', r-square = ' + str(np.round(r_value**2,2))
-    
-    fig = px.scatter(testing_df_mrd, y="log_negative", x="log_People_Tested", color='%Poor',
-                 symbol='color',
-                 size='%Black', hover_data=['Province_State','Confirmed', 'Deaths'],
-                 labels={'log_negative': 'log(Negative tests)', 
-                        'log_People_Tested': 'log(Number of tests conducted)'})
-    
-    fig.add_trace(go.Scatter(x=testing_df_mrd['log_People_Tested'], y=pred_y,
-                    mode='lines',
-                    ))
-    
-    
-    fig.update_layout(title = lab,
-                      title_font=dict(size=14, 
-                      color='black', 
-                      family='Arial'),
-                      showlegend=False,
-                      margin=dict(l=10, r=40, b=80, t=20),
-                      #height=400,
-                      paper_bgcolor="rgb(245, 247, 249)",
-                      plot_bgcolor="rgb(245, 247, 249)",)
-    
-    
-    return fig
-
-    
-
-def generate_Positive_vs_Tested(reset):
-    
-    slope, intercept, r_value, p_value, std_err = stats.linregress(testing_df_mrd['log_People_Tested'], testing_df_mrd['log_positive'])
-    
-    pred_y = slope * testing_df_mrd['log_People_Tested'] + intercept
-    
-    lab = 'Power law slope = ' + str(np.round(slope,2)) + ', r-square = ' + str(np.round(r_value**2,2))
-    
-    fig = px.scatter(testing_df_mrd, x="log_People_Tested", y="log_positive",
-                     color='%Poor',
-                     symbol='color',
-                     #trendline="ols",
-                     size='%Black', hover_data=['state','total', 'death'],
-                     labels={'log_People_Tested': 'log(Number of tests conducted}', 
-                             'log_positive': 'log(Positive tests)'}
-                    )
-    
-    fig.add_trace(go.Scatter(x=testing_df_mrd['log_People_Tested'], y=pred_y,
-                    mode='lines',
-                    ))
-    
-    fig.update_layout(title = lab,
-                      title_font=dict(size=14, 
-                      color='black', 
-                      family='Arial'),
-                      showlegend=False,
-                      margin=dict(l=10, r=10, b=80, t=20),
-                      #height=400,
-                      paper_bgcolor="rgb(245, 247, 249)",
-                      plot_bgcolor="rgb(245, 247, 249)",)
-    
-    
-    return fig
-
-
-
-def generate_ICU_vs_Hospitalized(reset):
-    
-    df_sub = testing_df_mrd.filter(items=['inIcuCurrently', 'onVentilatorCurrently', 'hospitalizedCurrently',
-                                '%Poor', '%Black', 'sqrt_PopSize', 'PopSize', 'state', 
-                                'total', 'death', 'color'])
-    df_sub.dropna(inplace=True)
-
-    varx = df_sub['hospitalizedCurrently']
-    vary = df_sub['inIcuCurrently']
-    mask = ~np.isnan(varx) & ~np.isnan(vary)
-    slope, intercept, r_value, p_value, std_err = stats.linregress(varx[mask], vary[mask])
-
-    pred_y = slope * df_sub['hospitalizedCurrently'] + intercept
-    
-    lab = 'Slope = ' + str(np.round(slope,2)) + ', r-square = ' + str(np.round(r_value**2,2))
-    
-    fig = px.scatter(df_sub, x="hospitalizedCurrently", y="inIcuCurrently",
-                     color='%Poor',
-                     symbol='color',
-                     size='%Black', hover_data=['state','total', 'death'],
-                     labels={'hospitalizedCurrently': 'Number hospitalized', 
-                         'inIcuCurrently': 'Patients in ICU'}
-                    )
-    
-    fig.add_trace(go.Scatter(x=df_sub['hospitalizedCurrently'], y=pred_y,
-                    mode='lines',
-                    ))
-    
-    fig.update_layout(title = lab,
-                      title_font=dict(size=14, 
-                      color='black', 
-                      family='Arial'),
-                      showlegend=False,
-                      margin=dict(l=10, r=10, b=80, t=20),
-                      #height=400,
-                      paper_bgcolor="rgb(245, 247, 249)",
-                      plot_bgcolor="rgb(245, 247, 249)",)
-    
-    return fig
-
-
-
-def generate_ventilator_vs_ICU(reset):
-    
-    df_sub = testing_df_mrd.filter(items=['inIcuCurrently', 'onVentilatorCurrently',
-                                '%Poor', '%Black', 'sqrt_PopSize', 'PopSize', 'state', 
-                                'total', 'death', 'color'])
-    df_sub.dropna(inplace=True)
-
-    varx = df_sub['inIcuCurrently']
-    vary = df_sub['onVentilatorCurrently']
-    mask = ~np.isnan(varx) & ~np.isnan(vary)
-    slope, intercept, r_value, p_value, std_err = stats.linregress(varx[mask], vary[mask])
-
-    pred_y = slope * df_sub['inIcuCurrently'] + intercept
-    
-    lab = 'Slope = ' + str(np.round(slope,2)) + ', r-square = ' + str(np.round(r_value**2,2))
-    
-    fig = px.scatter(df_sub, x="inIcuCurrently", y="onVentilatorCurrently",
-                     color='%Poor',
-                     symbol='color',
-                     #trendline="ols",
-                     size='%Black', hover_data=['state','total', 'death'],
-                     labels={'onVentilatorCurrently': 'Patients on Ventilator', 
-                         'inIcuCurrently': 'Patients in ICU'}
-                    )
-    
-    fig.add_trace(go.Scatter(x=df_sub['inIcuCurrently'], y=pred_y,
-                    mode='lines',
-                    ))
-    
-    fig.update_layout(title = lab,
-                      title_font=dict(size=14, 
-                      color='black', 
-                      family='Arial'),
-                      showlegend=False,
-                      margin=dict(l=10, r=10, b=80, t=20),
-                      #height=400,
-                      paper_bgcolor="rgb(245, 247, 249)",
-                      plot_bgcolor="rgb(245, 247, 249)",)
-
-    return fig
