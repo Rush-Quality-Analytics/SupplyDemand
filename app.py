@@ -47,9 +47,6 @@ app.layout = html.Div([
             style={'display': 'none'}
         ),
         
-        
-        
-        
         # Banner
         html.Div(
             id="banner1",

@@ -20,7 +20,9 @@ pd.set_option('display.max_columns', None)
 
 statepops = pd.read_csv('DataUpdate/data/StatePops.csv')
 
-locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+url = 'https://raw.githubusercontent.com/klocey/StateCovidData/main/data/COVID-CASES-DF.txt'
+locs_df = pd.read_csv(url, sep='\t')
+            
 
 locs_df = locs_df[locs_df['Country/Region'] == 'US']
 locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
@@ -653,7 +655,9 @@ def generate_model_forecasts(loc, county, model, reset):
 
     if county == 'Entire state or territory':
         
-        locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+        url = 'https://raw.githubusercontent.com/klocey/StateCovidData/main/data/COVID-CASES-DF.txt'
+        locs_df = pd.read_csv(url, sep='\t')
+
         locs_df = locs_df[locs_df['Country/Region'] == 'US']
         locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
                             'Diamond Princess', 'Grand Princess', 'Recovered', 'United States Virgin Islands', 
@@ -703,8 +707,10 @@ def generate_model_forecasts(loc, county, model, reset):
         except:
             PopSize = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
             PopSize = PopSize[0]
-    
-            locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+            
+            url = 'https://raw.githubusercontent.com/klocey/StateCovidData/main/data/COVID-CASES-DF.txt'
+            locs_df = pd.read_csv(url, sep='\t')
+
             locs_df = locs_df[locs_df['Country/Region'] == 'US']
             locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
                                                             'Diamond Princess', 'Grand Princess', 'Recovered', 
@@ -1105,7 +1111,9 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     
 
     if county == 'Entire state or territory':
-        locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+        url = 'https://raw.githubusercontent.com/klocey/StateCovidData/main/data/COVID-CASES-DF.txt'
+        locs_df = pd.read_csv(url, sep='\t')
+
         locs_df = locs_df[locs_df['Country/Region'] == 'US']
         locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
                                                         'Diamond Princess', 'Grand Princess', 'Recovered', 
@@ -1154,7 +1162,9 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
             
             
         except:
-            locs_df = pd.read_csv('DataUpdate/data/COVID-CASES-DF.txt', sep='\t') 
+            url = 'https://raw.githubusercontent.com/klocey/StateCovidData/main/data/COVID-CASES-DF.txt'
+            locs_df = pd.read_csv(url, sep='\t')
+
             locs_df = locs_df[locs_df['Country/Region'] == 'US']
             locs_df = locs_df[~locs_df['Province/State'].isin(['US', 'American Samoa', 'Northern Mariana Islands',
                                                             'Diamond Princess', 'Grand Princess', 'Recovered', 
