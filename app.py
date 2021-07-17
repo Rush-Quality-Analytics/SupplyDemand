@@ -852,10 +852,11 @@ def update_output17(loc1, loc2):
       Input("county-select1", "value"),
       Input("model-select1", "value"),
       #Input("add-forecast1", "n_clicks"),
-      Input("reset-btn1", "n_clicks")
+      Input("reset-btn1", "n_clicks"),
+      Input("date1", "date"),
      ],
 )
-def update_model_forecast1(loc, county, model, reset_click):
+def update_model_forecast1(loc, county, model, reset_click, startdate):
     
     reset = False
     # Find which one has been triggered
@@ -866,7 +867,7 @@ def update_model_forecast1(loc, county, model, reset_click):
         if prop_id == "reset-btn1":
             reset = True
 
-    df_fits = app_fxns.generate_model_forecasts(loc, county, model, reset)
+    df_fits = app_fxns.generate_model_forecasts(loc, county, model, reset, startdate)
     fig1 = app_fxns.generate_model_forecast_plot(df_fits, reset)
     
     return df_fits, fig1
@@ -949,6 +950,7 @@ def update_table_model_forecast1(df_fits, loc, cty, reset_click):
      Input("shield1", "value"),
      Input('resp1', "value"),
      Input("reset-btn1", "n_clicks"),
+     Input("date1", "date"),
     ],
 )
 
@@ -957,7 +959,7 @@ def update_patient_census(loc, cty, model, icu_beds, nonicu_beds, per_loc, per_a
     per_cc, LOS_cc, LOS_nc, per_vent, TimeLag, transfers, per_ICU_transfer, mortality, 
     GLOVE_SURGICAL, GLOVE_EXAM_NITRILE, GLOVE_EXAM_VINYL, MASK_FACE_PROC_ANTI_FOG, 
     MASK_PROC_FLUID_RESISTANT, GOWN_ISOLATION_XL_YELLOW, MASK_SURG_ANTI_FOG_FILM, 
-    SHIELD_FACE_FULL_ANTI_FOG, RESP_PART_FILTER_REG, reset_click):
+    SHIELD_FACE_FULL_ANTI_FOG, RESP_PART_FILTER_REG, reset_click, startdate):
 
     reset = False
     # Find which one has been triggered
@@ -974,7 +976,7 @@ def update_patient_census(loc, cty, model, icu_beds, nonicu_beds, per_loc, per_a
     per_cc, LOS_cc, LOS_nc, per_vent, TimeLag, transfers, per_ICU_transfer, mortality, 
     GLOVE_SURGICAL, GLOVE_EXAM_NITRILE, GLOVE_EXAM_VINYL, MASK_FACE_PROC_ANTI_FOG, 
     MASK_PROC_FLUID_RESISTANT, GOWN_ISOLATION_XL_YELLOW, MASK_SURG_ANTI_FOG_FILM, 
-    SHIELD_FACE_FULL_ANTI_FOG, RESP_PART_FILTER_REG, reset)
+    SHIELD_FACE_FULL_ANTI_FOG, RESP_PART_FILTER_REG, reset, startdate)
     
     return df2
 
@@ -1009,10 +1011,11 @@ def update_plot_patient_census(df_census, loc, cty, reset_click):
      [Input("location-select2", "value"),
       Input("county-select2", "value"),
       Input("model-select2", "value"),
-      Input("reset-btn2", "n_clicks")
+      Input("reset-btn2", "n_clicks"),
+      Input("date1", "date"),
      ],
 )
-def update_model_forecast2(loc, county, model, reset_click):
+def update_model_forecast2(loc, county, model, reset_click, startdate):
     
     reset = False
     # Find which one has been triggered
@@ -1024,7 +1027,7 @@ def update_model_forecast2(loc, county, model, reset_click):
             reset = True
 
     # Return to original hm(no colored annotation) by resetting
-    df_fits = app_fxns.generate_model_forecasts(loc, county, model, reset)
+    df_fits = app_fxns.generate_model_forecasts(loc, county, model, reset, startdate)
     
     return df_fits
 

@@ -10,6 +10,7 @@ import plotly.express as px
 from scipy import stats
 import urllib
 import sys
+from datetime import date
 
 import multiprocessing as mp
 from multiprocessing import Pool
@@ -316,6 +317,17 @@ def generate_control_card1():
                     }
             ),
             
+            html.Br(),
+            html.P("Select a start date"),
+            dcc.DatePickerSingle(
+                id='date1',
+                min_date_allowed=date(2020, 3, 10),
+                max_date_allowed=date(2021, 7, 1),
+                initial_visible_month=date(2021, 6, 1),
+                date=date(2021, 6, 1)
+            ),
+            
+            html.Br(),
             html.Br(),
             html.P("Select a model"),
             dcc.Dropdown(
@@ -641,11 +653,11 @@ def generate_control_card2():
 
 
 
-def generate_model_forecasts(loc, county, model, reset):
+def generate_model_forecasts(loc, county, model, reset, startdate):
     
         
     new_cases = []
-    ForecastDays = 60
+    ForecastDays = 30
     
     col_names =  ['obs_y', 'pred_y', 'forecasted_y', 'pred_dates', 'forecast_dates', 
                   'label', 'obs_pred_r2', 'model', 'focal_loc', 
@@ -666,7 +678,7 @@ def generate_model_forecasts(loc, county, model, reset):
         locs_df.drop(columns=['Unnamed: 0'], inplace=True)
 
 
-        df_sub = locs_df[locs_df['Province/State'] == loc]
+        df_sub1 = locs_df[locs_df['Province/State'] == loc]
         locs_df = 0
         ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
         ArrivalDate = ArrivalDate[0]
@@ -678,30 +690,30 @@ def generate_model_forecasts(loc, county, model, reset):
             
             url = 'https://raw.githubusercontent.com/klocey/StateCovidData/main/data/' + loc + '-' + county + '-' + 'COVID-CASES.txt'
             
-            df_sub = pd.read_csv(url, sep='\t')
+            df_sub1 = pd.read_csv(url, sep='\t')
             
             #counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
-            df_sub = df_sub.filter(items=['date', 'Confirmed'], axis=1)
-            df_sub = df_sub.set_index('date').transpose()
-            df_sub = df_sub.reset_index(drop=True)
+            df_sub1 = df_sub1.filter(items=['date', 'Confirmed'], axis=1)
+            df_sub1 = df_sub1.set_index('date').transpose()
+            df_sub1 = df_sub1.reset_index(drop=True)
             #df_sub.drop(['date'], axis=1, inplace=True)
             
-            df_sub['Province/State'] = loc
-            df_sub['Country/Region'] = 'US'
-            df_sub['Lat'] = 0
-            df_sub['Long'] = 0
+            df_sub1['Province/State'] = loc
+            df_sub1['Country/Region'] = 'US'
+            df_sub1['Lat'] = 0
+            df_sub1['Long'] = 0
             
-            col = df_sub.pop('Long')
-            df_sub.insert(0, col.name, col)
+            col = df_sub1.pop('Long')
+            df_sub1.insert(0, col.name, col)
             
-            col = df_sub.pop('Lat')
-            df_sub.insert(0, col.name, col)
+            col = df_sub1.pop('Lat')
+            df_sub1.insert(0, col.name, col)
             
-            col = df_sub.pop('Country/Region')
-            df_sub.insert(0, col.name, col)
+            col = df_sub1.pop('Country/Region')
+            df_sub1.insert(0, col.name, col)
             
-            col = df_sub.pop('Province/State')
-            df_sub.insert(0, col.name, col)
+            col = df_sub1.pop('Province/State')
+            df_sub1.insert(0, col.name, col)
 
             
         except:
@@ -719,10 +731,20 @@ def generate_model_forecasts(loc, county, model, reset):
             
             locs_df.drop(columns=['Unnamed: 0'], inplace=True)
 
-            df_sub = locs_df[locs_df['Province/State'] == loc]
+            df_sub1 = locs_df[locs_df['Province/State'] == loc]
             locs_df = 0
             
-        
+    
+    col_labs = list(df_sub1)
+    labs1 = col_labs[4:]
+    labs2 = col_labs[:4]
+    #print(labs2)
+    for lab in labs1:
+        if pd.to_datetime(lab).date() >= pd.to_datetime(startdate).date():
+            labs2.append(lab)
+    
+    df_sub = df_sub1.filter(items=labs2, axis=1)
+    
     # add 1 to number of forecast days for indexing purposes
     ForecastDays = int(ForecastDays+1)
                 
@@ -740,11 +762,17 @@ def generate_model_forecasts(loc, county, model, reset):
             
         if j == 0:
             # get dates for today's predictions/forecast
+            obs_y_trunc1 = df_sub1.iloc[0,4:].values
             obs_y_trunc = df_sub.iloc[0,4:].values
         else:
             # get dates for previous days predictions/forecast
+            obs_y_trunc1 = df_sub1.iloc[0,4:j].values
             obs_y_trunc = df_sub.iloc[0,4:j].values
             
+        
+        ii = 0
+        while obs_y_trunc1[ii] == 0: ii+=1
+        y1 = obs_y_trunc1[ii:]
         
         ii = 0
         while obs_y_trunc[ii] == 0: ii+=1
@@ -758,8 +786,17 @@ def generate_model_forecasts(loc, county, model, reset):
                 elif val < y[ii-1]:
                     y[ii] = y[ii-1]
                     
+        y1 = list(y1)
+        if y1 != sorted(y1):
+            for ii, val in enumerate(y1):
+                if ii == 0: 
+                    continue
+                elif val < y1[ii-1]:
+                    y1[ii] = y1[ii-1]
+                    
         
         # declare x as a list of integers from 0 to len(y)
+        x1 = list(range(len(y1)))
         x = list(range(len(y)))
         iterations = 2
         # Call function to use chosen model to obtain:
@@ -767,7 +804,7 @@ def generate_model_forecasts(loc, county, model, reset):
         #    predicted y-values
         #    forecasted x and y values
         
-        condition = [x, y, model, ForecastDays, j, iterations]
+        condition = [x1, y1, x, y, model, ForecastDays, j, iterations]
         conditions.append(condition)
     
     pool = Pool()
@@ -887,7 +924,7 @@ def generate_model_forecasts(loc, county, model, reset):
 def generate_model_forecast_plot(fits_df, reset):
     fits_df = pd.read_json(fits_df)
     
-    ForecastDays = 60
+    ForecastDays = 30
     #labels = fits_df['label'].tolist()
     
     labels = ['Current forecast', '1 day old forecast', 
@@ -900,16 +937,20 @@ def generate_model_forecast_plot(fits_df, reset):
     obs_y = []
     fdates = []
     
+    Miny = 10000000
+    Maxy = 0
     for i, label in enumerate(labels):
             
         try:
             sub_df = fits_df[fits_df['label'] == label]
             r2 = sub_df['obs_pred_r2'].iloc[0]
             
-            dates = sub_df['pred_dates'].iloc[0]
-            clr = sub_df['pred_clr'].iloc[0]
-            obs_y = sub_df['obs_y'].iloc[0]
             if label == 'Current forecast':
+                dates = sub_df['pred_dates'].iloc[0]
+                clr = sub_df['pred_clr'].iloc[0]
+                obs_y = sub_df['obs_y'].iloc[0]
+                Miny = np.min(obs_y)
+            
                 fig_data.append(
                     go.Scatter(
                         x=dates,
@@ -921,10 +962,13 @@ def generate_model_forecast_plot(fits_df, reset):
                     )
                 )
             
-            
             fdates = sub_df['forecast_dates'].iloc[0]
             forecasted_y = sub_df['forecasted_y'].iloc[0]
             clr = sub_df['fore_clr'].iloc[0]
+            
+            if np.max(forecasted_y) > Maxy:
+                Maxy = np.max(forecasted_y)
+                
             #focal_loc = sub_df['focal_loc'].iloc[0]
             #popsize = sub_df['PopSize'].iloc[0]
                 
@@ -988,7 +1032,6 @@ def generate_model_forecast_plot(fits_df, reset):
         ),
     )
     
-    figure.update_yaxes(range=[0, 1.5*max(obs_y)])
     figure.update_layout(
         title=dict(text="r<sup>2</sup> values pertain to the fits of models (colored lines) to the previous 30 days of observed data.",
                    font=dict(
@@ -998,6 +1041,13 @@ def generate_model_forecast_plot(fits_df, reset):
                     ),
                     ),
         )
+    
+    figure.update_yaxes(range=[0.99*Miny, 1.01*Maxy])
+    
+    #print(fdates[0], fdates[-30])
+    #figure.update_xaxes(range=[pd.to_datetime(fdates[0]).date(), 
+    #                           pd.to_datetime(fdates[-30]).date()])
+    #figure.update_xaxes(range=[fdates[0], fdates[30]])
     
     dates = 0
     sub_df = 0
@@ -1100,10 +1150,10 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     mortality, GLOVE_SURGICAL, GLOVE_EXAM_NITRILE, GLOVE_EXAM_VINYL, 
     MASK_FACE_PROC_ANTI_FOG, MASK_PROC_FLUID_RESISTANT, GOWN_ISOLATION_XL_YELLOW, 
     MASK_SURG_ANTI_FOG_FILM, SHIELD_FACE_FULL_ANTI_FOG, RESP_PART_FILTER_REG,
-    reset):
+    reset, startdate):
     
     new_cases = []
-    ForecastDays = 60
+    ForecastDays = 30
 
     
     PopSize = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
@@ -1122,7 +1172,7 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
         
         locs_df.drop(columns=['Unnamed: 0'], inplace=True)
 
-        df_sub = locs_df[locs_df['Province/State'] == loc]
+        df_sub1 = locs_df[locs_df['Province/State'] == loc]
         ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
         ArrivalDate = ArrivalDate[0]
         locs_df = 0
@@ -1132,30 +1182,30 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
         
         try:
             url = 'https://raw.githubusercontent.com/klocey/StateCovidData/main/data/' + loc + '-' + county + '-' + 'COVID-CASES.txt'
-            df_sub = pd.read_csv(url, sep='\t') #index_col=0)
+            df_sub1 = pd.read_csv(url, sep='\t') #index_col=0)
 
             #counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
-            df_sub = df_sub.filter(items=['date', 'Confirmed'], axis=1)
-            df_sub = df_sub.set_index('date').transpose()
-            df_sub = df_sub.reset_index(drop=True)
+            df_sub1 = df_sub1.filter(items=['date', 'Confirmed'], axis=1)
+            df_sub1 = df_sub1.set_index('date').transpose()
+            df_sub1 = df_sub1.reset_index(drop=True)
             #df_sub.drop(['date'], axis=1, inplace=True)
             
-            df_sub['Province/State'] = loc
-            df_sub['Country/Region'] = 'US'
-            df_sub['Lat'] = 0
-            df_sub['Long'] = 0
+            df_sub1['Province/State'] = loc
+            df_sub1['Country/Region'] = 'US'
+            df_sub1['Lat'] = 0
+            df_sub1['Long'] = 0
             
-            col = df_sub.pop('Long')
-            df_sub.insert(0, col.name, col)
+            col = df_sub1.pop('Long')
+            df_sub1.insert(0, col.name, col)
             
-            col = df_sub.pop('Lat')
-            df_sub.insert(0, col.name, col)
+            col = df_sub1.pop('Lat')
+            df_sub1.insert(0, col.name, col)
             
-            col = df_sub.pop('Country/Region')
-            df_sub.insert(0, col.name, col)
+            col = df_sub1.pop('Country/Region')
+            df_sub1.insert(0, col.name, col)
             
-            col = df_sub.pop('Province/State')
-            df_sub.insert(0, col.name, col)
+            col = df_sub1.pop('Province/State')
+            df_sub1.insert(0, col.name, col)
             
     
             ArrivalDate = np.nan
@@ -1173,27 +1223,54 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
             
             locs_df.drop(columns=['Unnamed: 0'], inplace=True)
 
-            df_sub = locs_df[locs_df['Province/State'] == loc]
+            df_sub1 = locs_df[locs_df['Province/State'] == loc]
             ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
             ArrivalDate = ArrivalDate[0]
             locs_df = 0
             
-      
+    col_labs = list(df_sub1)
+    labs1 = col_labs[4:]
+    labs2 = col_labs[:4]
+    #print(labs2)
+    for lab in labs1:
+        if pd.to_datetime(lab).date() >= pd.to_datetime(startdate).date():
+            labs2.append(lab)
+    
+    df_sub = df_sub1.filter(items=labs2, axis=1)
+    
     # add 1 to number of forecast days for indexing purposes
     ForecastDays = int(ForecastDays+1)
         
     # get column labels, will filter below to extract dates
+    yi1 = list(df_sub1)
     yi = list(df_sub)
         
+    obs_y_trunc1 = []
+    DATES1 = yi1[4:]
+    obs_y_trunc1 = df_sub1.iloc[0,4:].values
+    
     obs_y_trunc = []
     DATES = yi[4:]
     obs_y_trunc = df_sub.iloc[0,4:].values
+    
+    ii = 0
+    while obs_y_trunc1[ii] == 0: ii+=1
+    y1 = obs_y_trunc1[ii:]
+    dates1 = DATES1[ii:]
     
     ii = 0
     while obs_y_trunc[ii] == 0: ii+=1
     y = obs_y_trunc[ii:]
     dates = DATES[ii:]
         
+    y1 = list(y1)
+    if y1 != sorted(y1):
+        for ii, val in enumerate(y1):
+            if ii == 0: 
+                continue
+            elif val < y1[ii-1]:
+                y1[ii] = y1[ii-1]
+                
     y = list(y)
     if y != sorted(y):
         for ii, val in enumerate(y):
@@ -1203,6 +1280,7 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
                 y[ii] = y[ii-1]
                     
     # declare x as a list of integers from 0 to len(y)
+    x1 = list(range(len(y1)))
     x = list(range(len(y)))
 
     # Call function to use chosen model to obtain:
@@ -1211,7 +1289,7 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     #    forecasted x and y values
     iterations = 2
     
-    condition = [x, y, model, ForecastDays, 0, iterations]
+    condition = [x1, y1, x, y, model, ForecastDays, 0, iterations]
     result = fxns.fit_curve(condition)
     obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = result
     
@@ -1502,7 +1580,7 @@ def generate_new_and_active_cases(df, loc, county, model, reset):
     forecasted_y = df['forecasted_y'].iloc[0]
     
     new_cases = []
-    ForecastDays = 60
+    ForecastDays = 30
     
     # add 1 to number of forecast days for indexing purposes
     ForecastDays = int(ForecastDays+1)
@@ -1733,7 +1811,7 @@ def generate_plot_new_cases(df, loc, cty, reset):
     forecasted_y = df['forecasted_y'].iloc[0]
     
     new_cases = []
-    ForecastDays = 60
+    ForecastDays = 30
     
     # add 1 to number of forecast days for indexing purposes
     ForecastDays = int(ForecastDays+1)
@@ -1975,7 +2053,7 @@ def generate_plot_employee_forecast1(df, loc, cty, employees, inc_rate, furlough
     
     new_cases = []
     new_cases_e = []
-    ForecastDays = 60
+    ForecastDays = 30
     
     # add 1 to number of forecast days for indexing purposes
     ForecastDays = int(ForecastDays+1)

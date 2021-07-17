@@ -1059,7 +1059,7 @@ def get_sine_logistic(obs_x, obs_y, ForecastDays):
 
 def fit_curve(condition):
     
-    obs_x, obs_y, model, ForecastDays, day, iterations = condition
+    obs_x1, obs_y1, obs_x, obs_y, model, ForecastDays, day, iterations = condition
     # A function to fit various models to observed COVID-19 cases data according to:
     # obs_x: observed x values
     # obs_y: observed y values
@@ -1071,11 +1071,17 @@ def fit_curve(condition):
     # 30-days of observed data
     
     # use the number of y observations as the number of x observations
+    obs_x1 = list(range(len(obs_y1)))
     obs_x = list(range(len(obs_y)))
     # convert y and x observations to numpy arrays
+    obs_x1 = np.array(obs_x1)
+    obs_y1 = np.array(obs_y1)
     obs_x = np.array(obs_x)
     obs_y = np.array(obs_y)
     
+    Miny = np.min(obs_y)
+    if model != 'Time series analysis':
+        obs_y = obs_y - Miny
     
     # Get the forecasted values, predicted values, and observed vs predicted r-square
     # value for the chosen model
@@ -1085,8 +1091,13 @@ def fit_curve(condition):
         obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
     
     elif model == 'Time series analysis':
-        forecasted_y, forecasted_x, pred_y, params = get_WAF(obs_x, obs_y, ForecastDays)
+        forecasted_y, forecasted_x, pred_y, params = get_WAF(obs_x1, obs_y1, ForecastDays)
+        
+        pred_y = pred_y[len(obs_y1)-len(obs_y):]
         obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
+        
+        forecasted_y = forecasted_y[len(obs_y1)-len(obs_y):]
+        forecasted_x = forecasted_x[len(obs_x1)-len(obs_x):]
         
     elif model == 'Logistic (multi-phase)':
         forecasted_y, forecasted_x, pred_y, params = get_logistic(obs_x, obs_y, ForecastDays)
@@ -1286,8 +1297,16 @@ def fit_curve(condition):
             
         
         params = params1.extend(params2)
+       
         
-        
+    #print(len(pred_y), len(obs_y), len(obs_x), ':', len(forecasted_y), len(forecasted_x))
+    
+    if model != 'Time series analysis':
+        pred_y = np.array(pred_y) + Miny
+        pred_y = pred_y.tolist()
+        forecasted_y = np.array(forecasted_y) + Miny
+        forecasted_y = forecasted_y.tolist()
+    
     del obs_y
     
     return [obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params]
