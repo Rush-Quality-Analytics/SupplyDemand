@@ -38,15 +38,19 @@ def obs_pred_rsquare(obs, pred):
 def gaussian1(x, n, s, m):  
     # For non-cumulative Gaussian:
     #    return n**2 * (1/(s*((2*pi)**0.5))) * np.exp(-0.5 * ((x - m)/s)**2)
+    n = np.exp(n)
     return (n * 0.5 * (1 + sc.special.erf((x - m)/(s*2**0.5))))
     
 def gaussian2(x, n, s, m, s1, m1):
+    n = np.exp(n)
     return (n * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5)))))
     
 def gaussian3(x, n, s, m, s1, m1, s2, m2):  
+    n = np.exp(n)
     return (n * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5)))))
   
-def gaussian4(x, n, s, m, s1, m1, s2, m2, s3, m3):  
+def gaussian4(x, n, s, m, s1, m1, s2, m2, s3, m3): 
+    n = np.exp(n)
     return (n * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5)))) + (1 + sc.special.erf((x - m3)/(s3*2**0.5))))
   
     
