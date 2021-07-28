@@ -738,7 +738,7 @@ def generate_model_forecasts(loc, county, model, reset, startdate):
     col_labs = list(df_sub1)
     labs1 = col_labs[4:]
     labs2 = col_labs[:4]
-    #print(labs2)
+    
     for lab in labs1:
         if pd.to_datetime(lab).date() >= pd.to_datetime(startdate).date():
             labs2.append(lab)
@@ -752,6 +752,9 @@ def generate_model_forecasts(loc, county, model, reset, startdate):
     yi = list(df_sub)
         
     obs_y_trunc = []
+    y = []
+    Y = []
+    Y1 = []
     fore_clrs =  ['purple',  'mediumorchid', 'plum', 'blue', 'deepskyblue', 
                   'darkturquoise', 'green', 'limegreen', 'gold', 'orange', 'red']
     pred_clrs = ['0.0', '0.1', '0.2', '0.25', '0.3', '0.35', '0.4', '0.5',
@@ -778,22 +781,27 @@ def generate_model_forecasts(loc, county, model, reset, startdate):
         while obs_y_trunc[ii] == 0: ii+=1
         y = obs_y_trunc[ii:]
         
-        y = list(y)
-        if y != sorted(y):
-            for ii, val in enumerate(y):
-                if ii == 0: 
-                    continue
-                elif val < y[ii-1]:
-                    y[ii] = y[ii-1]
+        
+        y = sorted(y, reverse=True)
+        for ii, val in enumerate(y):
+            if ii == len(y) - 1:
+                break
+            
+            if val == y[ii+1]:
+                y[ii] = (y[ii-1] + y[ii])/2
+
                     
-        y1 = list(y1)
-        if y1 != sorted(y1):
-            for ii, val in enumerate(y1):
-                if ii == 0: 
-                    continue
-                elif val < y1[ii-1]:
-                    y1[ii] = y1[ii-1]
-                    
+        y1 = sorted(y1, reverse=True)
+        for ii, val in enumerate(y1):
+            if ii == len(y1) - 1:
+                break
+            
+            if val == y1[ii+1]:
+                y1[ii] = (y1[ii-1] + y1[ii])/2
+
+                  
+        y = sorted(y)
+        y1 = sorted(y1)
         
         # declare x as a list of integers from 0 to len(y)
         x1 = list(range(len(y1)))
@@ -836,7 +844,7 @@ def generate_model_forecasts(loc, county, model, reset, startdate):
         
         ii = 0
         while obs_y_trunc[ii] == 0: ii+=1
-        y = obs_y_trunc[ii:]
+        #y = obs_y_trunc[ii:]
         dates = DATES[ii:]
         
             
@@ -884,15 +892,15 @@ def generate_model_forecasts(loc, county, model, reset, startdate):
             label = str(-j)+' day old forecast'
             
             
-        if label == 'Current forecast':
-            for ii, val in enumerate(forecasted_y):
-                if ii > 0:
-                    if forecasted_y[ii] - forecasted_y[ii-1] > 0:
-                        new_cases.append(forecasted_y[ii] - forecasted_y[ii-1])
-                    else:
-                        new_cases.append(0)
-                if ii == 0:
-                    new_cases.append(forecasted_y[ii])
+        #if label == 'Current forecast':
+        #    for ii, val in enumerate(forecasted_y):
+        #        if ii > 0:
+        #            if forecasted_y[ii] - forecasted_y[ii-1] > 0:
+        #                new_cases.append(forecasted_y[ii] - forecasted_y[ii-1])
+        #            else:
+        #                new_cases.append(0)
+        #        if ii == 0:
+        #            new_cases.append(forecasted_y[ii])
                         
                 
         # get dates from ArrivalDate to the current day
@@ -1141,9 +1149,6 @@ def generate_model_forecast_table(fits_df, reset):
     return csv_string
     
     
-    
-
-
         
 def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, per_admit, 
     per_cc, LOS_cc, LOS_nc, per_vent, TimeLag, transfers, per_ICU_transfer, 
@@ -1567,8 +1572,6 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
 
 
 
-
-
 def generate_new_and_active_cases(df, loc, county, model, reset):
     
     df = pd.read_json(df)
@@ -1671,8 +1674,6 @@ def generate_new_and_active_cases(df, loc, county, model, reset):
     Active = 0
     
     return df
-
-
 
 
         
@@ -2013,8 +2014,6 @@ def generate_plot_new_cases(df, loc, cty, reset):
 
 
 
-
-
 def generate_plot_employee_forecast1(df, loc, cty, employees, inc_rate, furlough, reset):
     
     pop_size = int()
@@ -2267,8 +2266,6 @@ def generate_plot_employee_forecast1(df, loc, cty, employees, inc_rate, furlough
     
     
     return figure
-
-
 
 
 
