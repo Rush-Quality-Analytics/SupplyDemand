@@ -925,7 +925,8 @@ def update_table_model_forecast1(df_fits, loc, cty, reset_click):
 
 @app.callback(
     Output('df2', 'children'),
-    [Input("location-select1", "value"),
+    [Input('df1', 'children'),
+     Input("location-select1", "value"),
      Input('county-select1', 'value'),
      Input("model-select1", "value"),
      Input("ICU beds1", "value"),
@@ -955,7 +956,7 @@ def update_table_model_forecast1(df_fits, loc, cty, reset_click):
 )
 
 
-def update_patient_census(loc, cty, model, icu_beds, nonicu_beds, per_loc, per_admit, 
+def update_patient_census(df1, loc, cty, model, icu_beds, nonicu_beds, per_loc, per_admit,
     per_cc, LOS_cc, LOS_nc, per_vent, TimeLag, transfers, per_ICU_transfer, mortality, 
     GLOVE_SURGICAL, GLOVE_EXAM_NITRILE, GLOVE_EXAM_VINYL, MASK_FACE_PROC_ANTI_FOG, 
     MASK_PROC_FLUID_RESISTANT, GOWN_ISOLATION_XL_YELLOW, MASK_SURG_ANTI_FOG_FILM, 
@@ -972,7 +973,7 @@ def update_patient_census(loc, cty, model, icu_beds, nonicu_beds, per_loc, per_a
             
     # Return to original hm(no colored annotation) by resetting
     
-    df2 = app_fxns.generate_patient_census(loc, cty, model, icu_beds, nonicu_beds, per_loc, per_admit, 
+    df2 = app_fxns.generate_patient_census(df1, loc, cty, model, icu_beds, nonicu_beds, per_loc, per_admit,
     per_cc, LOS_cc, LOS_nc, per_vent, TimeLag, transfers, per_ICU_transfer, mortality, 
     GLOVE_SURGICAL, GLOVE_EXAM_NITRILE, GLOVE_EXAM_VINYL, MASK_FACE_PROC_ANTI_FOG, 
     MASK_PROC_FLUID_RESISTANT, GOWN_ISOLATION_XL_YELLOW, MASK_SURG_ANTI_FOG_FILM, 

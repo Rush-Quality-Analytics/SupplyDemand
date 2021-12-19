@@ -5,7 +5,7 @@ import datetime # library for date-time functionality
 import numpy as np # numerical python
 from scipy import stats # scientific python statistical package
 from scipy.optimize import curve_fit # optimization for fitting curves
-
+import random
 from scipy.interpolate import interp1d
 from scipy.signal import savgol_filter
 
@@ -85,6 +85,8 @@ def logistic4(x, e, a, b, c, d,  a1, b1, c1, d1,  a2, b2, c2, d2,  a3, b3, c3, d
 
 
 def get_WAF(obs_x, obs_y, ForecastDays):
+    np.random.seed(1)
+    random.seed(1)
     
     '''
     WAF: Weighted average forecasting
@@ -292,6 +294,8 @@ def get_WAF(obs_x, obs_y, ForecastDays):
 
 
 def opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model):
+    np.random.seed(1)
+    random.seed(1)
     
     # A FUNCTION TO IMPROVE SCIPY'S ABILITY TO FIND A FITTED CURVE
     # This is done because scipy's numerical optimizer may fail to converge and return
@@ -445,6 +449,8 @@ def opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model):
 
 
 def get_gaussian(obs_x, obs_y, ForecastDays):
+    np.random.seed(1)
+    random.seed(1)
     
     # obs_x: observed x values
     # obs_y: observd y values
@@ -542,6 +548,8 @@ def get_gaussian(obs_x, obs_y, ForecastDays):
 
 
 def get_phase_wave(obs_x, obs_y, ForecastDays):
+    np.random.seed(1)
+    random.seed(1)
     
     # obs_x: observed x values
     # obs_y: observd y values
@@ -655,6 +663,8 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
 
 
 def get_logistic(obs_x, obs_y, ForecastDays):
+    np.random.seed(1)
+    random.seed(1)
     
     # obs_x: observed x values
     # obs_y: observd y values
@@ -766,6 +776,9 @@ def get_logistic(obs_x, obs_y, ForecastDays):
 
 
 def get_exponential(obs_x, obs_y, ForecastDays):
+    np.random.seed(1)
+    random.seed(1)
+    
     # obs_x: observed x values
     # obs_y: observd y values
     # ForecastDays: number of days ahead to extend prediction
@@ -818,6 +831,9 @@ def get_exponential(obs_x, obs_y, ForecastDays):
 
 
 def get_polynomial(obs_x, obs_y, ForecastDays, degree=2):
+    np.random.seed(1)
+    random.seed(1)
+    
     # obs_x: observed x values
     # obs_y: observd y values
     # ForecastDays: number of days ahead to extend prediction
@@ -876,6 +892,8 @@ def get_polynomial(obs_x, obs_y, ForecastDays, degree=2):
 
 
 def get_2phase_logistic(obs_x, obs_y, ForecastDays):
+    np.random.seed(1)
+    random.seed(1)
     
     def logistic(x, a, b, c, d):
         # A general logistic function
@@ -965,6 +983,8 @@ def get_2phase_logistic(obs_x, obs_y, ForecastDays):
 
 
 def get_sine_logistic(obs_x, obs_y, ForecastDays):
+    np.random.seed(1)
+    random.seed(1)
     
     def lapse_logistic(x, a, b, c, d):
         # A general logistic function

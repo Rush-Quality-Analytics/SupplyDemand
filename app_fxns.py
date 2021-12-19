@@ -322,9 +322,9 @@ def generate_control_card1():
             dcc.DatePickerSingle(
                 id='date1',
                 min_date_allowed=date(2020, 3, 10),
-                max_date_allowed=date(2021, 7, 1),
-                initial_visible_month=date(2021, 6, 1),
-                date=date(2021, 6, 1)
+                max_date_allowed=date(2021, 9, 1),
+                initial_visible_month=date(2021, 7, 1),
+                date=date(2021, 7, 1)
             ),
             
             html.Br(),
@@ -337,19 +337,12 @@ def generate_control_card1():
             ),
             html.P("Most of these models are intensive to compute. So, allow the current model to finish before picking another model, county, or state. Otherwise, the app could time-out and you will need to refresh the page."),
             
-            #html.Br(),
-            #html.Div(
-            #    id="add-forecast",
-            #    children=html.Button(id="add-forecast1", children="Plot prior day's forecast", n_clicks=10),
-            #),
-            #html.P("Each click will add a previous day's forecast to the top figure."),
-            
+
             html.Br(),
             html.Hr(),
             
             html.Br(),
             html.H5("Select Hospital Variables"),
-            
             
             html.Br(),
             html.Div(id='ICU beds1-container'),
@@ -357,7 +350,7 @@ def generate_control_card1():
                 id="ICU beds1",
                 min=0,
                 max=500,
-                value=300,
+                value=200,
                 step = 1),  
             
             html.Br(),
@@ -366,7 +359,7 @@ def generate_control_card1():
                 id="nonICU beds1",
                 min=0,
                 max=500,
-                value=300,
+                value=200,
                 step=1),
             
             html.Br(),
@@ -375,7 +368,7 @@ def generate_control_card1():
                 id="visits1",
                 min=0,
                 max=100,
-                value=10),    
+                value=10),
             
             html.Br(),
             html.Div(id='admits1-container'),
@@ -399,7 +392,7 @@ def generate_control_card1():
                 id="transfers1",
                 min=0,
                 max=100,
-                value=10), 
+                value=0),
             
             html.Br(),
             html.Div(id='percent transferICU1-container'),
@@ -407,7 +400,7 @@ def generate_control_card1():
                 id="percent transferICU1",
                 min=0,
                 max=100,
-                value=10),
+                value=0),
             
             html.Br(),
             html.Div(id='on vent1-container'),
@@ -445,9 +438,9 @@ def generate_control_card1():
             html.Div(id='time lag1-container'),
             dcc.Slider(
                 id="time lag1",
-                min=1,
+                min=0,
                 max=14,
-                value=4),
+                value=0),
             
             
             html.Br(),
@@ -1052,11 +1045,6 @@ def generate_model_forecast_plot(fits_df, reset):
     
     figure.update_yaxes(range=[0.99*Miny, 1.01*Maxy])
     
-    #print(fdates[0], fdates[-30])
-    #figure.update_xaxes(range=[pd.to_datetime(fdates[0]).date(), 
-    #                           pd.to_datetime(fdates[-30]).date()])
-    #figure.update_xaxes(range=[fdates[0], fdates[30]])
-    
     dates = 0
     sub_df = 0
     fits_df = 0
@@ -1150,7 +1138,7 @@ def generate_model_forecast_table(fits_df, reset):
     
     
         
-def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, per_admit, 
+def generate_patient_census(df1, loc, county, model, icu_beds, nonicu_beds, per_loc, per_admit,
     per_cc, LOS_cc, LOS_nc, per_vent, TimeLag, transfers, per_ICU_transfer, 
     mortality, GLOVE_SURGICAL, GLOVE_EXAM_NITRILE, GLOVE_EXAM_VINYL, 
     MASK_FACE_PROC_ANTI_FOG, MASK_PROC_FLUID_RESISTANT, GOWN_ISOLATION_XL_YELLOW, 
@@ -1232,100 +1220,17 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
             ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
             ArrivalDate = ArrivalDate[0]
             locs_df = 0
-            
-    col_labs = list(df_sub1)
-    labs1 = col_labs[4:]
-    labs2 = col_labs[:4]
-    #print(labs2)
-    for lab in labs1:
-        if pd.to_datetime(lab).date() >= pd.to_datetime(startdate).date():
-            labs2.append(lab)
     
-    df_sub = df_sub1.filter(items=labs2, axis=1)
+    df1 = pd.read_json(df1)
+    df1 = df1.iloc[[-1]]
     
-    # add 1 to number of forecast days for indexing purposes
-    ForecastDays = int(ForecastDays+1)
-        
-    # get column labels, will filter below to extract dates
-    yi1 = list(df_sub1)
-    yi = list(df_sub)
-        
-    obs_y_trunc1 = []
-    DATES1 = yi1[4:]
-    obs_y_trunc1 = df_sub1.iloc[0,4:].values
+    fdates = df1['forecast_dates'].tolist()
+    fdates = fdates[0]
+    forecasted_y = df1['forecasted_y'].tolist()
+    forecasted_y = forecasted_y[0]
+    obs_y = df1['obs_y'].tolist()
+    obs_y = obs_y[0]
     
-    obs_y_trunc = []
-    DATES = yi[4:]
-    obs_y_trunc = df_sub.iloc[0,4:].values
-    
-    ii = 0
-    while obs_y_trunc1[ii] == 0: ii+=1
-    y1 = obs_y_trunc1[ii:]
-    dates1 = DATES1[ii:]
-    
-    ii = 0
-    while obs_y_trunc[ii] == 0: ii+=1
-    y = obs_y_trunc[ii:]
-    dates = DATES[ii:]
-        
-    y1 = list(y1)
-    if y1 != sorted(y1):
-        for ii, val in enumerate(y1):
-            if ii == 0: 
-                continue
-            elif val < y1[ii-1]:
-                y1[ii] = y1[ii-1]
-                
-    y = list(y)
-    if y != sorted(y):
-        for ii, val in enumerate(y):
-            if ii == 0: 
-                continue
-            elif val < y[ii-1]:
-                y[ii] = y[ii-1]
-                    
-    # declare x as a list of integers from 0 to len(y)
-    x1 = list(range(len(y1)))
-    x = list(range(len(y)))
-
-    # Call function to use chosen model to obtain:
-    #    r-square for observed vs. predicted
-    #    predicted y-values
-    #    forecasted x and y values
-    iterations = 2
-    
-    condition = [x1, y1, x, y, model, ForecastDays, 0, iterations]
-    result = fxns.fit_curve(condition)
-    obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params = result
-    
-    # convert y values to numpy array
-    y = np.array(y)
-
-    # because it isn't based on a best fit line,
-    # and the y-intercept is forced through [0,0]
-    # a model can perform so poorly that the 
-    # observed vs predicted r-square is negative (a nonsensical value)
-    # if this happens, report the r-square as 0.0
-    if obs_pred_r2 < 0:
-        obs_pred_r2 = 0.0
-
-    # convert any y-values (observed, predicted, or forecasted)
-    # that are less than 0 (nonsensical values) to 0.
-    y[y < 0] = 0
-    forecasted_y = np.array(forecasted_y)
-    forecasted_y[forecasted_y < 0] = 0
-            
-    # number of from ArrivalDate to end of forecast window
-    #numdays = len(forecasted_x)
-    latest_date = pd.to_datetime(dates[-1])
-    first_date = pd.to_datetime(dates[0])
-
-    # get the date of the last day in the forecast window
-    future_date = latest_date + datetime.timedelta(days = ForecastDays-1)
-    
-    # get all dates from ArrivalDate to the last day in the forecast window
-    fdates = pd.date_range(start=first_date, end=future_date)
-    fdates = fdates.strftime('%m/%d/%Y')
     
     # designature plot label for legend
     for i, val in enumerate(forecasted_y):
@@ -1338,20 +1243,16 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
             new_cases.append(0)
             
     new_obs = []
-    for i, val in enumerate(y):
+    for i, val in enumerate(obs_y):
         if i > 0:
-            if y[i] - y[i-1] > 0:
-                new_obs.append(y[i] - y[i-1])
+            if obs_y[i] - obs_y[i-1] > 0:
+                new_obs.append(obs_y[i] - obs_y[i-1])
             else:
                 new_obs.append(0)
         if i == 0:
             new_obs.append(0)
 
                 
-    # get dates from ArrivalDate to the current day
-    dates = pd.date_range(start=first_date, end=latest_date)
-    dates = dates.strftime('%m/%d/%Y')
-            
     # declare column labels
     col_labels = ['date', 'Total cases', 'New visits', 
                   'New admits', 'All COVID', 'Non-ICU', 'ICU', 'Vent',
@@ -1359,7 +1260,7 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
                   'Discharged from non-ICU alive']
     
     # row labels are the dates
-    row_labels = fdates.tolist()
+    row_labels = list(fdates)#.tolist()
         
     #### Inclusion of time lag
     # time lag is modeled as a Poisson distributed 
@@ -1390,10 +1291,7 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     ts_lag = np.sum(ar, axis=0)
     # upper truncate for the number of days in observed y values
     ts_lag = ts_lag[:len(new_cases)]
-        
-    # row labels are the dates
-    row_labels = fdates.tolist()  
-
+    
     #### Construct arrays for critical care and non-critical care patients
 
     # Use lognormal cdf to parameterize patient turnover
@@ -1454,7 +1352,6 @@ def generate_patient_census(loc, county, model, icu_beds, nonicu_beds, per_loc, 
     cells = []
     
     for i in range(len(row_labels)):
-            
         val = ts_lag[i]
         cell = [row_labels[i],
                 int(np.round(forecasted_y[i])), 
@@ -2375,8 +2272,8 @@ def generate_patient_census_table(census_df, reset):
     csv_string = df_table.to_csv(index=False, encoding='utf-8')
     csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
     
-    df_table['dates'] = df_table['date'] 
-    df_table['dates'] = pd.to_datetime(df_table['dates']).dt.date
+    df_table['dates'] = df_table['date']
+    df_table['dates'] = df_table['dates'].astype('datetime64[ns]')
     df_table = df_table[df_table['dates'] >= pd.Timestamp('today')]
     df_table.drop(['dates'], axis=1, inplace=True)
     
@@ -2385,8 +2282,7 @@ def generate_patient_census_table(census_df, reset):
                 fill_color='lavender',
                 align='left', 
                 height=30),
-        cells=dict(values=[df_table['date'], #df_table['Total cases'],
-                       #df_table['New cases'], df_table['Active cases'],
+        cells=dict(values=[df_table['date'].astype(str),
                        df_table['New visits'],
                        df_table['New admits'], df_table['All COVID'],
                        df_table['Non-ICU'], df_table['ICU'],
@@ -2517,7 +2413,7 @@ def generate_ppe_table(df, reset):
     csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
     
     df_table['dates'] = df_table['date'] 
-    df_table['dates'] = pd.to_datetime(df_table['dates']).dt.date
+    df_table['dates'] = df_table['dates'].astype('datetime64[ns]')
     df_table = df_table[df_table['dates'] >= pd.Timestamp('today')]
     df_table.drop(['dates'], axis=1, inplace=True)
     
@@ -2526,7 +2422,8 @@ def generate_ppe_table(df, reset):
                 fill_color='lavender',
                 align='left', 
                 height=30),
-        cells=dict(values=[df_table['date'], df_table['GLOVE SURGICAL'], df_table['GLOVE EXAM NITRILE'],
+        cells=dict(values=[df_table['date'].astype(str),
+                       df_table['GLOVE SURGICAL'], df_table['GLOVE EXAM NITRILE'],
                        df_table['GLOVE EXAM VINYL'], df_table['MASK FACE PROCEDURE ANTI FOG'],
                        df_table['MASK PROCEDURE FLUID RESISTANT'], df_table['GOWN ISOLATION XLARGE YELLOW'],
                        df_table['MASK SURGICAL ANTI FOG W/FILM'], df_table['SHIELD FACE FULL ANTI FOG'],
