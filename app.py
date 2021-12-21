@@ -343,7 +343,7 @@ app.layout = html.Div([
             id="right-column1b",
             className="nine columns",
             children=[html.Div(
-                        id="Table4b",
+                        id="employee_fig1",
                         children=[dcc.Loading(
                             id="loading-7b",
                             type="default",
@@ -366,6 +366,42 @@ app.layout = html.Div([
                                 ),
                             ],
                         ),],),
+                        
+                    html.Br(),
+                    html.Br(),
+                    
+                    html.Div(
+                            id="employee_Table1",
+                            children=[dcc.Loading(
+                                id="loading-8b",
+                                type="default",
+                                fullscreen=False,
+                                children=[
+                                    html.Div(
+                                        id="employee_cases2",
+                                        children=[
+                                            html.B("Employee Forecast Table"),
+                                            html.Hr(),
+                                            dcc.Graph(id="employee_forecast_table1"),
+                                        ],
+                                        style={'border-radius': '15px',
+                                               'box-shadow': '1px 1px 1px grey',
+                                               'background-color': '#f0f0f0',
+                                               'padding': '10px',
+                                               'margin-bottom': '10px',
+                                               'fontSize':16
+                                                },
+                                    ),
+                                ],
+                            ),],),
+                            
+                    html.A('Download CSV', id='employee_model_forecast_link', download="employee_forecast_data.csv",
+                           href="",
+                           target="_blank"),
+                    html.Br(),
+                    html.Br(),
+                    
+                    
                 ],
                 ),
                 
@@ -552,8 +588,13 @@ def update_output11(value):
 def update_output12(value):
     return 'Time lag in hospital visitation: {}'.format(value)
 
-
-
+'''
+@app.callback(
+    dash.dependencies.Output('ICU beds1-container', 'children'),
+    [dash.dependencies.Input('ICU beds1', 'value')])
+def update_output1(value):
+    return 'Relative positivity rate: {}'.format(value)
+'''
 
 
 
@@ -1034,7 +1075,9 @@ def update_model_forecast2(loc, county, model, reset_click, startdate):
 
 
 @app.callback(
-    Output("employee_forecast_plot1", "figure"),
+    [Output("employee_forecast_plot1", "figure"),
+    Output("employee_forecast_table1", "figure"),
+    Output('employee_model_forecast_link', 'href')],
     [Input('df3', 'children'),
      Input("location-select2", "value"),
      Input('county-select2', 'value'),
@@ -1056,7 +1099,8 @@ def update_plot_employee_forecast(df_census, loc, cty, employees, inc_rate, furl
             reset = True
 
     # Return to original hm(no colored annotation) by resetting
-    return app_fxns.generate_plot_employee_forecast1(df_census, loc, cty, employees, inc_rate, furlough, reset)
+    figure, table, csv_string = app_fxns.generate_plot_employee_forecast1(df_census, loc, cty, employees, inc_rate, furlough, reset)
+    return figure, table, csv_string
 
 
 

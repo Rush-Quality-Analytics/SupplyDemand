@@ -535,7 +535,7 @@ def generate_control_card1():
             html.Br(),
             html.Div(
                 id="reset-btn-outer1",
-                children=html.Button(id="reset-btn1", children="Reset Plots1", n_clicks=0),
+                children=html.Button(id="reset-btn1", children="Reset Plots", n_clicks=0),
             ),
         ],
     )
@@ -596,15 +596,15 @@ def generate_control_card2():
                 type='number',
             ),
             
-            html.Br(),
-            html.Br(),
-            html.P("No. of employees needed per covid patient"),
-            dcc.Input(
-                id="employees per patient or per bed",
-                placeholder=3,
-                value=3,
-                type='number',
-            ),
+            #html.Br(),
+            #html.Br(),
+            #html.P("No. of employees needed per covid patient"),
+            #dcc.Input(
+            #    id="employees per patient or per bed",
+            #    placeholder=3,
+            #    value=3,
+            #    type='number',
+            #),
             
             html.Br(),
             html.Br(),
@@ -618,28 +618,21 @@ def generate_control_card2():
             
             html.Br(),
             html.Br(),
-            html.P('Relative positivity rate'),
-            dcc.Slider(
+            html.P("Relative incidence rate"),
+            dcc.Input(
                 id="inc_rate",
                 min=0,
-                max=200,
-                value=100,
-                step=1,
-                marks={
-                    0: '0%',
-                    50: '50%',
-                    100: '100%',
-                    150: '150%',
-                    200: '200%',
-                },
-                ),
+                max=1000,
+                placeholder=200,
+                value=200,
+                type='number',
+            ),
             html.Div(id='incidence rate-container'),
-            
-            html.Br(),
+            #html.Br(),
             html.Br(),
             html.Div(
                 id="reset-btn-outer2",
-                children=html.Button(id="reset-btn2", children="Reset Plots2", n_clicks=0),
+                children=html.Button(id="reset-btn2", children="Reset Plots", n_clicks=0),
             ),
         ],
     )
@@ -2026,7 +2019,9 @@ def generate_plot_employee_forecast1(df, loc, cty, employees, inc_rate, furlough
         cells.append(cell)
         
     # Add the row to the dataframe
-    df = pd.DataFrame.from_records(cells, columns=col_labels)    
+    df = pd.DataFrame.from_records(cells, columns=col_labels)
+    df['date'] = df['date'].astype('datetime64[ns]')
+    df = df[df['date'] >= pd.Timestamp('today') - pd.Timedelta('10 days')]
     
     #### Construct arrays for critical care and non-critical care patients
         
@@ -2157,12 +2152,50 @@ def generate_plot_employee_forecast1(df, loc, cty, employees, inc_rate, furlough
         ),
     )
     
-    dates = 0
-    df = 0
+    #dates = 0
+    #df = 0
     
+    table = go.Figure(data=[go.Table(
+    header=dict(values=list(df),
+            fill_color='lavender',
+            align='left',
+            height=30),
+    cells=dict(values=[df['date'].astype(str),
+                   df['Active cases (gen pop)'],
+                   df['Active employee cases'],
+                   df['New employee cases']],
+                   fill_color="rgb(245, 247, 249)",
+                   align='left',
+                   height=30))
+    ],
+    layout=go.Layout(
+        margin=dict(l=10, r=10, b=10, t=10),
+        showlegend=True,
+        height=400,
+        paper_bgcolor="rgb(245, 247, 249)",
+        plot_bgcolor="rgb(245, 247, 249)",
+    ),)
     
+    csv_string = df.to_csv(index=False, encoding='utf-8')
+    csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
     
-    return figure
+    del fdates
+    del forecasted_y
+    del col_labels
+    del cells
+    del cell
+    del row_labels
+    del total_active
+    del Active
+    del total_active_e
+    del Active_e
+    del new_cases_e
+    del new_cases
+    del df
+    
+    return figure, table, csv_string
+
+
 
 
 
