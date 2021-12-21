@@ -1,0 +1,3253 @@
+	Province/State	Admin2
+0	New York	New York City
+1	New York	Nassau
+2	New York	Westchester
+3	New York	Suffolk
+4	New York	Rockland
+5	New York	Orange
+6	New York	Albany
+7	New York	Dutchess
+8	New York	Monroe
+9	New York	Erie
+10	New York	Onondaga
+11	New York	Saratoga
+12	New York	Schenectady
+13	New York	Putnam
+15	New York	Rensselaer
+16	New York	Ulster
+17	New York	Columbia
+18	New York	Tompkins
+19	New York	Sullivan
+20	New York	Niagara
+21	New York	Oneida
+22	New York	Ontario
+23	New York	Clinton
+24	New York	Herkimer
+25	New York	Broome
+26	New York	Montgomery
+27	New York	Essex
+28	New York	Wayne
+29	New York	Greene
+30	New York	Allegany
+31	New York	Wyoming
+32	New York	Hamilton
+33	New York	Chenango
+34	New York	Steuben
+35	New York	Livingston
+36	New York	Cortland
+37	New York	Delaware
+38	New York	Tioga
+39	New York	Genesee
+40	New York	Warren
+41	New York	Washington
+42	New York	Schoharie
+43	New York	Fulton
+44	New York	Jefferson
+45	Washington	King
+46	Washington	Snohomish
+48	Washington	Pierce
+49	Washington	Skagit
+50	Washington	Island
+51	Washington	Spokane
+52	Washington	Grant
+53	Washington	Kitsap
+54	Washington	Yakima
+55	Washington	Whatcom
+56	Washington	Thurston
+57	Washington	Clark
+58	Washington	Benton
+59	Washington	Jefferson
+60	Washington	Kittitas
+61	Washington	Klickitat
+62	Washington	Clallam
+63	Washington	Cowlitz
+64	Washington	Chelan
+65	Washington	Franklin
+66	Washington	Lewis
+67	Washington	Grays Harbor
+68	Washington	Columbia
+69	Washington	Lincoln
+70	Washington	Mason
+71	Washington	Walla Walla County
+72	Washington	Stevens
+73	Washington	San Juan
+74	Washington	Whitman
+75	New Jersey	Bergen
+77	New Jersey	Essex
+78	New Jersey	Monmouth
+79	New Jersey	Middlesex
+80	New Jersey	Hudson
+81	New Jersey	Union
+82	New Jersey	Morris
+83	New Jersey	Ocean
+84	New Jersey	Passaic
+85	New Jersey	Somerset
+86	New Jersey	Mercer
+87	New Jersey	Burlington
+88	New Jersey	Camden
+89	New Jersey	Hunterdon
+90	New Jersey	Sussex
+91	New Jersey	Warren
+92	New Jersey	Gloucester
+93	New Jersey	Atlantic
+94	New Jersey	Cape May
+95	New Jersey	Cumberland
+96	New Jersey	Salem
+97	California	Los Angeles
+98	California	Santa Clara
+99	California	San Diego
+100	California	San Mateo
+101	California	San Francisco
+102	California	Orange
+103	California	Alameda
+104	California	Contra Costa
+105	California	Sacramento
+106	California	Marin
+107	California	San Joaquin
+108	California	Riverside
+109	California	San Luis Obispo
+110	California	Ventura
+111	California	Sonoma
+112	California	San Bernardino
+113	California	Santa Cruz
+114	California	Solano
+115	California	Santa Barbara
+116	California	Placer
+117	California	Tulare
+118	California	Monterey
+119	California	Yolo
+120	California	Fresno
+121	California	Imperial
+122	California	San Benito
+123	California	Stanislaus
+124	California	Kern
+125	California	Madera
+126	California	Humboldt
+127	California	Calaveras
+128	California	Siskiyou
+129	California	Yuba
+130	California	Shasta
+131	California	Nevada
+132	California	Mendocino
+133	California	Amador
+134	California	Mono
+135	California	Butte
+136	California	Napa
+137	Illinois	Cook
+138	Illinois	DuPage
+139	Illinois	Lake
+140	Illinois	Will
+141	Illinois	Kane
+142	Illinois	McHenry
+143	Illinois	McLean
+144	Illinois	Sangamon
+145	Illinois	Winnebago
+146	Illinois	Kendall
+147	Illinois	St. Clair
+148	Illinois	Clinton
+149	Illinois	Peoria
+150	Illinois	Woodford
+151	Illinois	Madison
+152	Illinois	Kankakee
+154	Illinois	Champaign
+155	Illinois	Cumberland
+156	Illinois	Whiteside
+157	Illinois	Jackson
+158	Illinois	Williamson
+159	Illinois	LaSalle
+160	Illinois	Washington
+161	Illinois	Adams
+162	Illinois	Christian
+163	Illinois	DeKalb
+164	Illinois	Jo Daviess
+165	Illinois	Stephenson
+166	Illinois	Livingston
+167	Illinois	Rock Island
+168	Michigan	Wayne
+169	Michigan	Oakland
+170	Michigan	Macomb
+171	Michigan	Washtenaw
+172	Michigan	Kent
+173	Michigan	Genesee
+174	Michigan	Ingham
+175	Michigan	Livingston
+176	Michigan	St. Clair
+177	Michigan	Monroe
+178	Michigan	Ottawa
+179	Michigan	Midland
+180	Michigan	Berrien
+181	Michigan	Charlevoix
+182	Michigan	Clinton
+183	Michigan	Eaton
+184	Michigan	Calhoun
+185	Michigan	Saginaw
+186	Michigan	Montcalm
+187	Michigan	Bay
+188	Michigan	Leelanau
+189	Michigan	Otsego
+190	Michigan	Jackson
+191	Michigan	Barry
+192	Michigan	Wexford
+193	Michigan	Clare
+194	Michigan	Allegan
+195	Michigan	Tuscola
+196	Michigan	Gladwin
+197	Michigan	Emmet
+198	Michigan	Grand Traverse
+199	Michigan	Roscommon
+200	Florida	Miami-Dade
+201	Florida	Broward
+202	Florida	Palm Beach
+203	Florida	Hillsborough
+204	Florida	Duval
+205	Florida	Pinellas
+206	Florida	Alachua
+207	Florida	Collier
+208	Florida	Orange
+209	Florida	Lee
+210	Florida	Osceola
+211	Florida	Seminole
+212	Florida	St. Johns
+213	Florida	Sarasota
+214	Florida	Okaloosa
+215	Florida	Volusia
+216	Florida	Manatee
+217	Florida	Pasco
+218	Florida	Polk
+219	Florida	Citrus
+220	Florida	Indian River
+221	Florida	Clay
+222	Florida	Brevard
+223	Florida	Lake
+224	Florida	Leon
+225	Florida	Sumter
+226	Florida	Hernando
+227	Florida	Santa Rosa
+228	Florida	Escambia
+229	Florida	Walton
+230	Florida	Marion
+231	Florida	St. Lucie
+232	Florida	Charlotte
+233	Florida	Martin
+234	Florida	Baker
+235	Florida	Putnam
+236	Florida	Columbia
+237	Florida	Gadsden
+238	Florida	Nassau
+239	Florida	Jackson
+240	Florida	Monroe
+241	Florida	Bay
+242	Florida	Highlands
+244	Florida	Bradford
+245	Florida	Desoto
+246	Florida	Flagler
+247	Louisiana	Orleans
+248	Louisiana	Jefferson
+250	Louisiana	St. Tammany
+251	Louisiana	East Baton Rouge
+252	Louisiana	Caddo
+253	Louisiana	St. Bernard
+254	Louisiana	Ascension
+255	Louisiana	Lafourche
+256	Louisiana	Terrebonne
+257	Louisiana	St. John the Baptist
+258	Louisiana	St. Charles
+259	Louisiana	Lafayette
+260	Louisiana	Bossier
+261	Louisiana	Plaquemines
+262	Louisiana	Calcasieu
+263	Louisiana	West Baton Rouge
+264	Louisiana	St. Landry
+265	Louisiana	Tangipahoa
+266	Louisiana	Washington
+267	Louisiana	Iberia
+268	Louisiana	Iberville
+269	Louisiana	Livingston
+270	Louisiana	Rapides
+271	Louisiana	De Soto
+272	Louisiana	Evangeline
+273	Louisiana	Ouachita
+274	Louisiana	St. James
+275	Louisiana	Assumption
+276	Louisiana	Webster
+277	Louisiana	Catahoula
+278	Louisiana	Avoyelles
+279	Louisiana	Beauregard
+280	Louisiana	Bienville
+281	Louisiana	Claiborne
+282	Louisiana	St. Mary
+283	Louisiana	Acadia
+284	Massachusetts	Middlesex
+285	Massachusetts	Suffolk
+286	Massachusetts	Norfolk
+287	Massachusetts	Essex
+288	Massachusetts	Worcester
+289	Massachusetts	Plymouth
+290	Massachusetts	Barnstable
+291	Massachusetts	Bristol
+293	Massachusetts	Berkshire
+294	Massachusetts	Hampden
+295	Massachusetts	Franklin
+296	Massachusetts	Brockton
+297	Massachusetts	Hampshire
+298	Massachusetts	Dukes and Nantucket
+299	Texas	Dallas
+300	Texas	Harris
+301	Texas	Travis
+302	Texas	Tarrant
+303	Texas	Bexar
+304	Texas	Collin
+305	Texas	Denton
+306	Texas	Fort Bend
+307	Texas	McLennan
+308	Texas	Brazoria
+309	Texas	Montgomery
+310	Texas	Brazos
+311	Texas	Galveston
+312	Texas	Smith
+313	Texas	Bell
+314	Texas	Lubbock
+315	Texas	Williamson
+316	Texas	El Paso
+317	Texas	Hays
+318	Texas	Cameron
+319	Texas	Webb
+320	Texas	Wichita
+321	Texas	Matagorda
+322	Texas	Ellis
+323	Texas	Jefferson
+324	Texas	Hockley
+325	Texas	Johnson
+326	Texas	Comal
+327	Texas	Grimes
+328	Texas	Brown
+329	Texas	Randall
+330	Texas	Castro
+331	Texas	Hardin
+332	Texas	Hidalgo
+333	Texas	Atascosa
+334	Texas	Gregg
+335	Texas	Lavaca
+336	Texas	Bowie
+337	Texas	Rusk
+338	Texas	Fannin
+339	Texas	DeWitt
+340	Texas	Van Zandt
+341	Texas	Crane
+342	Texas	Lamar
+343	Texas	Midland
+344	Texas	Oldham
+345	Texas	Milam
+346	Texas	Kendall
+347	Texas	Guadalupe
+348	Texas	Fayette
+349	Texas	Medina
+350	Texas	Wharton
+351	Texas	Nueces
+352	Texas	Upshur
+353	Texas	Deaf Smith
+354	Texas	Chambers
+355	Texas	Liberty
+356	Texas	Burnet
+357	Texas	Walker
+358	Georgia	Fulton
+359	Georgia	Cobb
+360	Georgia	Bartow
+361	Georgia	DeKalb
+362	Georgia	Dougherty
+364	Georgia	Gwinnett
+365	Georgia	Cherokee
+366	Georgia	Lee
+367	Georgia	Carroll
+368	Georgia	Clayton
+369	Georgia	Richmond
+370	Georgia	Floyd
+371	Georgia	Fayette
+372	Georgia	Clarke
+373	Georgia	Hall
+374	Georgia	Lowndes
+375	Georgia	Coweta
+376	Georgia	Henry
+377	Georgia	Polk
+378	Georgia	Gordon
+379	Georgia	Newton
+380	Georgia	Troup
+381	Georgia	Forsyth
+382	Georgia	Paulding
+383	Georgia	Chatham
+384	Georgia	Douglas
+385	Georgia	Columbia
+386	Georgia	Glynn
+387	Georgia	Peach
+388	Georgia	Lamar
+389	Georgia	Whitfield
+390	Georgia	Rockdale
+391	Georgia	Early
+392	Georgia	Laurens
+393	Georgia	Muscogee
+394	Georgia	Effingham
+395	Georgia	Tift
+396	Georgia	Spalding
+397	Georgia	Worth
+398	Georgia	Pickens
+399	Georgia	Sumter
+400	Georgia	Terrell
+401	Georgia	Baldwin
+402	Georgia	Charlton
+403	Georgia	Houston
+404	Georgia	Barrow
+405	Georgia	Oconee
+406	Georgia	Turner
+407	Georgia	Bibb
+408	Georgia	Miller
+409	Georgia	Heard
+410	Georgia	Dawson
+411	Georgia	Monroe
+412	Georgia	Randolph
+413	Georgia	Clinch
+414	Georgia	Lincoln
+415	Georgia	Lumpkin
+416	Georgia	Butts
+417	Georgia	Chattooga
+418	Georgia	Twiggs
+419	Colorado	Denver
+420	Colorado	Eagle
+421	Colorado	El Paso
+422	Colorado	Jefferson
+423	Colorado	Arapahoe
+424	Colorado	Weld
+425	Colorado	Boulder
+426	Colorado	Douglas
+427	Colorado	Larimer
+428	Colorado	Gunnison
+429	Colorado	Adams
+430	Colorado	Pitkin
+431	Colorado	Garfield
+432	Colorado	Summit
+433	Colorado	Pueblo
+434	Colorado	Routt
+435	Colorado	Clear Creek
+436	Colorado	Chaffee
+437	Colorado	Elbert
+438	Colorado	Mesa
+439	Colorado	Grand
+440	Colorado	Morgan
+441	Colorado	Crowley
+442	Colorado	Broomfield
+443	Colorado	Park
+444	Colorado	Yuma
+446	Colorado	Hinsdale
+447	Colorado	Montrose
+448	Colorado	San Miguel
+449	Pennsylvania	Montgomery
+450	Pennsylvania	Philadelphia
+451	Pennsylvania	Delaware
+452	Pennsylvania	Allegheny
+453	Pennsylvania	Bucks
+454	Pennsylvania	Monroe
+455	Pennsylvania	Chester
+456	Pennsylvania	Northampton
+457	Pennsylvania	Lehigh
+458	Pennsylvania	Berks
+459	Pennsylvania	Cumberland
+460	Pennsylvania	York
+461	Pennsylvania	Washington
+462	Pennsylvania	Luzerne
+463	Pennsylvania	Lancaster
+464	Pennsylvania	Lackawanna
+465	Pennsylvania	Adams
+466	Pennsylvania	Westmoreland
+467	Pennsylvania	Pike
+468	Pennsylvania	Beaver
+469	Pennsylvania	Lebanon
+470	Pennsylvania	Wayne
+471	Pennsylvania	Erie
+472	Pennsylvania	Franklin
+473	Pennsylvania	Centre
+474	Pennsylvania	Potter
+475	Pennsylvania	Butler
+476	Pennsylvania	Dauphin
+477	Pennsylvania	Montour
+478	Pennsylvania	Columbia
+479	Pennsylvania	Fayette
+480	Pennsylvania	Schuylkill
+481	Pennsylvania	Mercer
+482	Tennessee	Davidson
+484	Tennessee	Shelby
+485	Tennessee	Williamson
+486	Tennessee	Unknown
+487	Tennessee	Sumner
+488	Tennessee	Hamilton
+489	Tennessee	Rutherford
+490	Tennessee	Putnam
+491	Tennessee	Knox
+492	Tennessee	Tipton
+493	Tennessee	Cheatham
+494	Tennessee	Dickson
+495	Tennessee	Robertson
+496	Tennessee	Fayette
+497	Tennessee	Montgomery
+498	Tennessee	Monroe
+499	Tennessee	Jefferson
+500	Tennessee	Campbell
+501	Tennessee	Cumberland
+502	Tennessee	Dyer
+503	Tennessee	Wilson
+504	Tennessee	Carroll
+505	Tennessee	Washington
+506	Tennessee	Greene
+507	Tennessee	Bradley
+508	Tennessee	Hamblen
+509	Tennessee	Maury
+510	Tennessee	Scott
+511	Tennessee	Sullivan
+512	Tennessee	Sevier
+513	Tennessee	Anderson
+514	Tennessee	Blount
+515	Tennessee	Gibson
+516	Tennessee	McMinn
+517	Tennessee	Cocke
+518	Tennessee	Roane
+519	Tennessee	Chester
+520	Tennessee	Franklin
+521	Tennessee	Houston
+522	Tennessee	Loudon
+523	Tennessee	Marion
+524	Tennessee	Perry
+525	Wisconsin	Milwaukee
+526	Wisconsin	Dane
+527	Wisconsin	Waukesha
+528	Wisconsin	Fond du Lac
+529	Wisconsin	Washington
+530	Wisconsin	Ozaukee
+531	Wisconsin	Kenosha
+532	Wisconsin	Sheboygan
+533	Wisconsin	Winnebago
+534	Wisconsin	La Crosse
+535	Wisconsin	Columbia
+536	Wisconsin	Racine
+537	Wisconsin	Eau Claire
+538	Wisconsin	Brown
+539	Wisconsin	Walworth
+540	Wisconsin	Rock
+541	Wisconsin	Outagamie
+542	Wisconsin	Sauk
+543	Wisconsin	St. Croix
+544	Wisconsin	Jefferson
+545	Wisconsin	Pierce
+546	Wisconsin	Wood
+547	Wisconsin	Calumet
+548	Wisconsin	Bayfield
+549	Wisconsin	Dunn
+550	Wisconsin	Chippewa
+551	Wisconsin	Marathon
+552	Wisconsin	Douglas
+553	Wisconsin	Green
+554	Ohio	Cuyahoga
+555	Ohio	Franklin
+556	Ohio	Summit
+557	Ohio	Lorain
+558	Ohio	Hamilton
+559	Ohio	Mahoning
+560	Ohio	Butler
+561	Ohio	Miami
+562	Ohio	Stark
+563	Ohio	Medina
+564	Ohio	Lucas
+565	Ohio	Lake
+566	Ohio	Delaware
+567	Ohio	Montgomery
+568	Ohio	Clermont
+569	Ohio	Trumbull
+570	Ohio	Warren
+571	Ohio	Belmont
+572	Ohio	Tuscarawas
+573	Ohio	Geauga
+574	Ohio	Coshocton
+575	Ohio	Ashtabula
+576	Ohio	Defiance
+577	Ohio	Columbiana
+578	Ohio	Darke
+579	Ohio	Huron
+580	Ohio	Ashland
+581	Ohio	Clark
+582	Ohio	Richland
+583	Ohio	Marion
+584	Ohio	Licking
+585	Ohio	Union
+586	Ohio	Erie
+587	Ohio	Gallia
+588	Ohio	Madison
+589	Ohio	Carroll
+590	Ohio	Clinton
+591	Ohio	Greene
+592	Ohio	Hancock
+593	Ohio	Portage
+594	Ohio	Wood
+595	Ohio	Washington
+596	Ohio	Knox
+597	Connecticut	Fairfield
+598	Connecticut	Hartford
+599	Connecticut	New Haven
+600	Connecticut	Tolland
+601	Connecticut	Litchfield
+602	Connecticut	Middlesex
+603	Connecticut	New London
+604	Connecticut	Windham
+605	North Carolina	Mecklenburg
+606	North Carolina	Wake
+607	North Carolina	Durham
+608	North Carolina	Forsyth
+609	North Carolina	Union
+610	North Carolina	Guilford
+611	North Carolina	Harnett
+612	North Carolina	Cabarrus
+613	North Carolina	Brunswick
+614	North Carolina	Iredell
+615	North Carolina	Orange
+616	North Carolina	Carteret
+617	North Carolina	New Hanover
+618	North Carolina	Buncombe
+619	North Carolina	Cherokee
+620	North Carolina	Franklin
+621	North Carolina	Chatham
+622	North Carolina	Johnston
+623	North Carolina	Onslow
+624	North Carolina	Wilson
+625	North Carolina	Gaston
+626	North Carolina	Pitt
+627	North Carolina	Cumberland
+628	North Carolina	Craven
+629	North Carolina	Watauga
+630	North Carolina	Moore
+631	North Carolina	Rowan
+632	North Carolina	Alamance
+633	North Carolina	Wayne
+634	North Carolina	Sampson
+635	North Carolina	Lincoln
+636	North Carolina	Hoke
+637	North Carolina	Davidson
+638	North Carolina	Pasquotank
+639	North Carolina	Lee
+640	North Carolina	Catawba
+641	North Carolina	Chowan
+642	North Carolina	Henderson
+643	North Carolina	Robeson
+644	North Carolina	Hyde
+645	North Carolina	Granville
+646	North Carolina	Davie
+647	North Carolina	Montgomery
+648	North Carolina	Nash
+649	North Carolina	Scotland
+650	Maryland	Montgomery
+651	Maryland	Prince George's
+652	Maryland	Baltimore
+653	Maryland	Baltimore City
+654	Maryland	Howard
+655	Maryland	Anne Arundel
+656	Maryland	Harford
+657	Maryland	Charles
+658	Maryland	Carroll
+659	Maryland	Calvert
+660	Maryland	Wicomico
+661	Maryland	Worcester
+662	Maryland	Talbot
+663	Maryland	Frederick
+664	Maryland	Caroline
+665	Maryland	Queen Anne's
+666	Maryland	Somerset
+667	Maryland	Washington
+668	Maryland	St. Mary's
+669	Virginia	James City
+670	Virginia	Fairfax
+671	Virginia	Arlington
+672	Virginia	Prince William
+673	Virginia	Virginia Beach
+674	Virginia	Loudoun
+675	Virginia	Chesterfield
+676	Virginia	Henrico
+677	Virginia	Richmond
+678	Virginia	Alexandria
+679	Virginia	Stafford
+680	Virginia	York
+681	Virginia	Williamsburg
+682	Virginia	Charlottesville
+683	Virginia	Norfolk
+684	Virginia	Spotsylvania
+685	Virginia	Goochland
+686	Virginia	Albemarle
+687	Virginia	Gloucester
+688	Virginia	Newport News
+689	Virginia	Lee
+690	Virginia	Rockingham
+691	Virginia	Culpeper
+692	Virginia	Hanover
+693	Virginia	Prince Edward
+694	Virginia	Harrisonburg
+695	Virginia	Charles City
+696	Virginia	Botetourt
+697	Virginia	Suffolk
+698	Virginia	Accomack
+699	Virginia	Mecklenburg
+700	Virginia	Rockbridge
+701	Virginia	Isle of Wight
+702	Virginia	Franklin
+703	Virginia	Danville
+704	Virginia	Bedford
+705	Virginia	Amherst
+706	Virginia	Fluvanna
+707	Virginia	Louisa
+708	Mississippi	Hinds
+709	Mississippi	DeSoto
+710	Mississippi	Harrison
+711	Mississippi	Forrest
+712	Mississippi	Pearl River
+713	Mississippi	Madison
+714	Mississippi	Leflore
+715	Mississippi	Coahoma
+716	Mississippi	Tippah
+717	Mississippi	Rankin
+718	Mississippi	Holmes
+719	Mississippi	Lee
+720	Mississippi	Jackson
+721	Mississippi	Lafayette
+722	Mississippi	Copiah
+723	Mississippi	Hancock
+724	Mississippi	Lincoln
+725	Mississippi	Lowndes
+726	Mississippi	Bolivar
+727	Mississippi	Wilkinson
+728	Mississippi	Franklin
+729	Mississippi	Marshall
+730	Mississippi	Pike
+731	Mississippi	Itawamba
+732	Mississippi	Washington
+733	Mississippi	Monroe
+734	Mississippi	Walthall
+735	Mississippi	Winston
+736	Mississippi	Lawrence
+737	Mississippi	Grenada
+738	Mississippi	Panola
+739	Mississippi	Tunica
+740	Mississippi	Oktibbeha
+741	Mississippi	Sunflower
+742	Mississippi	Perry
+743	Mississippi	Jones
+744	Mississippi	Smith
+745	Mississippi	Yazoo
+746	Mississippi	Humphreys
+747	Mississippi	Webster
+748	Mississippi	Adams
+749	Mississippi	Clay
+750	Mississippi	George
+751	Mississippi	Attala
+752	Mississippi	Leake
+753	Mississippi	Simpson
+754	Mississippi	Union
+755	Mississippi	Chickasaw
+756	Mississippi	Montgomery
+757	Mississippi	Pontotoc
+758	Mississippi	Scott
+759	Mississippi	Tate
+760	Indiana	Marion
+761	Indiana	Hamilton
+762	Indiana	Johnson
+763	Indiana	Lake
+764	Indiana	Hendricks
+765	Indiana	St. Joseph
+766	Indiana	Howard
+767	Indiana	Bartholomew
+768	Indiana	Franklin
+769	Indiana	Clark
+770	Indiana	Allen
+771	Indiana	Elkhart
+772	Indiana	Boone
+773	Indiana	Floyd
+774	Indiana	LaPorte
+775	Indiana	Tippecanoe
+776	Indiana	Madison
+777	Indiana	Vigo
+778	Indiana	Grant
+779	Indiana	Delaware
+780	Indiana	Hancock
+781	Indiana	Noble
+782	Indiana	Adams
+783	Indiana	Wells
+784	Indiana	Fayette
+785	Indiana	Jennings
+786	Indiana	Wayne
+787	Indiana	Owen
+788	Indiana	Vanderburgh
+789	Indiana	Shelby
+790	Indiana	Scott
+791	Indiana	Greene
+792	Indiana	Monroe
+793	Indiana	Miami
+794	Indiana	Tipton
+795	Indiana	Putnam
+796	Indiana	Morgan
+797	Indiana	Ripley
+798	Indiana	Washington
+799	Indiana	Dubois
+800	South Carolina	Kershaw
+801	South Carolina	Richland
+802	South Carolina	Greenville
+803	South Carolina	Beaufort
+804	South Carolina	Charleston
+805	South Carolina	Lexington
+806	South Carolina	Horry
+807	South Carolina	Anderson
+808	South Carolina	Lancaster
+809	South Carolina	Darlington
+810	South Carolina	York
+811	South Carolina	Sumter
+812	South Carolina	Orangeburg
+813	South Carolina	Greenwood
+814	South Carolina	Spartanburg
+815	South Carolina	Berkeley
+816	South Carolina	Fairfield
+817	South Carolina	Calhoun
+818	South Carolina	Dorchester
+819	South Carolina	Lee
+820	South Carolina	Abbeville
+821	South Carolina	Saluda
+822	South Carolina	Aiken
+823	South Carolina	Clarendon
+824	South Carolina	Florence
+825	South Carolina	Pickens
+826	South Carolina	Colleton
+827	South Carolina	Dillon
+828	South Carolina	Edgefield
+829	South Carolina	Marlboro
+830	South Carolina	Newberry
+831	South Carolina	Hampton
+832	South Carolina	Jasper
+833	Nevada	Clark
+835	Nevada	Washoe
+836	Nevada	Carson City
+837	Nevada	Elko County
+838	Utah	Salt Lake
+839	Utah	Summit
+840	Utah	Davis
+841	Utah	Wasatch
+842	Utah	Utah
+843	Utah	Tooele
+844	Utah	Cache
+845	Utah	Box Elder
+846	Minnesota	Hennepin
+847	Minnesota	Ramsey
+848	Minnesota	Olmsted
+849	Minnesota	Dakota
+850	Minnesota	Martin
+851	Minnesota	Carver
+852	Minnesota	Washington
+853	Minnesota	Mower
+854	Minnesota	Anoka
+855	Minnesota	Stearns
+856	Minnesota	Blue Earth
+857	Minnesota	Wright
+858	Minnesota	Nicollet
+859	Minnesota	Scott
+860	Minnesota	Steele
+861	Minnesota	Clay
+862	Minnesota	Dodge
+863	Minnesota	Renville
+864	Minnesota	Waseca
+865	Minnesota	Benton
+866	Minnesota	Rice
+867	Minnesota	Chisago
+868	Minnesota	Wabasha
+869	Minnesota	Jackson
+870	Minnesota	St. Louis
+871	Minnesota	Cass
+872	Minnesota	LeSeur
+874	Arkansas	Jefferson
+875	Arkansas	Pulaski
+876	Arkansas	Garland
+877	Arkansas	Cleburne
+878	Arkansas	Washington
+879	Arkansas	Faulkner
+880	Arkansas	Saline
+881	Arkansas	Grant
+882	Arkansas	Bradley
+883	Arkansas	Clark
+884	Arkansas	Craighead
+885	Arkansas	Independence
+886	Arkansas	Poinsett
+887	Arkansas	Pope
+888	Arkansas	Searcy
+889	Arkansas	Sevier
+890	Arkansas	Van Buren
+891	Arkansas	Benton
+892	Arkansas	Boone
+893	Arkansas	Crittenden
+894	Arkansas	Greene
+895	Arkansas	Polk
+896	Arkansas	Sebastian
+897	Arkansas	Columbia
+898	Arkansas	Conway
+899	Arkansas	Union
+900	Arkansas	Woodruff
+901	Oregon	Washington
+902	Oregon	Marion
+903	Oregon	Multnomah
+904	Oregon	Linn
+905	Oregon	Clackamas
+906	Oregon	Deschutes
+907	Oregon	Yamhill
+908	Oregon	Benton
+909	Oregon	Lane
+910	Oregon	Jackson
+911	Oregon	Umatilla
+912	Oregon	Klamath
+913	Oregon	Douglas
+914	Oregon	Polk
+915	Oregon	Grant
+916	Oregon	Union
+917	Oregon	Josephine
+918	Alabama	Jefferson
+919	Alabama	Shelby
+920	Alabama	Lee
+921	Alabama	Madison
+922	Alabama	Tuscaloosa
+923	Alabama	Elmore
+924	Alabama	Montgomery
+925	Alabama	St. Clair
+926	Alabama	Baldwin
+927	Alabama	Chambers
+928	Alabama	Mobile
+929	Alabama	Lauderdale
+930	Alabama	Cullman
+931	Alabama	Limestone
+932	Alabama	Calhoun
+933	Alabama	Talladega
+934	Alabama	Walker
+935	Alabama	Jackson
+936	Alabama	Lamar
+937	Alabama	Washington
+938	Alabama	Marion
+939	Arizona	Maricopa
+940	Arizona	Pima
+941	Arizona	Pinal
+942	Arizona	Coconino
+943	Arizona	Navajo
+944	Arizona	Yavapai
+945	Arizona	Apache
+946	Arizona	Graham
+947	Arizona	Santa Cruz
+948	Arizona	Yuma
+949	Arizona	Cochise
+951	Kentucky	Jefferson
+952	Kentucky	Fayette
+953	Kentucky	Harrison
+954	Kentucky	Montgomery
+955	Kentucky	Clark
+956	Kentucky	Bourbon
+957	Kentucky	Henderson
+958	Kentucky	Warren
+959	Kentucky	Pulaski
+960	Kentucky	Nelson
+961	Kentucky	Lyon
+962	Kentucky	Kenton
+963	Kentucky	Daviess
+964	Kentucky	Anderson
+965	Kentucky	Calloway
+966	Kentucky	Christian
+967	Kentucky	Franklin
+968	Kentucky	Hardin
+969	Kentucky	Oldham
+970	Missouri	St. Louis
+971	Missouri	Boone
+972	Missouri	Greene
+973	Missouri	St. Louis City
+974	Missouri	Jackson
+975	Missouri	Cass
+976	Missouri	Cole
+977	Missouri	St. Charles
+978	Missouri	Christian
+979	Missouri	Henry
+980	Missouri	Scott
+981	Missouri	Pulaski
+982	Missouri	Dunklin
+983	Missouri	Jasper
+984	Missouri	Adair
+985	Missouri	Johnson
+986	Missouri	Bates
+987	Iowa	Johnson
+988	Iowa	Polk
+989	Iowa	Dallas
+990	Iowa	Allamakee
+991	Iowa	Dubuque
+992	Iowa	Linn
+993	Iowa	Harrison
+994	Iowa	Black Hawk
+995	Iowa	Washington
+996	Iowa	Tama
+997	Iowa	Pottawattamie
+998	Iowa	Muscatine
+999	Iowa	Cerro Gordo
+1000	Iowa	Carroll
+1001	Iowa	Adair
+1002	Iowa	Winneshiek
+1003	Iowa	Fayette
+1004	Iowa	Henry
+1005	Iowa	Story
+1006	Iowa	Scott
+1007	Iowa	Woodbury
+1008	Iowa	Kossuth
+1009	Iowa	Sioux
+1010	Iowa	Poweshiek
+1011	Maine	Cumberland
+1012	Maine	York
+1014	Maine	Lincoln
+1015	Maine	Oxford
+1016	Maine	Kennebec
+1017	Maine	Androscoggin
+1018	Maine	Sagadahoc
+1019	Maine	Penobscot
+1020	Rhode Island	Providence
+1021	Rhode Island	Bristol
+1022	Rhode Island	Washington
+1023	Rhode Island	Newport
+1025	Rhode Island	Kent
+1026	New Hampshire	Rockingham
+1027	New Hampshire	Grafton
+1028	New Hampshire	Hillsborough
+1029	New Hampshire	Carroll
+1030	New Hampshire	Merrimack
+1031	New Hampshire	Strafford
+1032	New Hampshire	Cheshire
+1033	New Hampshire	Nashua
+1034	New Hampshire	Sullivan
+1035	Oklahoma	Oklahoma
+1036	Oklahoma	Cleveland
+1037	Oklahoma	Tulsa
+1038	Oklahoma	Kay
+1039	Oklahoma	Pawnee
+1040	Oklahoma	Payne
+1041	Oklahoma	Canadian
+1042	Oklahoma	Washington
+1043	Oklahoma	Garvin
+1044	Oklahoma	Jackson
+1045	Oklahoma	Custer
+1046	Oklahoma	Grady
+1047	Oklahoma	Logan
+1048	Oklahoma	McClain
+1049	Oklahoma	Muskogee
+1050	Oklahoma	Noble
+1051	Kansas	Johnson
+1052	Kansas	Wyandotte
+1053	Kansas	Douglas
+1054	Kansas	Leavenworth
+1055	Kansas	Butler
+1056	Kansas	Linn
+1057	Kansas	Morris
+1058	Kansas	Sedgwick
+1059	Kansas	Franklin
+1060	Kansas	Cherokee
+1061	Kansas	Jackson
+1062	Kansas	Riley
+1063	Kansas	Reno
+1064	Kansas	Mitchell
+1065	Kansas	Ford
+1066	New Mexico	Bernalillo
+1067	New Mexico	Santa Fe
+1068	New Mexico	Sandoval
+1069	New Mexico	Taos
+1070	New Mexico	Socorro
+1071	New Mexico	Dona Ana
+1072	New Mexico	San Miguel
+1073	New Mexico	McKinley
+1074	New Mexico	Lea
+1075	Hawaii	Honolulu
+1076	Hawaii	Maui
+1077	Hawaii	Kauai
+1078	Delaware	New Castle
+1079	Delaware	Sussex
+1080	Delaware	Kent
+1081	Vermont	Chittenden
+1082	Vermont	Windsor
+1083	Vermont	Windham
+1084	Vermont	Bennington
+1085	Vermont	Orange
+1086	Vermont	Addison
+1087	Vermont	Rutland
+1088	Vermont	Washington
+1089	Vermont	Franklin
+1090	Nebraska	Douglas
+1091	Nebraska	Sarpy
+1092	Nebraska	Lincoln
+1093	Nebraska	Knox
+1094	Nebraska	Lancaster
+1095	Nebraska	Buffalo
+1096	Nebraska	Cass
+1097	Nebraska	Adams
+1098	Nebraska	Nemaha
+1100	Idaho	Blaine
+1101	Idaho	Ada
+1102	Idaho	Kootenai
+1103	Idaho	Teton
+1104	Idaho	Bingham
+1105	Idaho	Madison
+1106	Idaho	Twin Falls
+1107	Idaho	Canyon
+1108	Montana	Gallatin
+1109	Montana	Yellowstone
+1110	Montana	Missoula
+1111	Montana	Lewis and Clark
+1112	Montana	Cascade
+1113	Montana	Silver Bow
+1114	Montana	Flathead
+1116	Montana	Broadwater
+1117	Montana	Roosevelt
+1118	Montana	Madison
+1119	Montana	Ravalli
+1121	North Dakota	Burleigh
+1122	North Dakota	Morton
+1123	North Dakota	Ward
+1124	North Dakota	Cass
+1125	North Dakota	Ramsey
+1126	North Dakota	Pierce
+1128	Wyoming	Fremont
+1129	Wyoming	Laramie
+1130	Wyoming	Sheridan
+1131	Wyoming	Teton
+1132	Wyoming	Park
+1133	Wyoming	Campbell
+1134	Wyoming	Natrona
+1135	Wyoming	Carbon
+1137	South Dakota	Beadle
+1138	South Dakota	Minnehaha
+1139	South Dakota	Pennington
+1140	South Dakota	Charles Mix
+1141	South Dakota	Davison
+1142	South Dakota	Bon Homme
+1143	South Dakota	McCook
+1144	South Dakota	Brown
+1145	Alaska	Fairbanks North Star
+1146	Alaska	Ketchikan Gateway
+1147	Alaska	Anchorage
+1148	Alaska	Soldotna
+1149	Alaska	Sterling
+1150	West Virginia	Jefferson
+1151	West Virginia	Kanawha
+1152	West Virginia	Mercer
+1153	West Virginia	Tucker
+1154	West Virginia	Monongalia
+1155	West Virginia	Marshall
+1156	West Virginia	Jackson
+1157	West Virginia	Putnam
+1160	Alabama	Autauga
+1161	Alabama	Barbour
+1162	Alabama	Bibb
+1163	Alabama	Blount
+1164	Alabama	Bullock
+1165	Alabama	Butler
+1166	Alabama	Cherokee
+1167	Alabama	Chilton
+1168	Alabama	Choctaw
+1169	Alabama	Clarke
+1170	Alabama	Clay
+1171	Alabama	Cleburne
+1172	Alabama	Coffee
+1173	Alabama	Colbert
+1174	Alabama	Conecuh
+1175	Alabama	Coosa
+1176	Alabama	Covington
+1177	Alabama	Crenshaw
+1178	Alabama	Dale
+1179	Alabama	Dallas
+1180	Alabama	DeKalb
+1181	Alabama	Escambia
+1182	Alabama	Etowah
+1183	Alabama	Fayette
+1184	Alabama	Franklin
+1185	Alabama	Geneva
+1186	Alabama	Greene
+1187	Alabama	Hale
+1188	Alabama	Henry
+1189	Alabama	Houston
+1190	Alabama	Lawrence
+1191	Alabama	Lowndes
+1192	Alabama	Macon
+1193	Alabama	Marengo
+1194	Alabama	Marshall
+1195	Alabama	Monroe
+1196	Alabama	Morgan
+1197	Alabama	Perry
+1198	Alabama	Pickens
+1199	Alabama	Pike
+1200	Alabama	Randolph
+1201	Alabama	Russell
+1202	Alabama	Sumter
+1203	Alabama	Tallapoosa
+1204	Alabama	Wilcox
+1205	Alabama	Winston
+1206	Alaska	Aleutians East
+1207	Alaska	Aleutians West
+1208	Alaska	Bethel
+1209	Alaska	Bristol Bay
+1210	Alaska	Denali
+1211	Alaska	Dillingham
+1212	Alaska	Haines
+1213	Alaska	Hoonah-Angoon
+1214	Alaska	Juneau
+1215	Alaska	Kenai Peninsula
+1216	Alaska	Kodiak Island
+1217	Alaska	Kusilvak
+1218	Alaska	Lake and Peninsula
+1219	Alaska	Matanuska-Susitna
+1220	Alaska	Nome
+1221	Alaska	North Slope
+1222	Alaska	Northwest Arctic
+1223	Alaska	Petersburg
+1224	Alaska	Prince of Wales-Hyder
+1225	Alaska	Sitka
+1226	Alaska	Skagway
+1227	Alaska	Southeast Fairbanks
+1228	Alaska	Valdez-Cordova
+1229	Alaska	Wrangell
+1230	Alaska	Yakutat
+1231	Alaska	Yukon-Koyukuk
+1232	Arizona	Gila
+1233	Arizona	Greenlee
+1234	Arizona	La Paz
+1235	Arizona	Mohave
+1236	Arkansas	Arkansas
+1237	Arkansas	Ashley
+1238	Arkansas	Baxter
+1239	Arkansas	Calhoun
+1240	Arkansas	Carroll
+1241	Arkansas	Chicot
+1242	Arkansas	Clay
+1243	Arkansas	Cleveland
+1244	Arkansas	Crawford
+1245	Arkansas	Cross
+1246	Arkansas	Dallas
+1247	Arkansas	Desha
+1248	Arkansas	Drew
+1249	Arkansas	Franklin
+1250	Arkansas	Fulton
+1251	Arkansas	Hempstead
+1252	Arkansas	Hot Spring
+1253	Arkansas	Howard
+1254	Arkansas	Izard
+1255	Arkansas	Jackson
+1256	Arkansas	Johnson
+1257	Arkansas	Lafayette
+1258	Arkansas	Lawrence
+1259	Arkansas	Lee
+1260	Arkansas	Lincoln
+1261	Arkansas	Little River
+1262	Arkansas	Logan
+1263	Arkansas	Lonoke
+1264	Arkansas	Madison
+1265	Arkansas	Marion
+1266	Arkansas	Miller
+1267	Arkansas	Mississippi
+1268	Arkansas	Monroe
+1269	Arkansas	Montgomery
+1270	Arkansas	Nevada
+1271	Arkansas	Newton
+1272	Arkansas	Ouachita
+1273	Arkansas	Perry
+1274	Arkansas	Phillips
+1275	Arkansas	Pike
+1276	Arkansas	Prairie
+1277	Arkansas	Randolph
+1278	Arkansas	Scott
+1279	Arkansas	Sharp
+1280	Arkansas	St. Francis
+1281	Arkansas	Stone
+1282	Arkansas	White
+1283	Arkansas	Yell
+1284	California	Alpine
+1285	California	Colusa
+1286	California	Del Norte
+1287	California	El Dorado
+1288	California	Glenn
+1289	California	Inyo
+1290	California	Kings
+1291	California	Lake
+1292	California	Lassen
+1293	California	Mariposa
+1294	California	Merced
+1295	California	Modoc
+1296	California	Plumas
+1297	California	Sierra
+1298	California	Sutter
+1299	California	Tehama
+1300	California	Trinity
+1301	California	Tuolumne
+1302	Colorado	Alamosa
+1303	Colorado	Archuleta
+1304	Colorado	Baca
+1305	Colorado	Bent
+1306	Colorado	Cheyenne
+1307	Colorado	Conejos
+1308	Colorado	Costilla
+1309	Colorado	Custer
+1310	Colorado	Delta
+1311	Colorado	Dolores
+1312	Colorado	Fremont
+1313	Colorado	Gilpin
+1314	Colorado	Huerfano
+1315	Colorado	Jackson
+1316	Colorado	Kiowa
+1317	Colorado	Kit Carson
+1318	Colorado	La Plata
+1319	Colorado	Lake
+1320	Colorado	Las Animas
+1321	Colorado	Lincoln
+1322	Colorado	Logan
+1323	Colorado	Mineral
+1324	Colorado	Moffat
+1325	Colorado	Montezuma
+1326	Colorado	Otero
+1327	Colorado	Ouray
+1328	Colorado	Phillips
+1329	Colorado	Prowers
+1330	Colorado	Rio Blanco
+1331	Colorado	Rio Grande
+1332	Colorado	Saguache
+1333	Colorado	San Juan
+1334	Colorado	Sedgwick
+1335	Colorado	Teller
+1336	Colorado	Washington
+1337	District of Columbia	District of Columbia
+1338	Florida	Calhoun
+1339	Florida	DeSoto
+1340	Florida	Dixie
+1341	Florida	Franklin
+1342	Florida	Gilchrist
+1343	Florida	Glades
+1344	Florida	Gulf
+1345	Florida	Hamilton
+1346	Florida	Hardee
+1347	Florida	Hendry
+1348	Florida	Holmes
+1349	Florida	Jefferson
+1350	Florida	Lafayette
+1351	Florida	Levy
+1352	Florida	Liberty
+1353	Florida	Madison
+1354	Florida	Okeechobee
+1355	Florida	Suwannee
+1356	Florida	Taylor
+1357	Florida	Union
+1358	Florida	Wakulla
+1359	Florida	Washington
+1360	Georgia	Appling
+1361	Georgia	Atkinson
+1362	Georgia	Bacon
+1363	Georgia	Baker
+1364	Georgia	Banks
+1365	Georgia	Ben Hill
+1366	Georgia	Berrien
+1367	Georgia	Bleckley
+1368	Georgia	Brantley
+1369	Georgia	Brooks
+1370	Georgia	Bryan
+1371	Georgia	Bulloch
+1372	Georgia	Burke
+1373	Georgia	Calhoun
+1374	Georgia	Camden
+1375	Georgia	Candler
+1376	Georgia	Catoosa
+1377	Georgia	Chattahoochee
+1378	Georgia	Clay
+1379	Georgia	Coffee
+1380	Georgia	Colquitt
+1381	Georgia	Cook
+1382	Georgia	Crawford
+1383	Georgia	Crisp
+1384	Georgia	Dade
+1385	Georgia	Decatur
+1386	Georgia	Dodge
+1387	Georgia	Dooly
+1388	Georgia	Echols
+1389	Georgia	Elbert
+1390	Georgia	Emanuel
+1391	Georgia	Evans
+1392	Georgia	Fannin
+1393	Georgia	Franklin
+1394	Georgia	Gilmer
+1395	Georgia	Glascock
+1396	Georgia	Grady
+1397	Georgia	Greene
+1398	Georgia	Habersham
+1399	Georgia	Hancock
+1400	Georgia	Haralson
+1401	Georgia	Harris
+1402	Georgia	Hart
+1403	Georgia	Irwin
+1404	Georgia	Jackson
+1405	Georgia	Jasper
+1406	Georgia	Jeff Davis
+1407	Georgia	Jefferson
+1408	Georgia	Jenkins
+1409	Georgia	Johnson
+1410	Georgia	Jones
+1411	Georgia	Lanier
+1412	Georgia	Liberty
+1413	Georgia	Long
+1414	Georgia	Macon
+1415	Georgia	Madison
+1416	Georgia	Marion
+1417	Georgia	McDuffie
+1418	Georgia	McIntosh
+1419	Georgia	Meriwether
+1420	Georgia	Mitchell
+1421	Georgia	Montgomery
+1422	Georgia	Morgan
+1423	Georgia	Murray
+1424	Georgia	Oglethorpe
+1425	Georgia	Pierce
+1426	Georgia	Pike
+1427	Georgia	Pulaski
+1428	Georgia	Putnam
+1429	Georgia	Quitman
+1430	Georgia	Rabun
+1431	Georgia	Schley
+1432	Georgia	Screven
+1433	Georgia	Seminole
+1434	Georgia	Stephens
+1435	Georgia	Stewart
+1436	Georgia	Talbot
+1437	Georgia	Taliaferro
+1438	Georgia	Tattnall
+1439	Georgia	Taylor
+1440	Georgia	Telfair
+1441	Georgia	Thomas
+1442	Georgia	Toombs
+1443	Georgia	Towns
+1444	Georgia	Treutlen
+1445	Georgia	Union
+1446	Georgia	Upson
+1447	Georgia	Walker
+1448	Georgia	Walton
+1449	Georgia	Ware
+1450	Georgia	Warren
+1451	Georgia	Washington
+1452	Georgia	Wayne
+1453	Georgia	Webster
+1454	Georgia	Wheeler
+1455	Georgia	White
+1456	Georgia	Wilcox
+1457	Georgia	Wilkes
+1458	Georgia	Wilkinson
+1459	Hawaii	Hawaii
+1460	Hawaii	Kalawao
+1461	Idaho	Adams
+1462	Idaho	Bannock
+1463	Idaho	Bear Lake
+1464	Idaho	Benewah
+1465	Idaho	Boise
+1466	Idaho	Bonner
+1467	Idaho	Bonneville
+1468	Idaho	Boundary
+1469	Idaho	Butte
+1470	Idaho	Camas
+1471	Idaho	Caribou
+1472	Idaho	Cassia
+1473	Idaho	Clark
+1474	Idaho	Clearwater
+1475	Idaho	Custer
+1476	Idaho	Elmore
+1477	Idaho	Franklin
+1478	Idaho	Fremont
+1479	Idaho	Gem
+1480	Idaho	Gooding
+1481	Idaho	Idaho
+1482	Idaho	Jefferson
+1483	Idaho	Jerome
+1484	Idaho	Latah
+1485	Idaho	Lemhi
+1486	Idaho	Lewis
+1487	Idaho	Lincoln
+1488	Idaho	Minidoka
+1489	Idaho	Nez Perce
+1490	Idaho	Oneida
+1491	Idaho	Owyhee
+1492	Idaho	Payette
+1493	Idaho	Power
+1494	Idaho	Shoshone
+1495	Idaho	Valley
+1496	Idaho	Washington
+1497	Illinois	Alexander
+1498	Illinois	Bond
+1499	Illinois	Boone
+1500	Illinois	Brown
+1501	Illinois	Bureau
+1502	Illinois	Calhoun
+1503	Illinois	Carroll
+1504	Illinois	Cass
+1505	Illinois	Clark
+1506	Illinois	Clay
+1507	Illinois	Coles
+1508	Illinois	Crawford
+1509	Illinois	De Witt
+1510	Illinois	Douglas
+1511	Illinois	Edgar
+1512	Illinois	Edwards
+1513	Illinois	Effingham
+1514	Illinois	Fayette
+1515	Illinois	Ford
+1516	Illinois	Franklin
+1517	Illinois	Fulton
+1518	Illinois	Gallatin
+1519	Illinois	Greene
+1520	Illinois	Grundy
+1521	Illinois	Hamilton
+1522	Illinois	Hancock
+1523	Illinois	Hardin
+1524	Illinois	Henderson
+1525	Illinois	Henry
+1526	Illinois	Iroquois
+1527	Illinois	Jasper
+1528	Illinois	Jefferson
+1529	Illinois	Jersey
+1530	Illinois	Johnson
+1531	Illinois	Knox
+1532	Illinois	Lawrence
+1533	Illinois	Lee
+1534	Illinois	Logan
+1535	Illinois	Macon
+1536	Illinois	Macoupin
+1537	Illinois	Marion
+1538	Illinois	Marshall
+1539	Illinois	Mason
+1540	Illinois	Massac
+1541	Illinois	McDonough
+1542	Illinois	Menard
+1543	Illinois	Mercer
+1544	Illinois	Monroe
+1545	Illinois	Montgomery
+1546	Illinois	Morgan
+1547	Illinois	Moultrie
+1548	Illinois	Ogle
+1549	Illinois	Perry
+1550	Illinois	Piatt
+1551	Illinois	Pike
+1552	Illinois	Pope
+1553	Illinois	Pulaski
+1554	Illinois	Putnam
+1555	Illinois	Randolph
+1556	Illinois	Richland
+1557	Illinois	Saline
+1558	Illinois	Schuyler
+1559	Illinois	Scott
+1560	Illinois	Shelby
+1561	Illinois	Stark
+1562	Illinois	Tazewell
+1563	Illinois	Union
+1564	Illinois	Vermilion
+1565	Illinois	Wabash
+1566	Illinois	Warren
+1567	Illinois	Wayne
+1568	Illinois	White
+1569	Indiana	Benton
+1570	Indiana	Blackford
+1571	Indiana	Brown
+1572	Indiana	Carroll
+1573	Indiana	Cass
+1574	Indiana	Clay
+1575	Indiana	Clinton
+1576	Indiana	Crawford
+1577	Indiana	Daviess
+1578	Indiana	Dearborn
+1579	Indiana	Decatur
+1580	Indiana	DeKalb
+1581	Indiana	Fountain
+1582	Indiana	Fulton
+1583	Indiana	Gibson
+1584	Indiana	Harrison
+1585	Indiana	Henry
+1586	Indiana	Huntington
+1587	Indiana	Jackson
+1588	Indiana	Jasper
+1589	Indiana	Jay
+1590	Indiana	Jefferson
+1591	Indiana	Knox
+1592	Indiana	Kosciusko
+1593	Indiana	LaGrange
+1594	Indiana	Lawrence
+1595	Indiana	Marshall
+1596	Indiana	Martin
+1597	Indiana	Montgomery
+1598	Indiana	Newton
+1599	Indiana	Ohio
+1600	Indiana	Orange
+1601	Indiana	Parke
+1602	Indiana	Perry
+1603	Indiana	Pike
+1604	Indiana	Porter
+1605	Indiana	Posey
+1606	Indiana	Pulaski
+1607	Indiana	Randolph
+1608	Indiana	Rush
+1609	Indiana	Spencer
+1610	Indiana	Starke
+1611	Indiana	Steuben
+1612	Indiana	Sullivan
+1613	Indiana	Switzerland
+1614	Indiana	Union
+1615	Indiana	Vermillion
+1616	Indiana	Wabash
+1617	Indiana	Warren
+1618	Indiana	Warrick
+1619	Indiana	White
+1620	Indiana	Whitley
+1621	Iowa	Adams
+1622	Iowa	Appanoose
+1623	Iowa	Audubon
+1624	Iowa	Benton
+1625	Iowa	Boone
+1626	Iowa	Bremer
+1627	Iowa	Buchanan
+1628	Iowa	Buena Vista
+1629	Iowa	Butler
+1630	Iowa	Calhoun
+1631	Iowa	Cass
+1632	Iowa	Cedar
+1633	Iowa	Cherokee
+1634	Iowa	Chickasaw
+1635	Iowa	Clarke
+1636	Iowa	Clay
+1637	Iowa	Clayton
+1638	Iowa	Clinton
+1639	Iowa	Crawford
+1640	Iowa	Davis
+1641	Iowa	Decatur
+1642	Iowa	Delaware
+1643	Iowa	Des Moines
+1644	Iowa	Dickinson
+1645	Iowa	Emmet
+1646	Iowa	Floyd
+1647	Iowa	Franklin
+1648	Iowa	Fremont
+1649	Iowa	Greene
+1650	Iowa	Grundy
+1651	Iowa	Guthrie
+1652	Iowa	Hamilton
+1653	Iowa	Hancock
+1654	Iowa	Hardin
+1655	Iowa	Howard
+1656	Iowa	Humboldt
+1657	Iowa	Ida
+1658	Iowa	Iowa
+1659	Iowa	Jackson
+1660	Iowa	Jasper
+1661	Iowa	Jefferson
+1662	Iowa	Jones
+1663	Iowa	Keokuk
+1664	Iowa	Lee
+1665	Iowa	Louisa
+1666	Iowa	Lucas
+1667	Iowa	Lyon
+1668	Iowa	Madison
+1669	Iowa	Mahaska
+1670	Iowa	Marion
+1671	Iowa	Marshall
+1672	Iowa	Mills
+1673	Iowa	Mitchell
+1674	Iowa	Monona
+1675	Iowa	Monroe
+1676	Iowa	Montgomery
+1677	Iowa	O'Brien
+1678	Iowa	Osceola
+1679	Iowa	Page
+1680	Iowa	Palo Alto
+1681	Iowa	Plymouth
+1682	Iowa	Pocahontas
+1683	Iowa	Ringgold
+1684	Iowa	Sac
+1685	Iowa	Shelby
+1686	Iowa	Taylor
+1687	Iowa	Union
+1688	Iowa	Van Buren
+1689	Iowa	Wapello
+1690	Iowa	Warren
+1691	Iowa	Wayne
+1692	Iowa	Webster
+1693	Iowa	Winnebago
+1694	Iowa	Worth
+1695	Iowa	Wright
+1696	Kansas	Allen
+1697	Kansas	Anderson
+1698	Kansas	Atchison
+1699	Kansas	Barber
+1700	Kansas	Barton
+1701	Kansas	Bourbon
+1702	Kansas	Brown
+1703	Kansas	Chase
+1704	Kansas	Chautauqua
+1705	Kansas	Cheyenne
+1706	Kansas	Clark
+1707	Kansas	Clay
+1708	Kansas	Cloud
+1709	Kansas	Coffey
+1710	Kansas	Comanche
+1711	Kansas	Cowley
+1712	Kansas	Crawford
+1713	Kansas	Decatur
+1714	Kansas	Dickinson
+1715	Kansas	Doniphan
+1716	Kansas	Edwards
+1717	Kansas	Elk
+1718	Kansas	Ellis
+1719	Kansas	Ellsworth
+1720	Kansas	Finney
+1721	Kansas	Geary
+1722	Kansas	Gove
+1723	Kansas	Graham
+1724	Kansas	Grant
+1725	Kansas	Gray
+1726	Kansas	Greeley
+1727	Kansas	Greenwood
+1728	Kansas	Hamilton
+1729	Kansas	Harper
+1730	Kansas	Harvey
+1731	Kansas	Haskell
+1732	Kansas	Hodgeman
+1733	Kansas	Jefferson
+1734	Kansas	Jewell
+1735	Kansas	Kearny
+1736	Kansas	Kingman
+1737	Kansas	Kiowa
+1738	Kansas	Labette
+1739	Kansas	Lane
+1740	Kansas	Lincoln
+1741	Kansas	Logan
+1742	Kansas	Lyon
+1743	Kansas	Marion
+1744	Kansas	Marshall
+1745	Kansas	McPherson
+1746	Kansas	Meade
+1747	Kansas	Miami
+1748	Kansas	Montgomery
+1749	Kansas	Morton
+1750	Kansas	Nemaha
+1751	Kansas	Neosho
+1752	Kansas	Ness
+1753	Kansas	Norton
+1754	Kansas	Osage
+1755	Kansas	Osborne
+1756	Kansas	Ottawa
+1757	Kansas	Pawnee
+1758	Kansas	Phillips
+1759	Kansas	Pottawatomie
+1760	Kansas	Pratt
+1761	Kansas	Rawlins
+1762	Kansas	Republic
+1763	Kansas	Rice
+1764	Kansas	Rooks
+1765	Kansas	Rush
+1766	Kansas	Russell
+1767	Kansas	Saline
+1768	Kansas	Scott
+1769	Kansas	Seward
+1770	Kansas	Shawnee
+1771	Kansas	Sheridan
+1772	Kansas	Sherman
+1773	Kansas	Smith
+1774	Kansas	Stafford
+1775	Kansas	Stanton
+1776	Kansas	Stevens
+1777	Kansas	Sumner
+1778	Kansas	Thomas
+1779	Kansas	Trego
+1780	Kansas	Wabaunsee
+1781	Kansas	Wallace
+1782	Kansas	Washington
+1783	Kansas	Wichita
+1784	Kansas	Wilson
+1785	Kansas	Woodson
+1786	Kentucky	Adair
+1787	Kentucky	Allen
+1788	Kentucky	Ballard
+1789	Kentucky	Barren
+1790	Kentucky	Bath
+1791	Kentucky	Bell
+1792	Kentucky	Boone
+1793	Kentucky	Boyd
+1794	Kentucky	Boyle
+1795	Kentucky	Bracken
+1796	Kentucky	Breathitt
+1797	Kentucky	Breckinridge
+1798	Kentucky	Bullitt
+1799	Kentucky	Butler
+1800	Kentucky	Caldwell
+1801	Kentucky	Campbell
+1802	Kentucky	Carlisle
+1803	Kentucky	Carroll
+1804	Kentucky	Carter
+1805	Kentucky	Casey
+1806	Kentucky	Clay
+1807	Kentucky	Clinton
+1808	Kentucky	Crittenden
+1809	Kentucky	Cumberland
+1810	Kentucky	Edmonson
+1811	Kentucky	Elliott
+1812	Kentucky	Estill
+1813	Kentucky	Fleming
+1814	Kentucky	Floyd
+1815	Kentucky	Fulton
+1816	Kentucky	Gallatin
+1817	Kentucky	Garrard
+1818	Kentucky	Grant
+1819	Kentucky	Graves
+1820	Kentucky	Grayson
+1821	Kentucky	Green
+1822	Kentucky	Greenup
+1823	Kentucky	Hancock
+1824	Kentucky	Harlan
+1825	Kentucky	Hart
+1826	Kentucky	Henry
+1827	Kentucky	Hickman
+1828	Kentucky	Hopkins
+1829	Kentucky	Jackson
+1830	Kentucky	Jessamine
+1831	Kentucky	Johnson
+1832	Kentucky	Knott
+1833	Kentucky	Knox
+1834	Kentucky	Larue
+1835	Kentucky	Laurel
+1836	Kentucky	Lawrence
+1837	Kentucky	Lee
+1838	Kentucky	Leslie
+1839	Kentucky	Letcher
+1840	Kentucky	Lewis
+1841	Kentucky	Lincoln
+1842	Kentucky	Livingston
+1843	Kentucky	Logan
+1844	Kentucky	Madison
+1845	Kentucky	Magoffin
+1846	Kentucky	Marion
+1847	Kentucky	Marshall
+1848	Kentucky	Martin
+1849	Kentucky	Mason
+1850	Kentucky	McCracken
+1851	Kentucky	McCreary
+1852	Kentucky	McLean
+1853	Kentucky	Meade
+1854	Kentucky	Menifee
+1855	Kentucky	Mercer
+1856	Kentucky	Metcalfe
+1857	Kentucky	Monroe
+1858	Kentucky	Morgan
+1859	Kentucky	Muhlenberg
+1860	Kentucky	Nicholas
+1861	Kentucky	Ohio
+1862	Kentucky	Owen
+1863	Kentucky	Owsley
+1864	Kentucky	Pendleton
+1865	Kentucky	Perry
+1866	Kentucky	Pike
+1867	Kentucky	Powell
+1868	Kentucky	Robertson
+1869	Kentucky	Rockcastle
+1870	Kentucky	Rowan
+1871	Kentucky	Russell
+1872	Kentucky	Scott
+1873	Kentucky	Shelby
+1874	Kentucky	Simpson
+1875	Kentucky	Spencer
+1876	Kentucky	Taylor
+1877	Kentucky	Todd
+1878	Kentucky	Trigg
+1879	Kentucky	Trimble
+1880	Kentucky	Union
+1881	Kentucky	Washington
+1882	Kentucky	Wayne
+1883	Kentucky	Webster
+1884	Kentucky	Whitley
+1885	Kentucky	Wolfe
+1886	Kentucky	Woodford
+1887	Louisiana	Allen
+1888	Louisiana	Caldwell
+1889	Louisiana	Cameron
+1890	Louisiana	Concordia
+1891	Louisiana	East Carroll
+1892	Louisiana	East Feliciana
+1893	Louisiana	Franklin
+1894	Louisiana	Grant
+1895	Louisiana	Jackson
+1896	Louisiana	Jefferson Davis
+1897	Louisiana	LaSalle
+1898	Louisiana	Lincoln
+1899	Louisiana	Madison
+1900	Louisiana	Morehouse
+1901	Louisiana	Natchitoches
+1902	Louisiana	Pointe Coupee
+1903	Louisiana	Red River
+1904	Louisiana	Richland
+1905	Louisiana	Sabine
+1906	Louisiana	St. Helena
+1907	Louisiana	St. Martin
+1908	Louisiana	Tensas
+1909	Louisiana	Union
+1910	Louisiana	Vermilion
+1911	Louisiana	Vernon
+1912	Louisiana	West Carroll
+1913	Louisiana	West Feliciana
+1914	Louisiana	Winn
+1915	Maine	Aroostook
+1916	Maine	Franklin
+1917	Maine	Hancock
+1918	Maine	Knox
+1919	Maine	Piscataquis
+1920	Maine	Somerset
+1921	Maine	Waldo
+1922	Maine	Washington
+1923	Maryland	Allegany
+1924	Maryland	Cecil
+1925	Maryland	Dorchester
+1926	Maryland	Garrett
+1927	Maryland	Kent
+1928	Massachusetts	Dukes
+1929	Massachusetts	Nantucket
+1930	Michigan	Alcona
+1931	Michigan	Alger
+1932	Michigan	Alpena
+1933	Michigan	Antrim
+1934	Michigan	Arenac
+1935	Michigan	Baraga
+1936	Michigan	Benzie
+1937	Michigan	Branch
+1938	Michigan	Cass
+1939	Michigan	Cheboygan
+1940	Michigan	Chippewa
+1941	Michigan	Crawford
+1942	Michigan	Delta
+1943	Michigan	Dickinson
+1944	Michigan	Gogebic
+1945	Michigan	Gratiot
+1946	Michigan	Hillsdale
+1947	Michigan	Houghton
+1948	Michigan	Huron
+1949	Michigan	Ionia
+1950	Michigan	Iosco
+1951	Michigan	Iron
+1952	Michigan	Isabella
+1953	Michigan	Kalamazoo
+1954	Michigan	Kalkaska
+1955	Michigan	Keweenaw
+1956	Michigan	Lake
+1957	Michigan	Lapeer
+1958	Michigan	Lenawee
+1959	Michigan	Luce
+1960	Michigan	Mackinac
+1961	Michigan	Manistee
+1962	Michigan	Marquette
+1963	Michigan	Mason
+1964	Michigan	Mecosta
+1965	Michigan	Menominee
+1966	Michigan	Missaukee
+1967	Michigan	Montmorency
+1968	Michigan	Muskegon
+1969	Michigan	Newaygo
+1970	Michigan	Oceana
+1971	Michigan	Ogemaw
+1972	Michigan	Ontonagon
+1973	Michigan	Osceola
+1974	Michigan	Oscoda
+1975	Michigan	Presque Isle
+1976	Michigan	Sanilac
+1977	Michigan	Schoolcraft
+1978	Michigan	Shiawassee
+1979	Michigan	St. Joseph
+1980	Michigan	Van Buren
+1981	Minnesota	Aitkin
+1982	Minnesota	Becker
+1983	Minnesota	Beltrami
+1984	Minnesota	Big Stone
+1985	Minnesota	Brown
+1986	Minnesota	Carlton
+1987	Minnesota	Chippewa
+1988	Minnesota	Clearwater
+1989	Minnesota	Cook
+1990	Minnesota	Cottonwood
+1991	Minnesota	Crow Wing
+1992	Minnesota	Douglas
+1993	Minnesota	Faribault
+1994	Minnesota	Fillmore
+1995	Minnesota	Freeborn
+1996	Minnesota	Goodhue
+1997	Minnesota	Grant
+1998	Minnesota	Houston
+1999	Minnesota	Hubbard
+2000	Minnesota	Isanti
+2001	Minnesota	Itasca
+2002	Minnesota	Kanabec
+2003	Minnesota	Kandiyohi
+2004	Minnesota	Kittson
+2005	Minnesota	Koochiching
+2006	Minnesota	Lac qui Parle
+2007	Minnesota	Lake
+2008	Minnesota	Lake of the Woods
+2009	Minnesota	Le Sueur
+2010	Minnesota	Lincoln
+2011	Minnesota	Lyon
+2012	Minnesota	Mahnomen
+2013	Minnesota	Marshall
+2014	Minnesota	McLeod
+2015	Minnesota	Meeker
+2016	Minnesota	Mille Lacs
+2017	Minnesota	Morrison
+2018	Minnesota	Murray
+2019	Minnesota	Nobles
+2020	Minnesota	Norman
+2021	Minnesota	Otter Tail
+2022	Minnesota	Pennington
+2023	Minnesota	Pine
+2024	Minnesota	Pipestone
+2025	Minnesota	Polk
+2026	Minnesota	Pope
+2027	Minnesota	Red Lake
+2028	Minnesota	Redwood
+2029	Minnesota	Rock
+2030	Minnesota	Roseau
+2031	Minnesota	Sherburne
+2032	Minnesota	Sibley
+2033	Minnesota	Stevens
+2034	Minnesota	Swift
+2035	Minnesota	Todd
+2036	Minnesota	Traverse
+2037	Minnesota	Wadena
+2038	Minnesota	Watonwan
+2039	Minnesota	Wilkin
+2040	Minnesota	Winona
+2041	Minnesota	Yellow Medicine
+2042	Mississippi	Alcorn
+2043	Mississippi	Amite
+2044	Mississippi	Benton
+2045	Mississippi	Calhoun
+2046	Mississippi	Carroll
+2047	Mississippi	Choctaw
+2048	Mississippi	Claiborne
+2049	Mississippi	Clarke
+2050	Mississippi	Covington
+2051	Mississippi	Greene
+2052	Mississippi	Issaquena
+2053	Mississippi	Jasper
+2054	Mississippi	Jefferson
+2055	Mississippi	Jefferson Davis
+2056	Mississippi	Kemper
+2057	Mississippi	Lamar
+2058	Mississippi	Lauderdale
+2059	Mississippi	Marion
+2060	Mississippi	Neshoba
+2061	Mississippi	Newton
+2062	Mississippi	Noxubee
+2063	Mississippi	Prentiss
+2064	Mississippi	Quitman
+2065	Mississippi	Sharkey
+2066	Mississippi	Stone
+2067	Mississippi	Tallahatchie
+2068	Mississippi	Tishomingo
+2069	Mississippi	Warren
+2070	Mississippi	Wayne
+2071	Mississippi	Yalobusha
+2072	Missouri	Andrew
+2073	Missouri	Atchison
+2074	Missouri	Audrain
+2075	Missouri	Barry
+2076	Missouri	Barton
+2077	Missouri	Benton
+2078	Missouri	Bollinger
+2079	Missouri	Buchanan
+2080	Missouri	Butler
+2081	Missouri	Caldwell
+2082	Missouri	Callaway
+2083	Missouri	Camden
+2084	Missouri	Cape Girardeau
+2085	Missouri	Carroll
+2086	Missouri	Carter
+2087	Missouri	Cedar
+2088	Missouri	Chariton
+2089	Missouri	Clark
+2090	Missouri	Clay
+2091	Missouri	Clinton
+2092	Missouri	Cooper
+2093	Missouri	Crawford
+2094	Missouri	Dade
+2095	Missouri	Dallas
+2096	Missouri	Daviess
+2097	Missouri	DeKalb
+2098	Missouri	Dent
+2099	Missouri	Douglas
+2100	Missouri	Franklin
+2101	Missouri	Gasconade
+2102	Missouri	Gentry
+2103	Missouri	Grundy
+2104	Missouri	Harrison
+2105	Missouri	Hickory
+2106	Missouri	Holt
+2107	Missouri	Howard
+2108	Missouri	Howell
+2109	Missouri	Iron
+2110	Missouri	Jefferson
+2111	Missouri	Knox
+2112	Missouri	Laclede
+2113	Missouri	Lafayette
+2114	Missouri	Lawrence
+2115	Missouri	Lewis
+2116	Missouri	Lincoln
+2117	Missouri	Linn
+2118	Missouri	Livingston
+2119	Missouri	Macon
+2120	Missouri	Madison
+2121	Missouri	Maries
+2122	Missouri	Marion
+2123	Missouri	McDonald
+2124	Missouri	Mercer
+2125	Missouri	Miller
+2126	Missouri	Mississippi
+2127	Missouri	Moniteau
+2128	Missouri	Monroe
+2129	Missouri	Montgomery
+2130	Missouri	Morgan
+2131	Missouri	New Madrid
+2132	Missouri	Newton
+2133	Missouri	Nodaway
+2134	Missouri	Oregon
+2135	Missouri	Osage
+2136	Missouri	Ozark
+2137	Missouri	Pemiscot
+2138	Missouri	Perry
+2139	Missouri	Pettis
+2140	Missouri	Phelps
+2141	Missouri	Pike
+2142	Missouri	Platte
+2143	Missouri	Polk
+2144	Missouri	Putnam
+2145	Missouri	Ralls
+2146	Missouri	Randolph
+2147	Missouri	Ray
+2148	Missouri	Reynolds
+2149	Missouri	Ripley
+2150	Missouri	Saline
+2151	Missouri	Schuyler
+2152	Missouri	Scotland
+2153	Missouri	Shannon
+2154	Missouri	Shelby
+2155	Missouri	St. Clair
+2156	Missouri	St. Francois
+2157	Missouri	Ste. Genevieve
+2158	Missouri	Stoddard
+2159	Missouri	Stone
+2160	Missouri	Sullivan
+2161	Missouri	Taney
+2162	Missouri	Texas
+2163	Missouri	Vernon
+2164	Missouri	Warren
+2165	Missouri	Washington
+2166	Missouri	Wayne
+2167	Missouri	Webster
+2168	Missouri	Worth
+2169	Missouri	Wright
+2170	Montana	Beaverhead
+2171	Montana	Big Horn
+2172	Montana	Blaine
+2173	Montana	Carbon
+2174	Montana	Carter
+2175	Montana	Chouteau
+2176	Montana	Custer
+2177	Montana	Daniels
+2178	Montana	Dawson
+2179	Montana	Deer Lodge
+2180	Montana	Fallon
+2181	Montana	Fergus
+2182	Montana	Garfield
+2183	Montana	Glacier
+2184	Montana	Golden Valley
+2185	Montana	Granite
+2186	Montana	Hill
+2187	Montana	Jefferson
+2188	Montana	Judith Basin
+2189	Montana	Lake
+2190	Montana	Liberty
+2191	Montana	Lincoln
+2192	Montana	McCone
+2193	Montana	Meagher
+2194	Montana	Mineral
+2195	Montana	Musselshell
+2196	Montana	Park
+2197	Montana	Petroleum
+2198	Montana	Phillips
+2199	Montana	Pondera
+2200	Montana	Powder River
+2201	Montana	Powell
+2202	Montana	Prairie
+2203	Montana	Richland
+2204	Montana	Rosebud
+2205	Montana	Sanders
+2206	Montana	Sheridan
+2207	Montana	Stillwater
+2208	Montana	Sweet Grass
+2209	Montana	Teton
+2210	Montana	Toole
+2211	Montana	Treasure
+2212	Montana	Valley
+2213	Montana	Wheatland
+2214	Montana	Wibaux
+2215	Nebraska	Antelope
+2216	Nebraska	Arthur
+2217	Nebraska	Banner
+2218	Nebraska	Blaine
+2219	Nebraska	Boone
+2220	Nebraska	Box Butte
+2221	Nebraska	Boyd
+2222	Nebraska	Brown
+2223	Nebraska	Burt
+2224	Nebraska	Butler
+2225	Nebraska	Cedar
+2226	Nebraska	Chase
+2227	Nebraska	Cherry
+2228	Nebraska	Cheyenne
+2229	Nebraska	Clay
+2230	Nebraska	Colfax
+2231	Nebraska	Cuming
+2232	Nebraska	Custer
+2233	Nebraska	Dakota
+2234	Nebraska	Dawes
+2235	Nebraska	Dawson
+2236	Nebraska	Deuel
+2237	Nebraska	Dixon
+2238	Nebraska	Dodge
+2239	Nebraska	Dundy
+2240	Nebraska	Fillmore
+2241	Nebraska	Franklin
+2242	Nebraska	Frontier
+2243	Nebraska	Furnas
+2244	Nebraska	Gage
+2245	Nebraska	Garden
+2246	Nebraska	Garfield
+2247	Nebraska	Gosper
+2248	Nebraska	Grant
+2249	Nebraska	Greeley
+2250	Nebraska	Hall
+2251	Nebraska	Hamilton
+2252	Nebraska	Harlan
+2253	Nebraska	Hayes
+2254	Nebraska	Hitchcock
+2255	Nebraska	Holt
+2256	Nebraska	Hooker
+2257	Nebraska	Howard
+2258	Nebraska	Jefferson
+2259	Nebraska	Johnson
+2260	Nebraska	Kearney
+2261	Nebraska	Keith
+2262	Nebraska	Keya Paha
+2263	Nebraska	Kimball
+2264	Nebraska	Logan
+2265	Nebraska	Loup
+2266	Nebraska	Madison
+2267	Nebraska	McPherson
+2268	Nebraska	Merrick
+2269	Nebraska	Morrill
+2270	Nebraska	Nance
+2271	Nebraska	Nuckolls
+2272	Nebraska	Otoe
+2273	Nebraska	Pawnee
+2274	Nebraska	Perkins
+2275	Nebraska	Phelps
+2276	Nebraska	Pierce
+2277	Nebraska	Platte
+2278	Nebraska	Polk
+2279	Nebraska	Red Willow
+2280	Nebraska	Richardson
+2281	Nebraska	Rock
+2282	Nebraska	Saline
+2283	Nebraska	Saunders
+2284	Nebraska	Scotts Bluff
+2285	Nebraska	Seward
+2286	Nebraska	Sheridan
+2287	Nebraska	Sherman
+2288	Nebraska	Sioux
+2289	Nebraska	Stanton
+2290	Nebraska	Thayer
+2291	Nebraska	Thomas
+2292	Nebraska	Thurston
+2293	Nebraska	Valley
+2294	Nebraska	Washington
+2295	Nebraska	Wayne
+2296	Nebraska	Webster
+2297	Nebraska	Wheeler
+2298	Nebraska	York
+2299	Nevada	Churchill
+2300	Nevada	Douglas
+2301	Nevada	Elko
+2302	Nevada	Esmeralda
+2303	Nevada	Eureka
+2304	Nevada	Humboldt
+2305	Nevada	Lander
+2306	Nevada	Lincoln
+2307	Nevada	Lyon
+2308	Nevada	Mineral
+2309	Nevada	Nye
+2310	Nevada	Pershing
+2311	Nevada	Storey
+2312	Nevada	White Pine
+2313	New Hampshire	Belknap
+2314	New Hampshire	Coos
+2315	New Mexico	Catron
+2316	New Mexico	Chaves
+2317	New Mexico	Cibola
+2318	New Mexico	Colfax
+2319	New Mexico	Curry
+2320	New Mexico	De Baca
+2321	New Mexico	Doña Ana
+2322	New Mexico	Eddy
+2323	New Mexico	Grant
+2324	New Mexico	Guadalupe
+2325	New Mexico	Harding
+2326	New Mexico	Hidalgo
+2327	New Mexico	Lincoln
+2328	New Mexico	Los Alamos
+2329	New Mexico	Luna
+2330	New Mexico	Mora
+2331	New Mexico	Otero
+2332	New Mexico	Quay
+2333	New Mexico	Rio Arriba
+2334	New Mexico	Roosevelt
+2335	New Mexico	San Juan
+2336	New Mexico	Sierra
+2337	New Mexico	Torrance
+2338	New Mexico	Union
+2339	New Mexico	Valencia
+2340	New York	Bronx
+2341	New York	Cattaraugus
+2342	New York	Cayuga
+2343	New York	Chautauqua
+2344	New York	Chemung
+2345	New York	Franklin
+2346	New York	Kings
+2347	New York	Lewis
+2348	New York	Madison
+2349	New York	Orleans
+2350	New York	Oswego
+2351	New York	Otsego
+2352	New York	Queens
+2353	New York	Richmond
+2354	New York	Schuyler
+2355	New York	Seneca
+2356	New York	St. Lawrence
+2357	New York	Yates
+2358	North Carolina	Alexander
+2359	North Carolina	Alleghany
+2360	North Carolina	Anson
+2361	North Carolina	Ashe
+2362	North Carolina	Avery
+2363	North Carolina	Beaufort
+2364	North Carolina	Bertie
+2365	North Carolina	Bladen
+2366	North Carolina	Burke
+2367	North Carolina	Caldwell
+2368	North Carolina	Camden
+2369	North Carolina	Caswell
+2370	North Carolina	Clay
+2371	North Carolina	Cleveland
+2372	North Carolina	Columbus
+2373	North Carolina	Currituck
+2374	North Carolina	Dare
+2375	North Carolina	Duplin
+2376	North Carolina	Edgecombe
+2377	North Carolina	Gates
+2378	North Carolina	Graham
+2379	North Carolina	Greene
+2380	North Carolina	Halifax
+2381	North Carolina	Haywood
+2382	North Carolina	Hertford
+2383	North Carolina	Jackson
+2384	North Carolina	Jones
+2385	North Carolina	Lenoir
+2386	North Carolina	Macon
+2387	North Carolina	Madison
+2388	North Carolina	Martin
+2389	North Carolina	McDowell
+2390	North Carolina	Mitchell
+2391	North Carolina	Northampton
+2392	North Carolina	Pamlico
+2393	North Carolina	Pender
+2394	North Carolina	Perquimans
+2395	North Carolina	Person
+2396	North Carolina	Polk
+2397	North Carolina	Randolph
+2398	North Carolina	Richmond
+2399	North Carolina	Rockingham
+2400	North Carolina	Rutherford
+2401	North Carolina	Stanly
+2402	North Carolina	Stokes
+2403	North Carolina	Surry
+2404	North Carolina	Swain
+2405	North Carolina	Transylvania
+2406	North Carolina	Tyrrell
+2407	North Carolina	Vance
+2408	North Carolina	Warren
+2409	North Carolina	Washington
+2410	North Carolina	Wilkes
+2411	North Carolina	Yadkin
+2412	North Carolina	Yancey
+2413	North Dakota	Adams
+2414	North Dakota	Barnes
+2415	North Dakota	Benson
+2416	North Dakota	Billings
+2417	North Dakota	Bottineau
+2418	North Dakota	Bowman
+2419	North Dakota	Burke
+2420	North Dakota	Cavalier
+2421	North Dakota	Dickey
+2422	North Dakota	Divide
+2423	North Dakota	Dunn
+2424	North Dakota	Eddy
+2425	North Dakota	Emmons
+2426	North Dakota	Foster
+2427	North Dakota	Golden Valley
+2428	North Dakota	Grand Forks
+2429	North Dakota	Grant
+2430	North Dakota	Griggs
+2431	North Dakota	Hettinger
+2432	North Dakota	Kidder
+2433	North Dakota	LaMoure
+2434	North Dakota	Logan
+2435	North Dakota	McHenry
+2436	North Dakota	McIntosh
+2437	North Dakota	McKenzie
+2438	North Dakota	McLean
+2439	North Dakota	Mercer
+2440	North Dakota	Mountrail
+2441	North Dakota	Nelson
+2442	North Dakota	Oliver
+2443	North Dakota	Pembina
+2444	North Dakota	Ransom
+2445	North Dakota	Renville
+2446	North Dakota	Richland
+2447	North Dakota	Rolette
+2448	North Dakota	Sargent
+2449	North Dakota	Sheridan
+2450	North Dakota	Sioux
+2451	North Dakota	Slope
+2452	North Dakota	Stark
+2453	North Dakota	Steele
+2454	North Dakota	Stutsman
+2455	North Dakota	Towner
+2456	North Dakota	Traill
+2457	North Dakota	Walsh
+2458	North Dakota	Wells
+2459	North Dakota	Williams
+2460	Ohio	Adams
+2461	Ohio	Allen
+2462	Ohio	Athens
+2463	Ohio	Auglaize
+2464	Ohio	Brown
+2465	Ohio	Champaign
+2466	Ohio	Crawford
+2467	Ohio	Fairfield
+2468	Ohio	Fayette
+2469	Ohio	Fulton
+2470	Ohio	Guernsey
+2471	Ohio	Hardin
+2472	Ohio	Harrison
+2473	Ohio	Henry
+2474	Ohio	Highland
+2475	Ohio	Hocking
+2476	Ohio	Holmes
+2477	Ohio	Jackson
+2478	Ohio	Jefferson
+2479	Ohio	Lawrence
+2480	Ohio	Logan
+2481	Ohio	Meigs
+2482	Ohio	Mercer
+2483	Ohio	Monroe
+2484	Ohio	Morgan
+2485	Ohio	Morrow
+2486	Ohio	Muskingum
+2487	Ohio	Noble
+2488	Ohio	Ottawa
+2489	Ohio	Paulding
+2490	Ohio	Perry
+2491	Ohio	Pickaway
+2492	Ohio	Pike
+2493	Ohio	Preble
+2494	Ohio	Putnam
+2495	Ohio	Ross
+2496	Ohio	Sandusky
+2497	Ohio	Scioto
+2498	Ohio	Seneca
+2499	Ohio	Shelby
+2500	Ohio	Van Wert
+2501	Ohio	Vinton
+2502	Ohio	Wayne
+2503	Ohio	Williams
+2504	Ohio	Wyandot
+2505	Oklahoma	Adair
+2506	Oklahoma	Alfalfa
+2507	Oklahoma	Atoka
+2508	Oklahoma	Beaver
+2509	Oklahoma	Beckham
+2510	Oklahoma	Blaine
+2511	Oklahoma	Bryan
+2512	Oklahoma	Caddo
+2513	Oklahoma	Carter
+2514	Oklahoma	Cherokee
+2515	Oklahoma	Choctaw
+2516	Oklahoma	Cimarron
+2517	Oklahoma	Coal
+2518	Oklahoma	Comanche
+2519	Oklahoma	Cotton
+2520	Oklahoma	Craig
+2521	Oklahoma	Creek
+2522	Oklahoma	Delaware
+2523	Oklahoma	Dewey
+2524	Oklahoma	Ellis
+2525	Oklahoma	Garfield
+2526	Oklahoma	Grant
+2527	Oklahoma	Greer
+2528	Oklahoma	Harmon
+2529	Oklahoma	Harper
+2530	Oklahoma	Haskell
+2531	Oklahoma	Hughes
+2532	Oklahoma	Jefferson
+2533	Oklahoma	Johnston
+2534	Oklahoma	Kingfisher
+2535	Oklahoma	Kiowa
+2536	Oklahoma	Latimer
+2537	Oklahoma	Le Flore
+2538	Oklahoma	Lincoln
+2539	Oklahoma	Love
+2540	Oklahoma	Major
+2541	Oklahoma	Marshall
+2542	Oklahoma	Mayes
+2543	Oklahoma	McCurtain
+2544	Oklahoma	McIntosh
+2545	Oklahoma	Murray
+2546	Oklahoma	Nowata
+2547	Oklahoma	Okfuskee
+2548	Oklahoma	Okmulgee
+2549	Oklahoma	Osage
+2550	Oklahoma	Ottawa
+2551	Oklahoma	Pittsburg
+2552	Oklahoma	Pontotoc
+2553	Oklahoma	Pottawatomie
+2554	Oklahoma	Pushmataha
+2555	Oklahoma	Roger Mills
+2556	Oklahoma	Rogers
+2557	Oklahoma	Seminole
+2558	Oklahoma	Sequoyah
+2559	Oklahoma	Stephens
+2560	Oklahoma	Texas
+2561	Oklahoma	Tillman
+2562	Oklahoma	Wagoner
+2563	Oklahoma	Washita
+2564	Oklahoma	Woods
+2565	Oklahoma	Woodward
+2566	Oregon	Baker
+2567	Oregon	Clatsop
+2568	Oregon	Columbia
+2569	Oregon	Coos
+2570	Oregon	Crook
+2571	Oregon	Curry
+2572	Oregon	Gilliam
+2573	Oregon	Harney
+2574	Oregon	Hood River
+2575	Oregon	Jefferson
+2576	Oregon	Lake
+2577	Oregon	Lincoln
+2578	Oregon	Malheur
+2579	Oregon	Morrow
+2580	Oregon	Sherman
+2581	Oregon	Tillamook
+2582	Oregon	Wallowa
+2583	Oregon	Wasco
+2584	Oregon	Wheeler
+2585	Pennsylvania	Armstrong
+2586	Pennsylvania	Bedford
+2587	Pennsylvania	Blair
+2588	Pennsylvania	Bradford
+2589	Pennsylvania	Cambria
+2590	Pennsylvania	Cameron
+2591	Pennsylvania	Carbon
+2592	Pennsylvania	Clarion
+2593	Pennsylvania	Clearfield
+2594	Pennsylvania	Clinton
+2595	Pennsylvania	Crawford
+2596	Pennsylvania	Elk
+2597	Pennsylvania	Forest
+2598	Pennsylvania	Fulton
+2599	Pennsylvania	Greene
+2600	Pennsylvania	Huntingdon
+2601	Pennsylvania	Indiana
+2602	Pennsylvania	Jefferson
+2603	Pennsylvania	Juniata
+2604	Pennsylvania	Lawrence
+2605	Pennsylvania	Lycoming
+2606	Pennsylvania	McKean
+2607	Pennsylvania	Mifflin
+2608	Pennsylvania	Northumberland
+2609	Pennsylvania	Perry
+2610	Pennsylvania	Snyder
+2611	Pennsylvania	Somerset
+2612	Pennsylvania	Sullivan
+2613	Pennsylvania	Susquehanna
+2614	Pennsylvania	Tioga
+2615	Pennsylvania	Union
+2616	Pennsylvania	Venango
+2617	Pennsylvania	Warren
+2618	Pennsylvania	Wyoming
+2619	South Carolina	Allendale
+2620	South Carolina	Bamberg
+2621	South Carolina	Barnwell
+2622	South Carolina	Cherokee
+2623	South Carolina	Chester
+2624	South Carolina	Chesterfield
+2625	South Carolina	Georgetown
+2626	South Carolina	Laurens
+2627	South Carolina	Marion
+2628	South Carolina	McCormick
+2629	South Carolina	Oconee
+2630	South Carolina	Union
+2631	South Carolina	Williamsburg
+2632	South Dakota	Aurora
+2633	South Dakota	Bennett
+2634	South Dakota	Brookings
+2635	South Dakota	Brule
+2636	South Dakota	Buffalo
+2637	South Dakota	Butte
+2638	South Dakota	Campbell
+2639	South Dakota	Clark
+2640	South Dakota	Clay
+2641	South Dakota	Codington
+2642	South Dakota	Corson
+2643	South Dakota	Custer
+2644	South Dakota	Day
+2645	South Dakota	Deuel
+2646	South Dakota	Dewey
+2647	South Dakota	Douglas
+2648	South Dakota	Edmunds
+2649	South Dakota	Fall River
+2650	South Dakota	Faulk
+2651	South Dakota	Grant
+2652	South Dakota	Gregory
+2653	South Dakota	Haakon
+2654	South Dakota	Hamlin
+2655	South Dakota	Hand
+2656	South Dakota	Hanson
+2657	South Dakota	Harding
+2658	South Dakota	Hughes
+2659	South Dakota	Hutchinson
+2660	South Dakota	Hyde
+2661	South Dakota	Jackson
+2662	South Dakota	Jerauld
+2663	South Dakota	Jones
+2664	South Dakota	Kingsbury
+2665	South Dakota	Lake
+2666	South Dakota	Lawrence
+2667	South Dakota	Lincoln
+2668	South Dakota	Lyman
+2669	South Dakota	Marshall
+2670	South Dakota	McPherson
+2671	South Dakota	Meade
+2672	South Dakota	Mellette
+2673	South Dakota	Miner
+2674	South Dakota	Moody
+2675	South Dakota	Oglala Lakota
+2676	South Dakota	Perkins
+2677	South Dakota	Potter
+2678	South Dakota	Roberts
+2679	South Dakota	Sanborn
+2680	South Dakota	Spink
+2681	South Dakota	Stanley
+2682	South Dakota	Sully
+2683	South Dakota	Todd
+2684	South Dakota	Tripp
+2685	South Dakota	Turner
+2686	South Dakota	Union
+2687	South Dakota	Walworth
+2688	South Dakota	Yankton
+2689	South Dakota	Ziebach
+2690	Tennessee	Bedford
+2691	Tennessee	Benton
+2692	Tennessee	Bledsoe
+2693	Tennessee	Cannon
+2694	Tennessee	Carter
+2695	Tennessee	Claiborne
+2696	Tennessee	Clay
+2697	Tennessee	Coffee
+2698	Tennessee	Crockett
+2699	Tennessee	Decatur
+2700	Tennessee	DeKalb
+2701	Tennessee	Fentress
+2702	Tennessee	Giles
+2703	Tennessee	Grainger
+2704	Tennessee	Grundy
+2705	Tennessee	Hancock
+2706	Tennessee	Hardeman
+2707	Tennessee	Hardin
+2708	Tennessee	Hawkins
+2709	Tennessee	Haywood
+2710	Tennessee	Henderson
+2711	Tennessee	Henry
+2712	Tennessee	Hickman
+2713	Tennessee	Humphreys
+2714	Tennessee	Jackson
+2715	Tennessee	Johnson
+2716	Tennessee	Lake
+2717	Tennessee	Lauderdale
+2718	Tennessee	Lawrence
+2719	Tennessee	Lewis
+2720	Tennessee	Lincoln
+2721	Tennessee	Macon
+2722	Tennessee	Madison
+2723	Tennessee	Marshall
+2724	Tennessee	McNairy
+2725	Tennessee	Meigs
+2726	Tennessee	Moore
+2727	Tennessee	Morgan
+2728	Tennessee	Obion
+2729	Tennessee	Overton
+2730	Tennessee	Pickett
+2731	Tennessee	Polk
+2732	Tennessee	Rhea
+2733	Tennessee	Sequatchie
+2734	Tennessee	Smith
+2735	Tennessee	Stewart
+2736	Tennessee	Trousdale
+2737	Tennessee	Unicoi
+2738	Tennessee	Union
+2739	Tennessee	Van Buren
+2740	Tennessee	Warren
+2741	Tennessee	Wayne
+2742	Tennessee	Weakley
+2743	Tennessee	White
+2744	Texas	Anderson
+2745	Texas	Andrews
+2746	Texas	Angelina
+2747	Texas	Aransas
+2748	Texas	Archer
+2749	Texas	Armstrong
+2750	Texas	Austin
+2751	Texas	Bailey
+2752	Texas	Bandera
+2753	Texas	Bastrop
+2754	Texas	Baylor
+2755	Texas	Bee
+2756	Texas	Blanco
+2757	Texas	Borden
+2758	Texas	Bosque
+2759	Texas	Brewster
+2760	Texas	Briscoe
+2761	Texas	Brooks
+2762	Texas	Burleson
+2763	Texas	Caldwell
+2764	Texas	Calhoun
+2765	Texas	Callahan
+2766	Texas	Camp
+2767	Texas	Carson
+2768	Texas	Cass
+2769	Texas	Cherokee
+2770	Texas	Childress
+2771	Texas	Clay
+2772	Texas	Cochran
+2773	Texas	Coke
+2774	Texas	Coleman
+2775	Texas	Collingsworth
+2776	Texas	Colorado
+2777	Texas	Comanche
+2778	Texas	Concho
+2779	Texas	Cooke
+2780	Texas	Coryell
+2781	Texas	Cottle
+2782	Texas	Crockett
+2783	Texas	Crosby
+2784	Texas	Culberson
+2785	Texas	Dallam
+2786	Texas	Dawson
+2787	Texas	Delta
+2788	Texas	Dickens
+2789	Texas	Dimmit
+2790	Texas	Donley
+2791	Texas	Duval
+2792	Texas	Eastland
+2793	Texas	Ector
+2794	Texas	Edwards
+2795	Texas	Erath
+2796	Texas	Falls
+2797	Texas	Fisher
+2798	Texas	Floyd
+2799	Texas	Foard
+2800	Texas	Franklin
+2801	Texas	Freestone
+2802	Texas	Frio
+2803	Texas	Gaines
+2804	Texas	Garza
+2805	Texas	Gillespie
+2806	Texas	Glasscock
+2807	Texas	Goliad
+2808	Texas	Gonzales
+2809	Texas	Gray
+2810	Texas	Grayson
+2811	Texas	Hale
+2812	Texas	Hall
+2813	Texas	Hamilton
+2814	Texas	Hansford
+2815	Texas	Hardeman
+2816	Texas	Harrison
+2817	Texas	Hartley
+2818	Texas	Haskell
+2819	Texas	Hemphill
+2820	Texas	Henderson
+2821	Texas	Hill
+2822	Texas	Hood
+2823	Texas	Hopkins
+2824	Texas	Houston
+2825	Texas	Howard
+2826	Texas	Hudspeth
+2827	Texas	Hunt
+2828	Texas	Hutchinson
+2829	Texas	Irion
+2830	Texas	Jack
+2831	Texas	Jackson
+2832	Texas	Jasper
+2833	Texas	Jeff Davis
+2834	Texas	Jim Hogg
+2835	Texas	Jim Wells
+2836	Texas	Jones
+2837	Texas	Karnes
+2838	Texas	Kaufman
+2839	Texas	Kenedy
+2840	Texas	Kent
+2841	Texas	Kerr
+2842	Texas	Kimble
+2843	Texas	King
+2844	Texas	Kinney
+2845	Texas	Kleberg
+2846	Texas	Knox
+2847	Texas	La Salle
+2848	Texas	Lamb
+2849	Texas	Lampasas
+2850	Texas	Lee
+2851	Texas	Leon
+2852	Texas	Limestone
+2853	Texas	Lipscomb
+2854	Texas	Live Oak
+2855	Texas	Llano
+2856	Texas	Loving
+2857	Texas	Lynn
+2858	Texas	Madison
+2859	Texas	Marion
+2860	Texas	Martin
+2861	Texas	Mason
+2862	Texas	Maverick
+2863	Texas	McCulloch
+2864	Texas	McMullen
+2865	Texas	Menard
+2866	Texas	Mills
+2867	Texas	Mitchell
+2868	Texas	Montague
+2869	Texas	Moore
+2870	Texas	Morris
+2871	Texas	Motley
+2872	Texas	Nacogdoches
+2873	Texas	Navarro
+2874	Texas	Newton
+2875	Texas	Nolan
+2876	Texas	Ochiltree
+2877	Texas	Orange
+2878	Texas	Palo Pinto
+2879	Texas	Panola
+2880	Texas	Parker
+2881	Texas	Parmer
+2882	Texas	Pecos
+2883	Texas	Polk
+2884	Texas	Potter
+2885	Texas	Presidio
+2886	Texas	Rains
+2887	Texas	Reagan
+2888	Texas	Real
+2889	Texas	Red River
+2890	Texas	Reeves
+2891	Texas	Refugio
+2892	Texas	Roberts
+2893	Texas	Robertson
+2894	Texas	Rockwall
+2895	Texas	Runnels
+2896	Texas	Sabine
+2897	Texas	San Augustine
+2898	Texas	San Jacinto
+2899	Texas	San Patricio
+2900	Texas	San Saba
+2901	Texas	Schleicher
+2902	Texas	Scurry
+2903	Texas	Shackelford
+2904	Texas	Shelby
+2905	Texas	Sherman
+2906	Texas	Somervell
+2907	Texas	Starr
+2908	Texas	Stephens
+2909	Texas	Sterling
+2910	Texas	Stonewall
+2911	Texas	Sutton
+2912	Texas	Swisher
+2913	Texas	Taylor
+2914	Texas	Terrell
+2915	Texas	Terry
+2916	Texas	Throckmorton
+2917	Texas	Titus
+2918	Texas	Tom Green
+2919	Texas	Trinity
+2920	Texas	Tyler
+2921	Texas	Upton
+2922	Texas	Uvalde
+2923	Texas	Val Verde
+2924	Texas	Victoria
+2925	Texas	Waller
+2926	Texas	Ward
+2927	Texas	Washington
+2928	Texas	Wheeler
+2929	Texas	Wilbarger
+2930	Texas	Willacy
+2931	Texas	Wilson
+2932	Texas	Winkler
+2933	Texas	Wise
+2934	Texas	Wood
+2935	Texas	Yoakum
+2936	Texas	Young
+2937	Texas	Zapata
+2938	Texas	Zavala
+2939	Utah	Beaver
+2940	Utah	Carbon
+2941	Utah	Daggett
+2942	Utah	Duchesne
+2943	Utah	Emery
+2944	Utah	Garfield
+2945	Utah	Grand
+2946	Utah	Iron
+2947	Utah	Juab
+2948	Utah	Kane
+2949	Utah	Millard
+2950	Utah	Morgan
+2951	Utah	Piute
+2952	Utah	Rich
+2953	Utah	San Juan
+2954	Utah	Sanpete
+2955	Utah	Sevier
+2956	Utah	Uintah
+2957	Utah	Washington
+2958	Utah	Wayne
+2959	Utah	Weber
+2960	Vermont	Caledonia
+2961	Vermont	Essex
+2962	Vermont	Grand Isle
+2963	Vermont	Lamoille
+2964	Vermont	Orleans
+2965	Virginia	Alleghany
+2966	Virginia	Amelia
+2967	Virginia	Appomattox
+2968	Virginia	Augusta
+2969	Virginia	Bath
+2970	Virginia	Bland
+2971	Virginia	Bristol
+2972	Virginia	Brunswick
+2973	Virginia	Buchanan
+2974	Virginia	Buckingham
+2975	Virginia	Buena Vista
+2976	Virginia	Campbell
+2977	Virginia	Caroline
+2978	Virginia	Carroll
+2979	Virginia	Charlotte
+2980	Virginia	Chesapeake
+2981	Virginia	Clarke
+2982	Virginia	Colonial Heights
+2983	Virginia	Covington
+2984	Virginia	Craig
+2985	Virginia	Cumberland
+2986	Virginia	Dickenson
+2987	Virginia	Dinwiddie
+2988	Virginia	Emporia
+2989	Virginia	Essex
+2990	Virginia	Fairfax City
+2991	Virginia	Falls Church
+2992	Virginia	Fauquier
+2993	Virginia	Floyd
+2994	Virginia	Franklin City
+2995	Virginia	Frederick
+2996	Virginia	Fredericksburg
+2997	Virginia	Galax
+2998	Virginia	Giles
+2999	Virginia	Grayson
+3000	Virginia	Greene
+3001	Virginia	Greensville
+3002	Virginia	Halifax
+3003	Virginia	Hampton
+3004	Virginia	Henry
+3005	Virginia	Highland
+3006	Virginia	Hopewell
+3007	Virginia	King and Queen
+3008	Virginia	King George
+3009	Virginia	King William
+3010	Virginia	Lancaster
+3011	Virginia	Lexington
+3012	Virginia	Lunenburg
+3013	Virginia	Lynchburg
+3014	Virginia	Madison
+3015	Virginia	Manassas
+3016	Virginia	Manassas Park
+3017	Virginia	Martinsville
+3018	Virginia	Mathews
+3019	Virginia	Middlesex
+3020	Virginia	Montgomery
+3021	Virginia	Nelson
+3022	Virginia	New Kent
+3023	Virginia	Northampton
+3024	Virginia	Northumberland
+3025	Virginia	Norton
+3026	Virginia	Nottoway
+3027	Virginia	Orange
+3028	Virginia	Page
+3029	Virginia	Patrick
+3030	Virginia	Petersburg
+3031	Virginia	Pittsylvania
+3032	Virginia	Poquoson
+3033	Virginia	Portsmouth
+3034	Virginia	Powhatan
+3035	Virginia	Prince George
+3036	Virginia	Pulaski
+3037	Virginia	Radford
+3038	Virginia	Rappahannock
+3039	Virginia	Richmond City
+3040	Virginia	Roanoke
+3041	Virginia	Roanoke City
+3042	Virginia	Russell
+3043	Virginia	Salem
+3044	Virginia	Scott
+3045	Virginia	Shenandoah
+3046	Virginia	Smyth
+3047	Virginia	Southampton
+3048	Virginia	Staunton
+3049	Virginia	Surry
+3050	Virginia	Sussex
+3051	Virginia	Tazewell
+3052	Virginia	Warren
+3053	Virginia	Washington
+3054	Virginia	Waynesboro
+3055	Virginia	Westmoreland
+3056	Virginia	Winchester
+3057	Virginia	Wise
+3058	Virginia	Wythe
+3059	Washington	Adams
+3060	Washington	Asotin
+3061	Washington	Douglas
+3062	Washington	Ferry
+3063	Washington	Okanogan
+3064	Washington	Pacific
+3065	Washington	Pend Oreille
+3066	Washington	Skamania
+3067	Washington	Wahkiakum
+3068	Washington	Walla Walla
+3069	West Virginia	Barbour
+3070	West Virginia	Berkeley
+3071	West Virginia	Boone
+3072	West Virginia	Braxton
+3073	West Virginia	Brooke
+3074	West Virginia	Cabell
+3075	West Virginia	Calhoun
+3076	West Virginia	Clay
+3077	West Virginia	Doddridge
+3078	West Virginia	Fayette
+3079	West Virginia	Gilmer
+3080	West Virginia	Grant
+3081	West Virginia	Greenbrier
+3082	West Virginia	Hampshire
+3083	West Virginia	Hancock
+3084	West Virginia	Hardy
+3085	West Virginia	Harrison
+3086	West Virginia	Lewis
+3087	West Virginia	Lincoln
+3088	West Virginia	Logan
+3089	West Virginia	Marion
+3090	West Virginia	Mason
+3091	West Virginia	McDowell
+3092	West Virginia	Mineral
+3093	West Virginia	Mingo
+3094	West Virginia	Monroe
+3095	West Virginia	Morgan
+3096	West Virginia	Nicholas
+3097	West Virginia	Ohio
+3098	West Virginia	Pendleton
+3099	West Virginia	Pleasants
+3100	West Virginia	Pocahontas
+3101	West Virginia	Preston
+3102	West Virginia	Raleigh
+3103	West Virginia	Randolph
+3104	West Virginia	Ritchie
+3105	West Virginia	Roane
+3106	West Virginia	Summers
+3107	West Virginia	Taylor
+3108	West Virginia	Tyler
+3109	West Virginia	Upshur
+3110	West Virginia	Wayne
+3111	West Virginia	Webster
+3112	West Virginia	Wetzel
+3113	West Virginia	Wirt
+3114	West Virginia	Wood
+3115	West Virginia	Wyoming
+3116	Wisconsin	Adams
+3117	Wisconsin	Ashland
+3118	Wisconsin	Barron
+3119	Wisconsin	Buffalo
+3120	Wisconsin	Burnett
+3121	Wisconsin	Clark
+3122	Wisconsin	Crawford
+3123	Wisconsin	Dodge
+3124	Wisconsin	Door
+3125	Wisconsin	Florence
+3126	Wisconsin	Forest
+3127	Wisconsin	Grant
+3128	Wisconsin	Green Lake
+3129	Wisconsin	Iowa
+3130	Wisconsin	Iron
+3131	Wisconsin	Jackson
+3132	Wisconsin	Juneau
+3133	Wisconsin	Kewaunee
+3134	Wisconsin	Lafayette
+3135	Wisconsin	Langlade
+3136	Wisconsin	Lincoln
+3137	Wisconsin	Manitowoc
+3138	Wisconsin	Marinette
+3139	Wisconsin	Marquette
+3140	Wisconsin	Menominee
+3141	Wisconsin	Monroe
+3142	Wisconsin	Oconto
+3143	Wisconsin	Oneida
+3144	Wisconsin	Pepin
+3145	Wisconsin	Polk
+3146	Wisconsin	Portage
+3147	Wisconsin	Price
+3148	Wisconsin	Richland
+3149	Wisconsin	Rusk
+3150	Wisconsin	Sawyer
+3151	Wisconsin	Shawano
+3152	Wisconsin	Taylor
+3153	Wisconsin	Trempealeau
+3154	Wisconsin	Vernon
+3155	Wisconsin	Vilas
+3156	Wisconsin	Washburn
+3157	Wisconsin	Waupaca
+3158	Wisconsin	Waushara
+3159	Wyoming	Albany
+3160	Wyoming	Big Horn
+3161	Wyoming	Converse
+3162	Wyoming	Crook
+3163	Wyoming	Goshen
+3164	Wyoming	Hot Springs
+3165	Wyoming	Johnson
+3166	Wyoming	Lincoln
+3167	Wyoming	Niobrara
+3168	Wyoming	Platte
+3169	Wyoming	Sublette
+3170	Wyoming	Sweetwater
+3171	Wyoming	Uinta
+3172	Wyoming	Washakie
+3173	Wyoming	Weston
+3419	Washington	Garfield County
+1018	Washington	Garfield
+1473	Missouri	Kansas City
+2571	Wyoming	unassigned
+2234	Utah	Washington County
+2942	Utah	unassigned
+793	Michigan	Federal Correctional Institution (FCI)
+1631	Michigan	Michigan Department of Corrections (MDOC)
+140	Utah	Bear River
+386	Utah	Central Utah
+2307	Utah	Southeast Utah
+2308	Utah	Southwest Utah
+2470	Utah	TriCounty
+2683	Utah	Weber-Morgan
+2347	Utah	Southwest
+3218	Alaska	Copper River
+3219	Alaska	Chugach
+20	Puerto Rico	Adjuntas
+21	Puerto Rico	Aguada
+22	Puerto Rico	Aguadilla
+23	Puerto Rico	Aguas Buenas
+24	Puerto Rico	Aibonito
+61	Puerto Rico	Anasco
+85	Puerto Rico	Arecibo
+92	Puerto Rico	Arroyo
+139	Puerto Rico	Barceloneta
+143	Puerto Rico	Barranquitas
+160	Puerto Rico	Bayamon
+341	Puerto Rico	Cabo Rojo
+344	Puerto Rico	Caguas
+384	Puerto Rico	Camuy
+388	Puerto Rico	Canovanas
+398	Puerto Rico	Carolina
+437	Puerto Rico	Catano
+443	Puerto Rico	Cayey
+449	Puerto Rico	Ceiba
+519	Puerto Rico	Ciales
+521	Puerto Rico	Cidra
+592	Puerto Rico	Coamo
+632	Puerto Rico	Comerio
+649	Puerto Rico	Corozal
+694	Puerto Rico	Culebra
+813	Puerto Rico	Dorado
+910	Puerto Rico	Fajardo
+945	Puerto Rico	Florida
+1150	Puerto Rico	Guanica
+1151	Puerto Rico	Guayama
+1152	Puerto Rico	Guayanilla
+1153	Puerto Rico	Guaynabo
+1158	Puerto Rico	Gurabo
+1241	Puerto Rico	Hatillo
+1306	Puerto Rico	Hormigueros
+1330	Puerto Rico	Humacao
+1367	Puerto Rico	Isabela
+1411	Puerto Rico	Jayuya
+1473	Puerto Rico	Juana Diaz
+1474	Puerto Rico	Juncos
+1571	Puerto Rico	Lajas
+1603	Puerto Rico	Lares
+1607	Puerto Rico	Las Marias
+1608	Puerto Rico	Las Piedras
+1724	Puerto Rico	Loiza
+1746	Puerto Rico	Luquillo
+1796	Puerto Rico	Manati
+1801	Puerto Rico	Maricao
+1857	Puerto Rico	Maunabo
+1860	Puerto Rico	Mayaguez
+1963	Puerto Rico	Moca
+2029	Puerto Rico	Morovis
+2055	Puerto Rico	Naguabo
+2058	Puerto Rico	Naranjito
+2171	Puerto Rico	Orocovis
+2229	Puerto Rico	Patillas
+2250	Puerto Rico	Penuelas
+2333	Puerto Rico	Ponce
+2389	Puerto Rico	Quebradillas
+2447	Puerto Rico	Rincon
+2452	Puerto Rico	Rio Grande
+2504	Puerto Rico	Sabana Grande
+2514	Puerto Rico	Salinas
+2528	Puerto Rico	San German
+2533	Puerto Rico	San Juan
+2536	Puerto Rico	San Lorenzo
+2543	Puerto Rico	San Sebastian
+2555	Puerto Rico	Santa Isabel
+2831	Puerto Rico	Toa Alta
+2832	Puerto Rico	Toa Baja
+2861	Puerto Rico	Trujillo Alto
+2956	Puerto Rico	Utuado
+2972	Puerto Rico	Vega Alta
+2973	Puerto Rico	Vega Baja
+2983	Puerto Rico	Vieques
+2986	Puerto Rico	Villalba
+3197	Puerto Rico	Yabucoa
+3205	Puerto Rico	Yauco
+2531	New York	New York
+2541	New York	Out of NY
+709	Alaska	Bristol Bay plus Lake and Peninsula
+744	Arizona	Out of AZ
+1632	Kansas	Out of KS

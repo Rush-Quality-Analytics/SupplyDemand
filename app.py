@@ -47,9 +47,6 @@ app.layout = html.Div([
             style={'display': 'none'}
         ),
         
-        
-        
-        
         # Banner
         html.Div(
             id="banner1",
@@ -346,7 +343,7 @@ app.layout = html.Div([
             id="right-column1b",
             className="nine columns",
             children=[html.Div(
-                        id="Table4b",
+                        id="employee_fig1",
                         children=[dcc.Loading(
                             id="loading-7b",
                             type="default",
@@ -369,6 +366,42 @@ app.layout = html.Div([
                                 ),
                             ],
                         ),],),
+                        
+                    html.Br(),
+                    html.Br(),
+                    
+                    html.Div(
+                            id="employee_Table1",
+                            children=[dcc.Loading(
+                                id="loading-8b",
+                                type="default",
+                                fullscreen=False,
+                                children=[
+                                    html.Div(
+                                        id="employee_cases2",
+                                        children=[
+                                            html.B("Employee Forecast Table"),
+                                            html.Hr(),
+                                            dcc.Graph(id="employee_forecast_table1"),
+                                        ],
+                                        style={'border-radius': '15px',
+                                               'box-shadow': '1px 1px 1px grey',
+                                               'background-color': '#f0f0f0',
+                                               'padding': '10px',
+                                               'margin-bottom': '10px',
+                                               'fontSize':16
+                                                },
+                                    ),
+                                ],
+                            ),],),
+                            
+                    html.A('Download CSV', id='employee_model_forecast_link', download="employee_forecast_data.csv",
+                           href="",
+                           target="_blank"),
+                    html.Br(),
+                    html.Br(),
+                    
+                    
                 ],
                 ),
                 
@@ -555,8 +588,13 @@ def update_output11(value):
 def update_output12(value):
     return 'Time lag in hospital visitation: {}'.format(value)
 
-
-
+'''
+@app.callback(
+    dash.dependencies.Output('ICU beds1-container', 'children'),
+    [dash.dependencies.Input('ICU beds1', 'value')])
+def update_output1(value):
+    return 'Relative positivity rate: {}'.format(value)
+'''
 
 
 
@@ -780,21 +818,16 @@ def update_output19(available_options):
     )
 def update_output13(v1):
     counties_df = []
-    with open('DataUpdate/data/COVID-CASES-Counties-DF.txt.gz', 'rb') as csvfile:
-                counties_df = pd.read_csv(csvfile, compression='gzip', sep='\t')
-    counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
     
-    counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
-                                                       'Out of AL', 'Out of IL',
-                                                       'Out of CO', 'Out of GA',
-                                                       'Out of HI', 'Out of LA',
-                                                       'Out of ME', 'Out of MI',
-                                                       'Out of OK', 'Out of PR',
-                                                       'Out of TN', 'Out of UT',
-                                                       ])]
+    with open('DataUpdate/data/States_Counties.txt', 'rb') as csvfile:
+                counties_df = pd.read_csv(csvfile, sep='\t')
+    
+    try:
+        counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
+    except:
+        pass
     
     tdf = counties_df[counties_df['Province/State'] == v1]
-    counties_df = 0
     cts = sorted(list(set(tdf['Admin2'].values.tolist())))
     tdf = 0
     l = 'Entire state or territory'
@@ -811,22 +844,15 @@ def update_output13(v1):
      ],
     )
 def update_output20(v1):
-    counties_df = []
-    with open('DataUpdate/data/COVID-CASES-Counties-DF.txt.gz', 'rb') as csvfile:
-                counties_df = pd.read_csv(csvfile, compression='gzip', sep='\t')
-    counties_df.drop(['Unnamed: 0'], axis=1, inplace=True) 
+    with open('DataUpdate/data/States_Counties.txt', 'rb') as csvfile:
+                counties_df = pd.read_csv(csvfile, sep='\t')
     
-    counties_df = counties_df[~counties_df['Admin2'].isin(['Unassigned', 'Out-of-state', 
-                                                       'Out of AL', 'Out of IL',
-                                                       'Out of CO', 'Out of GA',
-                                                       'Out of HI', 'Out of LA',
-                                                       'Out of ME', 'Out of MI',
-                                                       'Out of OK', 'Out of PR',
-                                                       'Out of TN', 'Out of UT',
-                                                       ])]
+    try:
+        counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
+    except:
+        pass
     
     tdf = counties_df[counties_df['Province/State'] == v1]
-    counties_df = 0
     cts = sorted(list(set(tdf['Admin2'].values.tolist())))
     tdf = 0
     l = 'Entire state or territory'
@@ -867,10 +893,11 @@ def update_output17(loc1, loc2):
       Input("county-select1", "value"),
       Input("model-select1", "value"),
       #Input("add-forecast1", "n_clicks"),
-      Input("reset-btn1", "n_clicks")
+      Input("reset-btn1", "n_clicks"),
+      Input("date1", "date"),
      ],
 )
-def update_model_forecast1(loc, county, model, reset_click):
+def update_model_forecast1(loc, county, model, reset_click, startdate):
     
     reset = False
     # Find which one has been triggered
@@ -881,7 +908,7 @@ def update_model_forecast1(loc, county, model, reset_click):
         if prop_id == "reset-btn1":
             reset = True
 
-    df_fits = app_fxns.generate_model_forecasts(loc, county, model, reset)
+    df_fits = app_fxns.generate_model_forecasts(loc, county, model, reset, startdate)
     fig1 = app_fxns.generate_model_forecast_plot(df_fits, reset)
     
     return df_fits, fig1
@@ -939,7 +966,8 @@ def update_table_model_forecast1(df_fits, loc, cty, reset_click):
 
 @app.callback(
     Output('df2', 'children'),
-    [Input("location-select1", "value"),
+    [Input('df1', 'children'),
+     Input("location-select1", "value"),
      Input('county-select1', 'value'),
      Input("model-select1", "value"),
      Input("ICU beds1", "value"),
@@ -964,15 +992,16 @@ def update_table_model_forecast1(df_fits, loc, cty, reset_click):
      Input("shield1", "value"),
      Input('resp1', "value"),
      Input("reset-btn1", "n_clicks"),
+     Input("date1", "date"),
     ],
 )
 
 
-def update_patient_census(loc, cty, model, icu_beds, nonicu_beds, per_loc, per_admit, 
+def update_patient_census(df1, loc, cty, model, icu_beds, nonicu_beds, per_loc, per_admit,
     per_cc, LOS_cc, LOS_nc, per_vent, TimeLag, transfers, per_ICU_transfer, mortality, 
     GLOVE_SURGICAL, GLOVE_EXAM_NITRILE, GLOVE_EXAM_VINYL, MASK_FACE_PROC_ANTI_FOG, 
     MASK_PROC_FLUID_RESISTANT, GOWN_ISOLATION_XL_YELLOW, MASK_SURG_ANTI_FOG_FILM, 
-    SHIELD_FACE_FULL_ANTI_FOG, RESP_PART_FILTER_REG, reset_click):
+    SHIELD_FACE_FULL_ANTI_FOG, RESP_PART_FILTER_REG, reset_click, startdate):
 
     reset = False
     # Find which one has been triggered
@@ -985,11 +1014,11 @@ def update_patient_census(loc, cty, model, icu_beds, nonicu_beds, per_loc, per_a
             
     # Return to original hm(no colored annotation) by resetting
     
-    df2 = app_fxns.generate_patient_census(loc, cty, model, icu_beds, nonicu_beds, per_loc, per_admit, 
+    df2 = app_fxns.generate_patient_census(df1, loc, cty, model, icu_beds, nonicu_beds, per_loc, per_admit,
     per_cc, LOS_cc, LOS_nc, per_vent, TimeLag, transfers, per_ICU_transfer, mortality, 
     GLOVE_SURGICAL, GLOVE_EXAM_NITRILE, GLOVE_EXAM_VINYL, MASK_FACE_PROC_ANTI_FOG, 
     MASK_PROC_FLUID_RESISTANT, GOWN_ISOLATION_XL_YELLOW, MASK_SURG_ANTI_FOG_FILM, 
-    SHIELD_FACE_FULL_ANTI_FOG, RESP_PART_FILTER_REG, reset)
+    SHIELD_FACE_FULL_ANTI_FOG, RESP_PART_FILTER_REG, reset, startdate)
     
     return df2
 
@@ -1024,10 +1053,11 @@ def update_plot_patient_census(df_census, loc, cty, reset_click):
      [Input("location-select2", "value"),
       Input("county-select2", "value"),
       Input("model-select2", "value"),
-      Input("reset-btn2", "n_clicks")
+      Input("reset-btn2", "n_clicks"),
+      Input("date1", "date"),
      ],
 )
-def update_model_forecast2(loc, county, model, reset_click):
+def update_model_forecast2(loc, county, model, reset_click, startdate):
     
     reset = False
     # Find which one has been triggered
@@ -1039,13 +1069,15 @@ def update_model_forecast2(loc, county, model, reset_click):
             reset = True
 
     # Return to original hm(no colored annotation) by resetting
-    df_fits = app_fxns.generate_model_forecasts(loc, county, model, reset)
+    df_fits = app_fxns.generate_model_forecasts(loc, county, model, reset, startdate)
     
     return df_fits
 
 
 @app.callback(
-    Output("employee_forecast_plot1", "figure"),
+    [Output("employee_forecast_plot1", "figure"),
+    Output("employee_forecast_table1", "figure"),
+    Output('employee_model_forecast_link', 'href')],
     [Input('df3', 'children'),
      Input("location-select2", "value"),
      Input('county-select2', 'value'),
@@ -1067,7 +1099,8 @@ def update_plot_employee_forecast(df_census, loc, cty, employees, inc_rate, furl
             reset = True
 
     # Return to original hm(no colored annotation) by resetting
-    return app_fxns.generate_plot_employee_forecast1(df_census, loc, cty, employees, inc_rate, furlough, reset)
+    figure, table, csv_string = app_fxns.generate_plot_employee_forecast1(df_census, loc, cty, employees, inc_rate, furlough, reset)
+    return figure, table, csv_string
 
 
 
@@ -1172,4 +1205,5 @@ def update_table_ppe(df, loc, cty, reset_click):
 
 # Run the server
 if __name__ == "__main__":
-    app.run_server(host='127.0.0.1', port=8050, debug=True, threaded=False, processes=11)
+    #app.run_server(host='127.0.0.1', port=8050, debug=True, threaded=False, processes=11)
+    app.run_server(host='127.0.0.1', port=8050, debug=True)

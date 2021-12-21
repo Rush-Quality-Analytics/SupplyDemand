@@ -5,7 +5,7 @@ import datetime # library for date-time functionality
 import numpy as np # numerical python
 from scipy import stats # scientific python statistical package
 from scipy.optimize import curve_fit # optimization for fitting curves
-
+import random
 from scipy.interpolate import interp1d
 from scipy.signal import savgol_filter
 
@@ -38,15 +38,19 @@ def obs_pred_rsquare(obs, pred):
 def gaussian1(x, n, s, m):  
     # For non-cumulative Gaussian:
     #    return n**2 * (1/(s*((2*pi)**0.5))) * np.exp(-0.5 * ((x - m)/s)**2)
+    n = np.exp(n)
     return (n * 0.5 * (1 + sc.special.erf((x - m)/(s*2**0.5))))
     
 def gaussian2(x, n, s, m, s1, m1):
+    n = np.exp(n)
     return (n * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5)))))
     
 def gaussian3(x, n, s, m, s1, m1, s2, m2):  
+    n = np.exp(n)
     return (n * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5)))))
   
-def gaussian4(x, n, s, m, s1, m1, s2, m2, s3, m3):  
+def gaussian4(x, n, s, m, s1, m1, s2, m2, s3, m3): 
+    n = np.exp(n)
     return (n * 0.5 * ((1 + sc.special.erf((x - m)/(s*2**0.5))) + (1 + sc.special.erf((x - m1)/(s1*2**0.5))) + (1 + sc.special.erf((x - m2)/(s2*2**0.5)))) + (1 + sc.special.erf((x - m3)/(s3*2**0.5))))
   
     
@@ -81,6 +85,8 @@ def logistic4(x, e, a, b, c, d,  a1, b1, c1, d1,  a2, b2, c2, d2,  a3, b3, c3, d
 
 
 def get_WAF(obs_x, obs_y, ForecastDays):
+    np.random.seed(1)
+    random.seed(1)
     
     '''
     WAF: Weighted average forecasting
@@ -288,6 +294,8 @@ def get_WAF(obs_x, obs_y, ForecastDays):
 
 
 def opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model):
+    np.random.seed(1)
+    random.seed(1)
     
     # A FUNCTION TO IMPROVE SCIPY'S ABILITY TO FIND A FITTED CURVE
     # This is done because scipy's numerical optimizer may fail to converge and return
@@ -441,6 +449,8 @@ def opt_fit(obs_y, obs_x, forecasted_y, ForecastDays, model):
 
 
 def get_gaussian(obs_x, obs_y, ForecastDays):
+    np.random.seed(1)
+    random.seed(1)
     
     # obs_x: observed x values
     # obs_y: observd y values
@@ -538,6 +548,8 @@ def get_gaussian(obs_x, obs_y, ForecastDays):
 
 
 def get_phase_wave(obs_x, obs_y, ForecastDays):
+    np.random.seed(1)
+    random.seed(1)
     
     # obs_x: observed x values
     # obs_y: observd y values
@@ -651,6 +663,8 @@ def get_phase_wave(obs_x, obs_y, ForecastDays):
 
 
 def get_logistic(obs_x, obs_y, ForecastDays):
+    np.random.seed(1)
+    random.seed(1)
     
     # obs_x: observed x values
     # obs_y: observd y values
@@ -762,6 +776,9 @@ def get_logistic(obs_x, obs_y, ForecastDays):
 
 
 def get_exponential(obs_x, obs_y, ForecastDays):
+    np.random.seed(1)
+    random.seed(1)
+    
     # obs_x: observed x values
     # obs_y: observd y values
     # ForecastDays: number of days ahead to extend prediction
@@ -814,6 +831,9 @@ def get_exponential(obs_x, obs_y, ForecastDays):
 
 
 def get_polynomial(obs_x, obs_y, ForecastDays, degree=2):
+    np.random.seed(1)
+    random.seed(1)
+    
     # obs_x: observed x values
     # obs_y: observd y values
     # ForecastDays: number of days ahead to extend prediction
@@ -872,6 +892,8 @@ def get_polynomial(obs_x, obs_y, ForecastDays, degree=2):
 
 
 def get_2phase_logistic(obs_x, obs_y, ForecastDays):
+    np.random.seed(1)
+    random.seed(1)
     
     def logistic(x, a, b, c, d):
         # A general logistic function
@@ -961,6 +983,8 @@ def get_2phase_logistic(obs_x, obs_y, ForecastDays):
 
 
 def get_sine_logistic(obs_x, obs_y, ForecastDays):
+    np.random.seed(1)
+    random.seed(1)
     
     def lapse_logistic(x, a, b, c, d):
         # A general logistic function
@@ -1059,7 +1083,7 @@ def get_sine_logistic(obs_x, obs_y, ForecastDays):
 
 def fit_curve(condition):
     
-    obs_x, obs_y, model, ForecastDays, day, iterations = condition
+    obs_x1, obs_y1, obs_x, obs_y, model, ForecastDays, day, iterations = condition
     # A function to fit various models to observed COVID-19 cases data according to:
     # obs_x: observed x values
     # obs_y: observed y values
@@ -1071,11 +1095,17 @@ def fit_curve(condition):
     # 30-days of observed data
     
     # use the number of y observations as the number of x observations
+    obs_x1 = list(range(len(obs_y1)))
     obs_x = list(range(len(obs_y)))
     # convert y and x observations to numpy arrays
+    obs_x1 = np.array(obs_x1)
+    obs_y1 = np.array(obs_y1)
     obs_x = np.array(obs_x)
     obs_y = np.array(obs_y)
     
+    Miny = np.min(obs_y)
+    if model != 'Time series analysis':
+        obs_y = obs_y - Miny
     
     # Get the forecasted values, predicted values, and observed vs predicted r-square
     # value for the chosen model
@@ -1085,8 +1115,13 @@ def fit_curve(condition):
         obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
     
     elif model == 'Time series analysis':
-        forecasted_y, forecasted_x, pred_y, params = get_WAF(obs_x, obs_y, ForecastDays)
+        forecasted_y, forecasted_x, pred_y, params = get_WAF(obs_x1, obs_y1, ForecastDays)
+        
+        pred_y = pred_y[len(obs_y1)-len(obs_y):]
         obs_pred_r2 = obs_pred_rsquare(obs_y[-30:], pred_y[-30:])
+        
+        forecasted_y = forecasted_y[len(obs_y1)-len(obs_y):]
+        forecasted_x = forecasted_x[len(obs_x1)-len(obs_x):]
         
     elif model == 'Logistic (multi-phase)':
         forecasted_y, forecasted_x, pred_y, params = get_logistic(obs_x, obs_y, ForecastDays)
@@ -1286,8 +1321,16 @@ def fit_curve(condition):
             
         
         params = params1.extend(params2)
+       
         
-        
+    #print(len(pred_y), len(obs_y), len(obs_x), ':', len(forecasted_y), len(forecasted_x))
+    
+    if model != 'Time series analysis':
+        pred_y = np.array(pred_y) + Miny
+        pred_y = pred_y.tolist()
+        forecasted_y = np.array(forecasted_y) + Miny
+        forecasted_y = forecasted_y.tolist()
+    
     del obs_y
     
     return [obs_pred_r2, obs_x, pred_y, forecasted_x, forecasted_y, params]
