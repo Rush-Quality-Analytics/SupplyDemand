@@ -1,5 +1,5 @@
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
 import numpy as np
 import pandas as pd
 from scipy.stats import poisson
@@ -322,9 +322,11 @@ def generate_control_card1():
             dcc.DatePickerSingle(
                 id='date1',
                 min_date_allowed=date(2020, 3, 10),
-                max_date_allowed=date(2021, 9, 1),
-                initial_visible_month=date(2021, 7, 1),
-                date=date(2021, 7, 1)
+                max_date_allowed=date(2023, 1, 1),
+                initial_visible_month=date(2020, 3, 10),
+                date=date(2020, 3, 10),
+                #stay_open_on_select=True,
+                
             ),
             
             html.Br(),
@@ -545,7 +547,7 @@ def generate_control_card1():
 
 def generate_control_card2():
     
-    """
+    """z
     :return: A Div containing controls for graphs.
     """
     return html.Div(
@@ -665,11 +667,20 @@ def generate_model_forecasts(loc, county, model, reset, startdate):
 
 
         df_sub1 = locs_df[locs_df['Province/State'] == loc]
+        
+        # Convert the single row to a list
+        row_values = df_sub1.iloc[0].tolist()
+        
+        # Find the last non-zero index
+        last_nonzero_idx = len(row_values) - 1 - next((i for i, x in enumerate(reversed(row_values)) if x != 0), len(row_values))
+        
+        # Keep only up to the last non-zero column
+        df_sub1 = df_sub1.iloc[:, :last_nonzero_idx + 1]
+        
         locs_df = 0
         ArrivalDate = statepops[statepops['Province/State'] == loc]['Date_of_first_reported_infection'].tolist()
         ArrivalDate = ArrivalDate[0]
-
-    
+        
     else:
         
         try:
@@ -2021,7 +2032,7 @@ def generate_plot_employee_forecast1(df, loc, cty, employees, inc_rate, furlough
     # Add the row to the dataframe
     df = pd.DataFrame.from_records(cells, columns=col_labels)
     df['date'] = df['date'].astype('datetime64[ns]')
-    df = df[df['date'] >= pd.Timestamp('today') - pd.Timedelta('10 days')]
+    df = df.tail(20) #df[df['date'] >= pd.Timestamp('today') - pd.Timedelta('10 days')]
     
     #### Construct arrays for critical care and non-critical care patients
         
@@ -2300,14 +2311,14 @@ def generate_patient_census_table(census_df, reset):
             'RESPIRATOR PARTICULATE FILTER REG', 'Total cases', 
             ]
     
-    df_table.drop(nogo, axis=1, inplace=True)
+    df_table.drop(nogo, axis=1, inplace=True, errors='ignore')
     
     csv_string = df_table.to_csv(index=False, encoding='utf-8')
     csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + urllib.parse.quote(csv_string)
     
     df_table['dates'] = df_table['date']
     df_table['dates'] = df_table['dates'].astype('datetime64[ns]')
-    df_table = df_table[df_table['dates'] >= pd.Timestamp('today')]
+    df_table = df_table.tail(20) #df_table[df_table['dates'] >= pd.Timestamp('today')]
     df_table.drop(['dates'], axis=1, inplace=True)
     
     figure = go.Figure(data=[go.Table(
@@ -2333,10 +2344,8 @@ def generate_patient_census_table(census_df, reset):
             height=400,
             paper_bgcolor="rgb(245, 247, 249)",
             plot_bgcolor="rgb(245, 247, 249)",
-        ),)
-    
-    df_table = 0
-    
+        ),
+        )
     return figure, csv_string
 
 
@@ -2447,7 +2456,7 @@ def generate_ppe_table(df, reset):
     
     df_table['dates'] = df_table['date'] 
     df_table['dates'] = df_table['dates'].astype('datetime64[ns]')
-    df_table = df_table[df_table['dates'] >= pd.Timestamp('today')]
+    df_table = df_table.tail(20) #df_table[df_table['dates'] >= pd.Timestamp('today')]
     df_table.drop(['dates'], axis=1, inplace=True)
     
     figure = go.Figure(data=[go.Table(
@@ -2472,8 +2481,6 @@ def generate_ppe_table(df, reset):
             paper_bgcolor="rgb(245, 247, 249)",
             plot_bgcolor="rgb(245, 247, 249)",
         ),)
-    
-    df_table = 0
     
     return figure, csv_string
 

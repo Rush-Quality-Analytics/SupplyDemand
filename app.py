@@ -1,6 +1,6 @@
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
 from dash.dependencies import Input, Output
 import pathlib
 import time
@@ -209,7 +209,6 @@ app.layout = html.Div([
                 html.Br(),
                 
                 html.Div(
-                        id="Table2",
                         children=[dcc.Loading(
                             id="loading-4",
                             type="default",
@@ -222,13 +221,13 @@ app.layout = html.Div([
                                         html.Hr(),
                                         dcc.Graph(id="patient_census_table_plot1"),
                                     ],
-                                    style={'border-radius': '15px',
-                                           'box-shadow': '1px 1px 1px grey',
-                                           'background-color': '#f0f0f0',
-                                           'padding': '10px',
-                                           'margin-bottom': '10px',
-                                           'fontSize':16
-                                            },
+                                    #style={'border-radius': '15px',
+                                    #       'box-shadow': '1px 1px 1px grey',
+                                    #       'background-color': '#f0f0f0',
+                                    #       'padding': '10px',
+                                    #       'margin-bottom': '10px',
+                                    #       'fontSize':16
+                                    #        },
                                 ),
                             ],
                         ),],),
@@ -1106,7 +1105,8 @@ def update_plot_employee_forecast(df_census, loc, cty, employees, inc_rate, furl
 
 
 @app.callback(
-    [Output("patient_census_table_plot1", "figure"), Output('Patient_Census_Discharge_link', 'href')],
+    [Output("patient_census_table_plot1", "figure"), 
+     Output('Patient_Census_Discharge_link', 'href')],
     [Input('df2', 'children'),
      Input("location-select1", "value"),
      Input('county-select1', 'value'),
@@ -1205,5 +1205,4 @@ def update_table_ppe(df, loc, cty, reset_click):
 
 # Run the server
 if __name__ == "__main__":
-    #app.run_server(host='127.0.0.1', port=8050, debug=True, threaded=False, processes=11)
-    app.run_server(host='127.0.0.1', port=8050, debug=True)
+    app.run(host='0.0.0.0', debug = True) # modified to run on linux server
