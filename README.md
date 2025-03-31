@@ -6,29 +6,32 @@ Source code and data for an application (https://rush-covid19.herokuapp.com/) to
 
 ## Requirements
 
-* Python 3.6 or greater
-* dash==1.0.0
-* gunicorn>=19.9.0
-* numpy>=1.16.2
-* pandas>=0.24.2
-* datetime==4.3
+* Python 3.12 or greater
+* werkzeug==3.0.6
+* dash==3.0.1
+* gunicorn==23.0.0
+* numpy==2.2.4
+* pandas==2.2.3
+* scipy==1.15.2
+* Flask==3.0.3
+* plotly==6.0.1
+* DateTime==5.5
 * pathlib==1.0.1
-* scipy>=1.4.0
-* flask>=1.1.1
-* plotly==4.5.2
+* dash-core-components==2.0.0
+* dash-html-components==2.0.0
 
 ## How to run this app
 
 Create a virtual environment for running this app with Python 3. Clone this repository and open your terminal/command prompt in the root folder.
 
 ```
-python3 -m virtualenv venv
+python3.12 -m venv venv_python3_12
 
 ```
 In Unix system:
 
 ```
-source venv/bin/activate
+source venv_python3_12/bin/activate
 
 ```
 In Windows: 
