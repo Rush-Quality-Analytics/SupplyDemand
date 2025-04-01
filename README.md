@@ -37,7 +37,7 @@ source venv_python3_12/bin/activate
 In Windows: 
 
 ```
-venv\Scripts\activate
+venv_python3_12\Scripts\activate
 ```
 
 Install all required packages by running:
