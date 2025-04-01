@@ -9,8 +9,10 @@ import plotly.graph_objects as go
 import plotly.express as px
 from scipy import stats
 import urllib
+from urllib.parse import quote
 import sys
 from datetime import date
+from io import StringIO
 
 import multiprocessing as mp
 from multiprocessing import Pool
@@ -353,7 +355,8 @@ def generate_control_card1():
                 min=0,
                 max=500,
                 value=200,
-                step = 1),  
+                step = 1,
+                ),
             
             html.Br(),
             html.Div(id='nonICU beds1-container'),
@@ -362,7 +365,8 @@ def generate_control_card1():
                 min=0,
                 max=500,
                 value=200,
-                step=1),
+                step=1,
+                ),
             
             html.Br(),
             html.Div(id='visits1-container'),
@@ -685,8 +689,13 @@ def generate_model_forecasts(loc, county, model, reset, startdate):
         
         try:
             
-            url = 'https://raw.githubusercontent.com/klocey/StateCovidData/main/data/' + loc + '-' + county + '-' + 'COVID-CASES.txt'
-            
+            url = "https://raw.githubusercontent.com/klocey/StateCovidData/main/data/"
+            filename = loc + '-' + county + '-' + 'COVID-CASES.txt'
+
+            # Encode the filename
+            encoded_filename = quote(filename)
+            url = url + encoded_filename
+
             df_sub1 = pd.read_csv(url, sep='\t')
             
             #counties_df.drop(['Unnamed: 0'], axis=1, inplace=True)
@@ -714,6 +723,7 @@ def generate_model_forecasts(loc, county, model, reset, startdate):
 
             
         except:
+            
             PopSize = statepops[statepops['Province/State'] == loc]['PopSize'].tolist()
             PopSize = PopSize[0]
             
@@ -927,7 +937,7 @@ def generate_model_forecasts(loc, county, model, reset, startdate):
     
 
 def generate_model_forecast_plot(fits_df, reset):
-    fits_df = pd.read_json(fits_df)
+    fits_df = pd.read_json(StringIO(fits_df))
     
     ForecastDays = 30
     #labels = fits_df['label'].tolist()
@@ -1061,7 +1071,7 @@ def generate_model_forecast_plot(fits_df, reset):
 
 
 def generate_model_forecast_table(fits_df, reset):
-    df = pd.read_json(fits_df)
+    df = pd.read_json(StringIO(fits_df))
     df_table = pd.DataFrame()
     
     col0 = df.forecast_dates.iloc[-1]
@@ -1225,7 +1235,7 @@ def generate_patient_census(df1, loc, county, model, icu_beds, nonicu_beds, per_
             ArrivalDate = ArrivalDate[0]
             locs_df = 0
     
-    df1 = pd.read_json(df1)
+    df1 = pd.read_json(StringIO(df1))
     df1 = df1.iloc[[-1]]
     
     fdates = df1['forecast_dates'].tolist()
@@ -1475,7 +1485,7 @@ def generate_patient_census(df1, loc, county, model, icu_beds, nonicu_beds, per_
 
 def generate_new_and_active_cases(df, loc, county, model, reset):
     
-    df = pd.read_json(df)
+    df = pd.read_json(StringIO(df))
     df = df[df['label'] == 'Current forecast']
     
     #df['forecast_dates'] = df['forecast_dates'].dt.strftime('%m/%d')#.values.tolist()
@@ -1580,7 +1590,7 @@ def generate_new_and_active_cases(df, loc, county, model, reset):
         
 def generate_plot_patient_census(census_df, reset):
     
-    census_df = pd.read_json(census_df)
+    census_df = pd.read_json(StringIO(census_df))
     
     nogo = ['GLOVE SURGICAL', 'GLOVE EXAM NITRILE', 
             'GLOVE EXAM VINYL', 'MASK FACE PROCEDURE ANTI FOG',
@@ -1704,7 +1714,7 @@ def generate_plot_new_cases(df, loc, cty, reset):
         
     cty_pops = 0
      
-    df = pd.read_json(df)
+    df = pd.read_json(StringIO(df))
     df = df[df['label'] == 'Current forecast']
     
     #df['forecast_dates'] = df['forecast_dates'].dt.strftime('%m/%d')#.values.tolist()
@@ -1801,7 +1811,6 @@ def generate_plot_new_cases(df, loc, cty, reset):
     total_active = 0
     Active = 0
     
-    #df = pd.read_json(df)
     labels = list(df)
     labels = labels[1:]
     fig_data = []
@@ -1943,7 +1952,7 @@ def generate_plot_employee_forecast1(df, loc, cty, employees, inc_rate, furlough
         
     cty_pops = 0
      
-    df = pd.read_json(df)
+    df = pd.read_json(StringIO(df))
     df = df[df['label'] == 'Current forecast']
     
     #df['forecast_dates'] = df['forecast_dates'].dt.strftime('%m/%d')#.values.tolist()
@@ -2051,7 +2060,6 @@ def generate_plot_employee_forecast1(df, loc, cty, employees, inc_rate, furlough
     new_cases_e = 0
     new_cases = 0
     
-    #df = pd.read_json(df)
     labels = list(df)
     
     labels = labels[1:]
@@ -2212,7 +2220,7 @@ def generate_plot_employee_forecast1(df, loc, cty, employees, inc_rate, furlough
 
 def generate_plot_discharge_census(census_df, reset):
     
-    census_df = pd.read_json(census_df)
+    census_df = pd.read_json(StringIO(census_df))
     
     nogo = ['GLOVE SURGICAL', 'GLOVE EXAM NITRILE', 
             'GLOVE EXAM VINYL', 'MASK FACE PROCEDURE ANTI FOG',
@@ -2302,7 +2310,7 @@ def generate_plot_discharge_census(census_df, reset):
 
 
 def generate_patient_census_table(census_df, reset):
-    df_table = pd.read_json(census_df)
+    df_table = pd.read_json(StringIO(census_df))
     
     nogo = ['GLOVE SURGICAL', 'GLOVE EXAM NITRILE', 
             'GLOVE EXAM VINYL', 'MASK FACE PROCEDURE ANTI FOG',
@@ -2352,7 +2360,7 @@ def generate_patient_census_table(census_df, reset):
 
 def generate_plot_ppe(df, reset):
     
-    ppe_df = pd.read_json(df)
+    ppe_df = pd.read_json(StringIO(df))
     
     nogo = ['Total cases', 'New visits', 'New admits',
                   'All COVID', 'Non-ICU', 'ICU', 'Vent',
@@ -2438,7 +2446,7 @@ def generate_plot_ppe(df, reset):
 
 
 def generate_ppe_table(df, reset):
-    df_table = pd.read_json(df)
+    df_table = pd.read_json(StringIO(df))
     
     nogo = ['Total cases', 'New visits', 'New admits',
                   'All COVID', 'Non-ICU', 'ICU', 'Vent',
