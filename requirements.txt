@@ -1,4 +1,4 @@
-werkzeug==3.0.6
+werkzeug==3.1.5
 dash==3.0.1
 gunicorn==23.0.0
 numpy==2.2.4
